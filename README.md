@@ -21,7 +21,9 @@ Analyze ecological and eco-evolutionary models, including Adaptive Dynamics, in 
 
 ## Documentation
 
-- There is extensive documentation, including Tutorials, installed in Mathematica's built-in Documentation.  Go to Help - Wolfram Documentation and search for EcoEvo.
+- There is extensive documentation, including Tutorials, installed in Mathematica's built-in Documentation.  Go to Help - Wolfram Documentation and search for EcoEvo or run
+
+      Documentation`HelpLookup["EcoEvo"];
 
 ## Questions / Comments
 
