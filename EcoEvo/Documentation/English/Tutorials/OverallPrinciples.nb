@@ -1,0 +1,586 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     21730,        578]
+NotebookOptionsPosition[     15345,        445]
+NotebookOutlinePosition[     15776,        462]
+CellTagsIndexPosition[     15733,        459]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ "New in: ",
+ Cell["1.0", "HistoryData",
+  CellTags->"New",ExpressionUUID->"254f72c3-11d6-42ed-a177-1b7e25f03673"],
+ " | Modified in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Modified",ExpressionUUID->"af9ace05-f1ef-4c18-906a-15eaea187f81"],
+ " | Obsolete in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Obsolete",ExpressionUUID->"dc03f0a7-df42-47df-a4e7-6642ceec7945"],
+ " | Excised in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Excised",ExpressionUUID->"d397fd89-cb54-4e32-9df2-872b04375d90"]
+}], "History",
+ CellChangeTimes->{{3.737042049598568*^9, 3.737042049921115*^9}},
+ CellID->1247902091,ExpressionUUID->"860e6efb-10bf-4fac-bb90-e002533d08b5"],
+
+Cell[CellGroupData[{
+
+Cell["Categorization", "CategorizationSection",
+ CellID->1122911449,ExpressionUUID->"fa862556-4d11-478c-a014-bfdb90a2a5ee"],
+
+Cell["Tutorial", "Categorization",
+ CellLabel->"Entity Type",
+ CellID->686433507,ExpressionUUID->"73219322-11ca-44b5-8fc8-b88fcc3a746f"],
+
+Cell["EcoEvo Package", "Categorization",
+ CellLabel->"Paclet Name",
+ CellID->605800465,ExpressionUUID->"923d52d3-face-4ceb-8a41-9716ee26341f"],
+
+Cell["EcoEvo`", "Categorization",
+ CellLabel->"Context",
+ CellID->468444828,ExpressionUUID->"ee38ddb3-a4d6-4b8c-aa09-cdf49653abef"],
+
+Cell["EcoEvo/tutorial/OverallPrinciples", "Categorization",
+ CellLabel->"URI",ExpressionUUID->"6084539a-2f90-44e5-bcb5-eb4fcb196c8b"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Keywords", "KeywordsSection",
+ CellID->1427428552,ExpressionUUID->"2df68a40-0a44-4716-8504-dc1b633990b5"],
+
+Cell["XXXX", "Keywords",
+ CellID->1251852827,ExpressionUUID->"a6da4231-1045-4c62-9935-9fd6320fc282"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Details", "DetailsSection",
+ CellID->307771771,ExpressionUUID->"6ef9b563-f56e-4065-bc87-76c7e5099862"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Lead",
+ CellID->218895918,ExpressionUUID->"52daa01d-61da-429f-ab63-ff8cff810b2a"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Developers",
+ CellID->350963985,ExpressionUUID->"7ebda8b7-7fe7-4a7d-b13e-da9d6aa0cb54"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Authors",
+ CellID->795871300,ExpressionUUID->"a20cb492-c17a-4240-b90d-787ff6fe2cb7"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Feature Name",
+ CellID->199739161,ExpressionUUID->"b7db8941-5fb1-4eed-b1dc-f8f73dddc69c"],
+
+Cell["XXXX", "Details",
+ CellLabel->"QA",
+ CellID->40625308,ExpressionUUID->"6389a5cd-b710-4fe3-8909-81392060e82f"],
+
+Cell["XXXX", "Details",
+ CellLabel->"DA",
+ CellID->357121918,ExpressionUUID->"4f7aa824-e8e8-4e73-81bf-5fb95ef68127"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Docs",
+ CellID->35949532,ExpressionUUID->"577137dc-e874-42e8-97ca-aa0cf70ac147"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Features Page Notes",
+ CellID->929432370,ExpressionUUID->"bc30aac6-0492-47a7-837d-bfe3383aac41"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Comments",
+ CellID->240026365,ExpressionUUID->"aaeef6d5-d438-44b3-a4fd-1fc0647cd370"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Overall Principles", "Title",
+ CellID->509267359,ExpressionUUID->"a70a898d-5e18-489f-8a57-2cabba1f6524"],
+
+Cell["\<\
+The purpose of the EcoEvo package is to streamline the analysis of ecological \
+and eco-evolutionary models.  Some of the design principles are described \
+below.\
+\>", "Text",
+ CellChangeTimes->{{3.737042504246114*^9, 3.737042584581193*^9}, {
+  3.737043716203498*^9, 3.737043716673174*^9}},
+ CellID->1534169418,ExpressionUUID->"c7677c06-0b39-4dfc-9f2f-52f5f5e8b817"],
+
+Cell[CellGroupData[{
+
+Cell["General", "Subsection",
+ CellChangeTimes->{{3.737043737026266*^9, 3.737043738497633*^9}},
+ CellID->1989512163,ExpressionUUID->"50ac3a78-dcc5-4b74-b3f0-330893fb7324"],
+
+Cell[TextData[{
+ "Once a model is set for analysis with ",
+ Cell[BoxData[
+  ButtonBox["SetModel",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/SetModel"]], "InlineFormula",
+  ExpressionUUID->"aa6df221-b034-4c1c-9900-d47be1bf2581"],
+ ", equations don't need to be re-entered as arguments of each function."
+}], "Text",
+ CellChangeTimes->{{3.7370425978145514`*^9, 3.737042607759763*^9}, {
+  3.737044409623866*^9, 3.73704442763988*^9}},
+ CellID->1758160239,ExpressionUUID->"a1a2d5c2-f102-4b2e-8fd4-af44ea4d766a"],
+
+Cell["\<\
+The same functions work on different model types (ContinuousTime, \
+DiscreteTime, periodic, etc.).\
+\>", "Text",
+ CellChangeTimes->{{3.737042629159814*^9, 3.7370426336558723`*^9}},
+ CellID->231275468,ExpressionUUID->"c52705f1-558b-434c-866e-eda416e9be81"],
+
+Cell[TextData[{
+ ButtonBox["Rule lists",
+  BaseStyle->"Link",
+  ButtonData->"paclet:EcoEvo/guide/EcoEvo#978350796"],
+ " are used as both input to and output of various functions (e.g. as initial \
+conditions and as equilibria)."
+}], "Text",
+ CellChangeTimes->{{3.737042618887114*^9, 3.737042624614067*^9}, {
+  3.737044336230744*^9, 3.737044361214952*^9}, {3.737045543522574*^9, 
+  3.7370455451865463`*^9}},
+ CellID->1837189271,ExpressionUUID->"2cb3a4c5-0dbf-4213-8fe8-ce5ed670c998"],
+
+Cell[TextData[{
+ "Simulation output is in the form of temporal rule lists, which can be \
+plotted with ",
+ Cell[BoxData[
+  ButtonBox["PlotDynamics",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/PlotDynamics"]], "InlineFormula",
+  ExpressionUUID->"5408222c-d5c3-46b8-9386-cd3b421c98d4"],
+ ", used as input to various functions (in which case they are appropriately \
+averaged), or turned into numerical rule lists using ",
+ Cell[BoxData[
+  ButtonBox["Slice",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/Slice"]], "InlineFormula",ExpressionUUID->
+  "6fa1412e-136d-4a66-b0f8-dd8b5c302284"],
+ " and ",
+ Cell[BoxData[
+  ButtonBox["FinalSlice",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/FinalSlice"]], "InlineFormula",
+  ExpressionUUID->"124dc811-a3b1-49ef-aa76-b93311786f61"],
+ ". "
+}], "Text",
+ CellChangeTimes->{{3.7370455249072313`*^9, 3.737045644165353*^9}},
+ CellID->1048570528,ExpressionUUID->"24694138-8a03-4ae1-b868-1f9d11fadaf1"],
+
+Cell["\<\
+Many functions will work analytically if numerical values aren't given.\
+\>", "Text",
+ CellChangeTimes->{{3.737044368372966*^9, 3.737044396879085*^9}},
+ CellID->402938217,ExpressionUUID->"cdc7ade4-5247-4253-9f47-5584154bf62f"],
+
+Cell[TextData[{
+ "Functions that start with Solve use ",
+ ButtonBox["Solve",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/Solve"],
+ ", those that start with NSolve use ",
+ ButtonBox["NSolve",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/NSolve"],
+ ", and those that start with Find use ",
+ ButtonBox["FindRoot",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/FindRoot"],
+ " or possibly ",
+ ButtonBox["FixedPoint",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/FixedPoint"],
+ "."
+}], "Text",
+ CellChangeTimes->{{3.737045044964608*^9, 3.737045113054614*^9}},
+ CellID->562667237,ExpressionUUID->"3514f7d8-552b-43d6-b0cb-17e2bc46b02f"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsection",
+ CellChangeTimes->{{3.737044615539404*^9, 3.7370446162091846`*^9}},
+ CellID->1717301342,ExpressionUUID->"cd940867-3146-46e5-8aa2-67287598587b"],
+
+Cell["\<\
+Most functions take optional arguments at the end of the function call.\
+\>", "Text",
+ CellChangeTimes->{{3.737044774867628*^9, 3.737044794547812*^9}},
+ CellID->715377576,ExpressionUUID->"4b4ddba2-552c-4033-b278-0cb84f441185"],
+
+Cell[TextData[{
+ "Functions that call other functions can pass options using *Opts.  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " EcoSim calls NDSolve, so to pass options to NDSolve, use \
+NDSolveOpts\[Rule]",
+ StyleBox["ndsolveoptions", "TI"],
+ " in EcoSim.  These can be nested."
+}], "Text",
+ CellChangeTimes->{{3.737044796737155*^9, 3.737044899444705*^9}},
+ CellID->47704691,ExpressionUUID->"fd6eaa46-5b5f-4b53-bd2f-1c076e686949"],
+
+Cell["\<\
+Most functions have the option Verbose.  Setting Verbose\[Rule]True prints \
+out extra information about what the function is actually doing.  Setting \
+VerboseAll\[Rule]True sets Verbose for all functions within.\
+\>", "Text",
+ CellChangeTimes->{{3.737044903578918*^9, 3.737044965469491*^9}, {
+  3.7370451586234093`*^9, 3.7370451587991467`*^9}},
+ CellID->1588772180,ExpressionUUID->"ffdf1769-7870-403f-8298-03c75d7f9ff7"],
+
+Cell["Functions with multiple methods have the option Method.", "Text",
+ CellChangeTimes->{{3.737045227439355*^9, 3.737045236103546*^9}},
+ CellID->1600172207,ExpressionUUID->"00ea6255-f10d-4fbd-8f83-86a85cd983c5"],
+
+Cell["\<\
+Potentially time-consuming numerical functions have the option Monitor to \
+show a progress monitor.\
+\>", "Text",
+ CellChangeTimes->{{3.737045121509622*^9, 3.737045174039261*^9}},
+ CellID->2059752718,ExpressionUUID->"db36aa97-6dff-4ebb-86d4-9c94b39a2e5a"],
+
+Cell["\<\
+Many functions have the option Fixed, which fixes variables at the given \
+values.\
+\>", "Text",
+ CellChangeTimes->{{3.737046329941379*^9, 3.737046361449387*^9}},
+ CellID->1286586422,ExpressionUUID->"11052219-ef06-4b15-bc67-c58997afa628"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Populations", "Subsection",
+ CellChangeTimes->{{3.7370463733081007`*^9, 3.737046375675687*^9}},
+ CellID->1375805180,ExpressionUUID->"a75ad2f3-7b44-4543-9712-dc8a868f1405"],
+
+Cell["\<\
+Populations that are omitted in initial values are assumed to be Fixed at \
+zero.\
+\>", "Text",
+ CellChangeTimes->{{3.7370463801405582`*^9, 3.737046399985992*^9}},
+ CellID->913812942,ExpressionUUID->"e64b47c5-53b0-4094-bc62-d1792fc97727"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Guilds", "Subsection",
+ CellChangeTimes->{{3.7370437437627773`*^9, 3.737043745561811*^9}},
+ CellID->517697797,ExpressionUUID->"8d78e588-d26f-4c24-ab46-87155da87973"],
+
+Cell["Guilds are open-ended with respect to the number of species.", "Text",
+ CellChangeTimes->{{3.737042637448367*^9, 3.737042641880166*^9}, {
+  3.737043644563789*^9, 3.737043646840938*^9}, {3.737043752028212*^9, 
+  3.7370437751075563`*^9}},
+ CellID->1951756563,ExpressionUUID->"51426786-2bdb-4d45-b809-2085cad41713"],
+
+Cell[TextData[{
+ "When setting up model equations, Nsp[",
+ StyleBox["guild", "TI"],
+ "] is a placeholder for the number of species in guild ",
+ StyleBox["guild", "TI"],
+ "."
+}], "Text",
+ CellChangeTimes->{{3.737043785890184*^9, 3.737043860683008*^9}},
+ CellID->1793539306,ExpressionUUID->"1eaa2c2a-7d34-40a6-94c8-1b2e8ac08193"],
+
+Cell[TextData[{
+ "Species number is denoted using subscripts (ctrl-minus).  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", "1"}], ",", 
+    RowBox[{
+     SubscriptBox["x", "2"], "\[Rule]", "2"}]}], "}"}]],
+  CellChangeTimes->{{3.737044047005454*^9, 3.737044055332399*^9}, {
+   3.737044209302231*^9, 3.737044212781708*^9}},ExpressionUUID->
+  "94d7c4cf-f21d-402f-8f23-03be33acf1ca"]
+}], "Text",
+ CellChangeTimes->{{3.73704365011436*^9, 3.7370436887451477`*^9}, {
+  3.7370440395332537`*^9, 3.737044041628044*^9}, {3.7370464152368793`*^9, 
+  3.737046426871786*^9}},
+ CellID->2052850748,ExpressionUUID->"277fb916-d1f0-4767-ada4-750f40a89268"],
+
+Cell[TextData[{
+ "The number of species in a particular function call is inferred from the \
+traits and/or population values given.  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " using the traits defined above in a function would temporarily get \
+Nsp[guild] equal to 2."
+}], "Text",
+ CellChangeTimes->{{3.737043778193924*^9, 3.737043778450253*^9}, {
+  3.737044099814314*^9, 3.737044120348825*^9}, {3.737044203175226*^9, 
+  3.7370442591100283`*^9}},
+ CellID->600376508,ExpressionUUID->"a2956024-f212-4963-8092-53eee1bc70f7"],
+
+Cell[TextData[{
+ "When setting up traits or populations, Nsp[",
+ StyleBox["guild", "TI"],
+ "]\[Rule]",
+ StyleBox["n", "TI"],
+ " makes a \"blank\" set of ",
+ StyleBox["n", "TI"],
+ " species in guild ",
+ StyleBox["guild", "TI"],
+ ".  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " trait specification {Nsp[1]\[Rule]2} would be treated as ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", 
+     SubscriptBox["x", "1"]}], ",", 
+    RowBox[{
+     SubscriptBox["x", "2"], "\[Rule]", 
+     SubscriptBox["x", "2"]}]}], "}"}]], "InlineFormula",
+  FormatType->"StandardForm",ExpressionUUID->
+  "55ad9506-7469-4de8-98bf-637dc6ecae82"],
+ " if there was a single trait x and population specification \
+{Nsp[1]\[Rule]2} would be treated as ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", 
+     SubscriptBox["n", "1"]}], ",", 
+    RowBox[{
+     SubscriptBox["n", "2"], "\[Rule]", 
+     SubscriptBox["n", "2"]}]}], "}"}]], "InlineFormula",
+  FormatType->"StandardForm",ExpressionUUID->
+  "b1e36537-e781-4c29-978b-2b15c1f1b74a"],
+ "."
+}], "Text",
+ CellChangeTimes->{{3.7370438624112253`*^9, 3.737043942962628*^9}, {
+   3.7370441544293423`*^9, 3.737044182205339*^9}, {3.73704426794256*^9, 
+   3.7370442941586018`*^9}, {3.7370445372808867`*^9, 3.7370445764330673`*^9}, 
+   3.737044882894256*^9},
+ CellID->1133081649,ExpressionUUID->"a0ed8986-389d-4bb5-a389-d1658c57efea"],
+
+Cell[TextData[{
+ "Functions that take both traits and population rule lists can take a \
+combined rule list of traits and population values.  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", "1"}], ",", 
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", "1"}]}], "}"}]], "InlineFormula",
+  FormatType->"StandardForm",ExpressionUUID->
+  "50952b2a-e05d-4e55-bc94-1d87886a2602"],
+ " would be split into ",
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", " ", "1"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", "1"}], "}"}]}]], "InlineFormula",
+  FormatType->"StandardForm",ExpressionUUID->
+  "8e2d63b0-2a02-4d19-b91e-84026ce40870"],
+ "."
+}], "Text",
+ CellChangeTimes->{{3.737044301872089*^9, 3.737044320206066*^9}, {
+  3.737044435887677*^9, 3.737044522114915*^9}},
+ CellID->456710004,ExpressionUUID->"fd6c37a6-5184-4c05-b103-cb577bbe049f"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["More About", "TutorialMoreAboutSection",
+ CellChangeTimes->{3.7370444685127277`*^9},
+ CellID->23220180,ExpressionUUID->"1cb3e04d-4316-461e-84f8-ba34ad6e643b"],
+
+Cell["XXXX", "TutorialMoreAbout",
+ CellID->1567025153,ExpressionUUID->"f8e2a670-5668-4efa-9038-8d2ffe88790e"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Related Tutorials", "RelatedTutorialsSection",
+ CellID->415694126,ExpressionUUID->"c6edc019-081c-452f-9870-37ec9baf6202"],
+
+Cell["XXXX", "RelatedTutorials",
+ CellID->806871991,ExpressionUUID->"30047d2b-c6ab-4b3f-b852-e26a3ae8c8f9"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Related Wolfram Education Group Courses", "TutorialRelatedLinksSection",
+ CellID->415694148,ExpressionUUID->"6420e457-31d1-4a78-b961-ec50b5b30a76"],
+
+Cell["XXXX", "TutorialRelatedLinks",
+ CellID->415694149,ExpressionUUID->"6ee1fdc8-0c7a-47d6-8735-98313d84b3ae"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{827, 1200},
+WindowMargins->{{557, Automatic}, {Automatic, 0}},
+FrontEndVersion->"11.3 for Mac OS X x86 (32-bit, 64-bit Kernel) (March 5, \
+2018)",
+StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "TutorialPageStyles.nb", 
+  CharacterEncoding -> "UTF-8"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 666, 15, 24, "History",ExpressionUUID->"860e6efb-10bf-4fac-bb90-e002533d08b5",
+ CellID->1247902091],
+Cell[CellGroupData[{
+Cell[1249, 39, 123, 1, 29, "CategorizationSection",ExpressionUUID->"fa862556-4d11-478c-a014-bfdb90a2a5ee",
+ CellID->1122911449],
+Cell[1375, 42, 136, 2, 70, "Categorization",ExpressionUUID->"73219322-11ca-44b5-8fc8-b88fcc3a746f",
+ CellID->686433507],
+Cell[1514, 46, 142, 2, 70, "Categorization",ExpressionUUID->"923d52d3-face-4ceb-8a41-9716ee26341f",
+ CellID->605800465],
+Cell[1659, 50, 131, 2, 70, "Categorization",ExpressionUUID->"ee38ddb3-a4d6-4b8c-aa09-cdf49653abef",
+ CellID->468444828],
+Cell[1793, 54, 133, 1, 70, "Categorization",ExpressionUUID->"6084539a-2f90-44e5-bcb5-eb4fcb196c8b"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[1963, 60, 111, 1, 19, "KeywordsSection",ExpressionUUID->"2df68a40-0a44-4716-8504-dc1b633990b5",
+ CellID->1427428552],
+Cell[2077, 63, 100, 1, 70, "Keywords",ExpressionUUID->"a6da4231-1045-4c62-9935-9fd6320fc282",
+ CellID->1251852827]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[2214, 69, 108, 1, 19, "DetailsSection",ExpressionUUID->"6ef9b563-f56e-4065-bc87-76c7e5099862",
+ CellID->307771771],
+Cell[2325, 72, 118, 2, 70, "Details",ExpressionUUID->"52daa01d-61da-429f-ab63-ff8cff810b2a",
+ CellID->218895918],
+Cell[2446, 76, 124, 2, 70, "Details",ExpressionUUID->"7ebda8b7-7fe7-4a7d-b13e-da9d6aa0cb54",
+ CellID->350963985],
+Cell[2573, 80, 121, 2, 70, "Details",ExpressionUUID->"a20cb492-c17a-4240-b90d-787ff6fe2cb7",
+ CellID->795871300],
+Cell[2697, 84, 126, 2, 70, "Details",ExpressionUUID->"b7db8941-5fb1-4eed-b1dc-f8f73dddc69c",
+ CellID->199739161],
+Cell[2826, 88, 115, 2, 70, "Details",ExpressionUUID->"6389a5cd-b710-4fe3-8909-81392060e82f",
+ CellID->40625308],
+Cell[2944, 92, 116, 2, 70, "Details",ExpressionUUID->"4f7aa824-e8e8-4e73-81bf-5fb95ef68127",
+ CellID->357121918],
+Cell[3063, 96, 117, 2, 70, "Details",ExpressionUUID->"577137dc-e874-42e8-97ca-aa0cf70ac147",
+ CellID->35949532],
+Cell[3183, 100, 133, 2, 70, "Details",ExpressionUUID->"bc30aac6-0492-47a7-837d-bfe3383aac41",
+ CellID->929432370],
+Cell[3319, 104, 122, 2, 70, "Details",ExpressionUUID->"aaeef6d5-d438-44b3-a4fd-1fc0647cd370",
+ CellID->240026365]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[3478, 111, 110, 1, 106, "Title",ExpressionUUID->"a70a898d-5e18-489f-8a57-2cabba1f6524",
+ CellID->509267359],
+Cell[3591, 114, 377, 7, 40, "Text",ExpressionUUID->"c7677c06-0b39-4dfc-9f2f-52f5f5e8b817",
+ CellID->1534169418],
+Cell[CellGroupData[{
+Cell[3993, 125, 171, 2, 39, "Subsection",ExpressionUUID->"50ac3a78-dcc5-4b74-b3f0-330893fb7324",
+ CellID->1989512163],
+Cell[4167, 129, 520, 11, 43, "Text",ExpressionUUID->"a1a2d5c2-f102-4b2e-8fd4-af44ea4d766a",
+ CellID->1758160239],
+Cell[4690, 142, 265, 5, 23, "Text",ExpressionUUID->"c52705f1-558b-434c-866e-eda416e9be81",
+ CellID->231275468],
+Cell[4958, 149, 482, 10, 40, "Text",ExpressionUUID->"2cb3a4c5-0dbf-4213-8fe8-ce5ed670c998",
+ CellID->1837189271],
+Cell[5443, 161, 970, 24, 63, "Text",ExpressionUUID->"24694138-8a03-4ae1-b868-1f9d11fadaf1",
+ CellID->1048570528],
+Cell[6416, 187, 236, 4, 23, "Text",ExpressionUUID->"cdc7ade4-5247-4253-9f47-5584154bf62f",
+ CellID->402938217],
+Cell[6655, 193, 636, 20, 40, "Text",ExpressionUUID->"3514f7d8-552b-43d6-b0cb-17e2bc46b02f",
+ CellID->562667237]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7328, 218, 173, 2, 39, "Subsection",ExpressionUUID->"cd940867-3146-46e5-8aa2-67287598587b",
+ CellID->1717301342],
+Cell[7504, 222, 236, 4, 23, "Text",ExpressionUUID->"4b4ddba2-552c-4033-b278-0cb84f441185",
+ CellID->715377576],
+Cell[7743, 228, 436, 10, 40, "Text",ExpressionUUID->"fd6eaa46-5b5f-4b53-bd2f-1c076e686949",
+ CellID->47704691],
+Cell[8182, 240, 432, 7, 40, "Text",ExpressionUUID->"ffdf1769-7870-403f-8298-03c75d7f9ff7",
+ CellID->1588772180],
+Cell[8617, 249, 213, 2, 23, "Text",ExpressionUUID->"00ea6255-f10d-4fbd-8f83-86a85cd983c5",
+ CellID->1600172207],
+Cell[8833, 253, 266, 5, 23, "Text",ExpressionUUID->"db36aa97-6dff-4ebb-86d4-9c94b39a2e5a",
+ CellID->2059752718],
+Cell[9102, 260, 248, 5, 23, "Text",ExpressionUUID->"11052219-ef06-4b15-bc67-c58997afa628",
+ CellID->1286586422]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9387, 270, 177, 2, 39, "Subsection",ExpressionUUID->"a75ad2f3-7b44-4543-9712-dc8a868f1405",
+ CellID->1375805180],
+Cell[9567, 274, 248, 5, 23, "Text",ExpressionUUID->"e64b47c5-53b0-4094-bc62-d1792fc97727",
+ CellID->913812942]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9852, 284, 171, 2, 39, "Subsection",ExpressionUUID->"8d78e588-d26f-4c24-ab46-87155da87973",
+ CellID->517697797],
+Cell[10026, 288, 318, 4, 23, "Text",ExpressionUUID->"51426786-2bdb-4d45-b809-2085cad41713",
+ CellID->1951756563],
+Cell[10347, 294, 327, 8, 23, "Text",ExpressionUUID->"1eaa2c2a-7d34-40a6-94c8-1b2e8ac08193",
+ CellID->1793539306],
+Cell[10677, 304, 737, 19, 23, "Text",ExpressionUUID->"277fb916-d1f0-4767-ada4-750f40a89268",
+ CellID->2052850748],
+Cell[11417, 325, 526, 11, 40, "Text",ExpressionUUID->"a2956024-f212-4963-8092-53eee1bc70f7",
+ CellID->600376508],
+Cell[11946, 338, 1453, 43, 61, "Text",ExpressionUUID->"a0ed8986-389d-4bb5-a389-d1658c57efea",
+ CellID->1133081649],
+Cell[13402, 383, 1024, 30, 42, "Text",ExpressionUUID->"fd6c37a6-5184-4c05-b103-cb577bbe049f",
+ CellID->456710004]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14463, 418, 164, 2, 72, "TutorialMoreAboutSection",ExpressionUUID->"1cb3e04d-4316-461e-84f8-ba34ad6e643b",
+ CellID->23220180],
+Cell[14630, 422, 109, 1, 22, "TutorialMoreAbout",ExpressionUUID->"f8e2a670-5668-4efa-9038-8d2ffe88790e",
+ CellID->1567025153]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14776, 428, 127, 1, 72, "RelatedTutorialsSection",ExpressionUUID->"c6edc019-081c-452f-9870-37ec9baf6202",
+ CellID->415694126],
+Cell[14906, 431, 107, 1, 22, "RelatedTutorials",ExpressionUUID->"30047d2b-c6ab-4b3f-b852-e26a3ae8c8f9",
+ CellID->806871991]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[15050, 437, 153, 1, 72, "TutorialRelatedLinksSection",ExpressionUUID->"6420e457-31d1-4a78-b961-ec50b5b30a76",
+ CellID->415694148],
+Cell[15206, 440, 111, 1, 22, "TutorialRelatedLinks",ExpressionUUID->"6ee1fdc8-0c7a-47d6-8735-98313d84b3ae",
+ CellID->415694149]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
