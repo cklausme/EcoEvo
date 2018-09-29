@@ -4358,7 +4358,7 @@ ndsolveopts,qssmethod,nintegrateopts,integrateopts,solveopts,nsolveopts,findroot
 invader,traits,invtraits,pcomps,pops,
 invtype,invnum,zeropcomps,sol,
 inveqns,invunks,qsseqns,qssunks,qsssubs,mode,
-tstart,tend,removets,qsssol,eval,evec,invsol,j},
+tstart,tend,removets,qsssol,eval,evec,invsol,j,tempIF},
 
 Block[{Nsp},
 
@@ -4514,7 +4514,7 @@ Which[
 	((modelperiod=!=0&&method=!="Instantaneous"&&time===t)||(Length[sol]>0&&Head[sol[[1,2]]]===TemporalData)),
 	mode="discretetime floquet"
 ];
-(*If[Global`debug,Print[func,": mode=",mode]];*)
+(*Print[func,": mode=",mode];*)
 
 
 (* calculate invasion fitness *)
@@ -4690,7 +4690,7 @@ Which[
 	(* should add SelectValid here? *)
 
 	If[Length[invunks]==1,
-		j={{Simplify[Cancel[(inveqns[[1]]/invunks[[1]])/.removets]/.qsssol[[1]]/.qsssubs/.invtraits/.traits/.sol]}}
+		j={{Simplify[Cancel[(inveqns[[1]]/invunks[[1]])/.removets]/.qsssol[[1]]/.qsssubs/.sol/.invtraits/.traits]}}
 	,
 		(* make Jacobian matrix of Extensive components *)
 		(* what about 0th order terms?! *)
@@ -4736,8 +4736,8 @@ Which[
 		];
 	];
 	
-	eval=eval/.x_InterpolatingFunction->x[t]; (* add [t] to InterpolatingFunctions *)
-	
+	(* add [t] to InterpolatingFunctions (but not ones with [var]) *)
+	eval=eval/.x_InterpolatingFunction->x[t]/.x_InterpolatingFunction[t][var_]->x[var];
 	If[verbose,Print[func,": eigenvalue=",eval]];
 	If[verbose,Print[func,": eigenvector=",evec]];
 	
@@ -7558,6 +7558,37 @@ Options[GlobalESSQ]={MaximizeInvOpts->{},InvThreshold->Automatic,Verbose->False,
 
 
 GlobalESSQ[eesol_?TraitsAndVariablesQ,opts___?OptionQ]:=GlobalESSQ[ExtractTraits[eesol],ExtractVariables[eesol],opts];
+
+
+TrackEcoEq[pops:(_?VariablesQ),{trait_,traitmin_?NumericQ,traitmax_?NumericQ},opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["TrackEcoEq"],
+(* options *)
+verbose,verboseall,printtrace,monitor,
+fixed,method,
+(* other variables *)
+nb,res,
+fixedvars},
+
+Block[{Nsp},
+
+If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[TrackEcoEq]}]];
+If[Global`debug,verbose=True];
+verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[TrackEcoEq]}]];
+If[verboseall,verbose=True];
+
+printtrace=Evaluate[PrintTrace/.Flatten[{opts,Options[TrackEcoEq]}]];
+monitor=Evaluate[Monitor/.Flatten[{opts,Options[TrackEcoEq]}]];
+
+Return[res]
+
+]];
 
 
 End[];
