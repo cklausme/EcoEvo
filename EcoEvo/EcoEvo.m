@@ -2293,7 +2293,7 @@ FinalSlice[sol_,n:(_?NumericQ):0]:=
 
 InitialSlice[sol_,n:(_?NumericQ):0]:=
 	If[n==0,
-		Return[Slice[sol,InitialTime[sol]+10.^-1.00]],
+		Return[Slice[sol,InitialTime[sol]+10.^-100]],
 		Return[Slice[sol,{InitialTime[sol]+10.^-100,InitialTime[sol]+n}]]
 	];
 
@@ -5217,7 +5217,7 @@ If[verboseall,verbose=True];
 
 monitor=Evaluate[Monitor/.Flatten[{opts,Options[PlotInv]}]];
 delayinv=Evaluate[DelayInv/.Flatten[{opts,Options[PlotInv]}]];
-(*If[delayinv===Automatic,If[modelperiod=!=0,delayinv=True,delayinv=False]];*)
+If[delayinv===Automatic,If[modelperiod=!=0,delayinv=True,delayinv=False]];
 invopts=Evaluate[InvOpts/.Flatten[{opts,Options[PlotInv]}]];
 time=Evaluate[Time/.Flatten[{opts,Options[PlotInv]}]];
 plotspecies=Evaluate[PlotSpecies/.Flatten[{opts,Options[PlotInv]}]];
@@ -5272,7 +5272,7 @@ PlotInv[eesol_?TraitsAndVariablesQ,{trait1_,trait1min_,trait1max_},opts___?Optio
 
 Options[PlotInv]={
 	InvOpts->{},Fixed->{},
-	DelayInv->False,Time->t,
+	DelayInv->Automatic,Time->t,
 	MarkerStyle->Automatic,PlotSpecies->True,AxesLabel->Automatic,
 	PlotStyle->Gray,PlotPoints->5,
 	Monitor->False,
