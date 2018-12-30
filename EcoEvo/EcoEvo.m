@@ -1752,7 +1752,7 @@ notEcoEvoSimOpts::usage="notEcoEvoSimOpts identifies non-options to EcoEvoSim.";
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.4\[Beta] (December 29, 2018)";
+$EcoEvoVersion="0.9.4X (December 30, 2018)";
 
 
 Print["EcoEvo Package Version ",$EcoEvoVersion];
@@ -2473,19 +2473,18 @@ Do[
 
 stylecount=0;
 
-nguilds=Max[Select[Append[model,Guild[0]->0],#[[1,0]]==Guild&][[All,1,1]]];
+modelguilds=Select[model,#[[1,0]]==Guild&];
+(*Print["modelguilds=",modelguilds];*)
+guilds=modelguilds[[All,1,1]];
+(*Print["guilds=",guilds];*)
+nguilds=Length[guilds];
+(*Print["nguilds=",nguilds];*)
 gcompeqn[gu_,gco_]:=Equation/.If[RuleListQ[Component[gco]/.(Guild[gu]/.model)],Component[gco]/.(Guild[gu]/.model),Guild[gu]/.model];
-guildnames={};
 
 Do[
-	guildname[gu]=Name/.Append[Guild[gu]/.model,Name->"Guild"<>ToString[gu]];
-	LookUp[guildname[gu]]={"guild",gu};
-	AppendTo[guildnames,guildname[gu]];
-	
 	ngcomps[gu]=Max[Select[Append[Guild[gu]/.model,Component[1]->{}],#[[1,0]]==Component&][[All,1,1]]];
 	ntraits[gu]=Max[Select[Append[Guild[gu]/.model,Trait[0]->{}],#[[1,0]]==Trait&][[All,1,1]]];
-	
-	(*Print[gu," ",ntraits[gu]];*)
+	(*Print[gu," ",{ngcomps[gu],ntraits[gu]}];*)
 
 	If[nguilds==1&&ngcomps[1]==1&&ntraits[1]==1,
 		gradients={Evaluate[Gradient/.Flatten[{opts,Options[SetModel]}]]},
@@ -2521,12 +2520,12 @@ Do[
 		LookUp[trait[gu,tr]]={"trait",gu,tr};
 		LookUp[Subscript[trait[gu,tr],sp_]]={"trait",gu,tr,sp};
 	,{tr,ntraits[gu]}];
-,{gu,nguilds}];
+,{gu,guilds}];
 
 auxs=Table[aux[au],{au,naux}];
 pcomps=Flatten[Table[Table[pcomp[pop,pco],{pco,npcomps[pop]}],{pop,npops}]];
-gcomps=Flatten[Table[Table[gcomp[gu,gco],{gco,ngcomps[gu]}],{gu,nguilds}]];
-traits=Flatten[Table[Table[trait[gu,tr],{tr,ntraits[gu]}],{gu,nguilds}]];
+gcomps=Flatten[Table[Table[gcomp[gu,gco],{gco,ngcomps[gu]}],{gu,guilds}]];
+traits=Flatten[Table[Table[trait[gu,tr],{tr,ntraits[gu]}],{gu,guilds}]];
 
 Which[
 	modeltype=="ContinuousTime",
@@ -2625,30 +2624,30 @@ Do[
 
 
 FromUnks:=Flatten[{
-	Table[Table[unk[gcomp[gu,gco],sp_]->Subscript[gcomp[gu,gco],sp],{gco,ngcomps[gu]}],{gu,nguilds}],
+	Table[Table[unk[gcomp[gu,gco],sp_]->Subscript[gcomp[gu,gco],sp],{gco,ngcomps[gu]}],{gu,guilds}],
 	Table[Table[unk[pcomp[pop,pco]]->pcomp[pop,pco],{pco,npcomps[pop]}],{pop,npops}],
 	Table[unk[aux[au]]->aux[au],{au,naux}],
-	Table[Table[unk[trait[gu,tr],sp_]->Subscript[trait[gu,tr],sp],{tr,ntraits[gu]}],{gu,nguilds}]
+	Table[Table[unk[trait[gu,tr],sp_]->Subscript[trait[gu,tr],sp],{tr,ntraits[gu]}],{gu,guilds}]
 }]
 
 
 AllTraits:=Flatten[
-	Table[Table[Table[Subscript[trait[gu,tr],sp],{tr,ntraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,nguilds}]];
+	Table[Table[Table[Subscript[trait[gu,tr],sp],{tr,ntraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}]];
 
 
 AllVariables:=Flatten[Join[				
-	Table[Table[Table[Subscript[gcomp[gu,gco],sp],{gco,ngcomps[gu]}],{sp,Nsp[gu]}],{gu,nguilds}],
+	Table[Table[Table[Subscript[gcomp[gu,gco],sp],{gco,ngcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}],
 	Table[Table[pcomp[pop,pco],{pco,npcomps[pop]}],{pop,npops}],
 	Table[aux[au],{au,naux}]
 ]];
 
 
 BlankTraits:=Flatten[
-	Table[Table[Table[Subscript[trait[gu,tr],sp]->Subscript[trait[gu,tr],sp],{tr,ntraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,nguilds}]];
+	Table[Table[Table[Subscript[trait[gu,tr],sp]->Subscript[trait[gu,tr],sp],{tr,ntraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}]];
 
 
 BlankVariables:=Flatten[Join[				
-	Table[Table[Table[Subscript[gcomp[gu,gco],sp]->Subscript[gcomp[gu,gco],sp],{gco,ngcomps[gu]}],{sp,Nsp[gu]}],{gu,nguilds}],
+	Table[Table[Table[Subscript[gcomp[gu,gco],sp]->Subscript[gcomp[gu,gco],sp],{gco,ngcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}],
 	Table[Table[pcomp[pop,pco]->pcomp[pop,pco],{pco,npcomps[pop]}],{pop,npops}],
 	Table[aux[au]->aux[au],{au,naux}]
 ]];
@@ -2673,7 +2672,7 @@ SetNsp[traits:(_?TraitsQ):{},pops:(_?VariablesQ):{}]:=Module[{tmp,tnsp,pnsp},
 			Abort[]
 		];
 		If[pnsp[gu]==-\[Infinity],pnsp[gu]=0];
-	,{gu,nguilds}];
+	,{gu,guilds}];
 	
 	Do[
 		If[ntraits[gu]!=0,
@@ -2687,16 +2686,16 @@ SetNsp[traits:(_?TraitsQ):{},pops:(_?VariablesQ):{}]:=Module[{tmp,tnsp,pnsp},
 		,
 			tnsp[gu]=pnsp[gu]
 		]
-	,{gu,nguilds}];
+	,{gu,guilds}];
 	
 (*Print["SetNsp: tnsp=",Table[tnsp[gu],{gu,nguilds}]," pnsp=",Table[pnsp[gu],{gu,nguilds}]];*)
 
-	If[Table[tnsp[gu],{gu,nguilds}]==Table[pnsp[gu],{gu,nguilds}]||pops=={}||traits=={},
+	If[Table[tnsp[gu],{gu,guilds}]==Table[pnsp[gu],{gu,guilds}]||pops=={}||traits=={},
 		Do[
 			Nsp[gu]=If[traits!={},tnsp[gu],pnsp[gu]]
-		,{gu,nguilds}]
+		,{gu,guilds}]
 	,
-		Msg[SetNsp::badnsp,Table[tnsp[gu],{gu,nguilds}],Table[pnsp[gu],{gu,nguilds}]];
+		Msg[SetNsp::badnsp,Table[tnsp[gu],{gu,guilds}],Table[pnsp[gu],{gu,guilds}]];
 		Abort[]
 	];
 ]/;(nguilds!=0);
@@ -2705,7 +2704,7 @@ SetNsp[traits:(_?TraitsQ):{},pops:(_?VariablesQ):{}]:=Module[{tmp,tnsp,pnsp},
 AddPopts:=DeleteDuplicates[Flatten[Join[
 	Table[Table[Table[
 		Subscript[gcomp[gu,gco],sp]->Subscript[gcomp[gu,gco],sp][t]
-	,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gco,ngcomps[gu]}],{gu,nguilds}],
+	,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gco,ngcomps[gu]}],{gu,guilds}],
 	Table[Table[
 		pcomp[pop,pco]->pcomp[pop,pco][t]
 	,{pco,npcomps[pop]}],{pop,npops}],
@@ -2715,13 +2714,13 @@ AddPopts:=DeleteDuplicates[Flatten[Join[
 
 AddTraitts:=Flatten[Table[Table[Table[
 	Subscript[trait[gu,tr],sp]->Subscript[trait[gu,tr],sp][t]
-,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{tr,ntraits[gu]}],{gu,nguilds}]];
+,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{tr,ntraits[gu]}],{gu,guilds}]];
 
 
 RemovePopts:=DeleteDuplicates[Flatten[Join[
 	Table[Table[Table[
 		Subscript[gcomp[gu,gco],sp][t]->Subscript[gcomp[gu,gco],sp]
-	,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gco,ngcomps[gu]}],{gu,nguilds}],
+	,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gco,ngcomps[gu]}],{gu,guilds}],
 	Table[Table[
 		pcomp[pop,pco][t]->pcomp[pop,pco]
 	,{pco,npcomps[pop]}],{pop,npops}],
@@ -2731,7 +2730,7 @@ RemovePopts:=DeleteDuplicates[Flatten[Join[
 
 RemoveTraitts:=Flatten[Table[Table[Table[
 	Subscript[trait[gu,tr],sp][t]->Subscript[trait[gu,tr],sp]
-,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{tr,ntraits[gu]}],{gu,nguilds}]];
+,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{tr,ntraits[gu]}],{gu,guilds}]];
 
 
 ExtractTraits[in_List]:=Module[{res},
@@ -2851,7 +2850,7 @@ Do[
 	];
 	If[Nsp[gu]==-\[Infinity],Nsp[gu]=0];
 	If[Global`debug,Print["Nsp[",gu,"]=",Nsp[gu]]];
-,{gu,nguilds}];
+,{gu,guilds}];
 
 (*Print["plotvarsin=",plotvarsin];*)
 
@@ -3043,7 +3042,7 @@ If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 
 (* figure out number of species in guilds *)
 SetNsp[traits,Join[pops,fixed]];
-(*Print["Nsp=",Table[Nsp[gu],{gu,nguilds}]];*)
+(*Print["Nsp=",Table[Nsp[gu],{gu,guilds}]];*)
 
 (* nonfixedvars are those given ICs *)
 nonfixedvars=pops[[All,1]];
@@ -3683,7 +3682,7 @@ Which[
 	evs=EcoEigenvalues[traits,pops,Time->time,Multipliers->True,Evaluate[Sequence@@ecoeigenvaluesopts]];
 	If[verbose,Print[func,": evs=",evs]];
 	Which[
-		modeltype=="DiscreteTime",
+		modeltype=="DiscreteTime"||(modeltype=="ContinuousTime"&&IFFQ[pops]==True),
 		res=Which[
 			Evaluate[Max[Re[evs]]===Indeterminate],Indeterminate,
 			Evaluate[Max[Abs[evs]]<1+tolerance],True,
@@ -3696,14 +3695,15 @@ Which[
 			Evaluate[Max[Re[evs]]>tolerance],False,
 			Evaluate[Max[Re[evs]]<tolerance],True, 
 			Else,Indeterminate		
-		],
-		modeltype=="ContinuousTime"&&IFFQ[pops]==True,
+		]
+		(*,
+		modeltype=="ContinuousTime"&&IFFQ[pops]\[Equal]True,
 		res=Which[
 			Evaluate[Max[Re[evs]]===Indeterminate],Indeterminate,
-			Evaluate[Abs[evs[[2]]]<1+tolerance],True,
-			Evaluate[Abs[evs[[2]]]>1+tolerance],False,
+			Evaluate[Abs[evs\[LeftDoubleBracket]2\[RightDoubleBracket]]<1+tolerance],True,
+			Evaluate[Abs[evs\[LeftDoubleBracket]2\[RightDoubleBracket]]>1+tolerance],False,
 			Else,Indeterminate
-		]
+		]*)
 	]
 ];
 
@@ -3804,7 +3804,7 @@ If[method===Automatic,
 		pops=={},
 		method="NSolveEcoEq",
 		Else,
-		If[naux+npops+Sum[Nsp[gu]*ngcomps[gu],{gu,nguilds}]<=4,
+		If[naux+npops+Sum[Nsp[gu]*ngcomps[gu],{gu,guilds}]<=4,
 			method="NSolveEcoEq",
 			method="FindEcoEq"
 		];
