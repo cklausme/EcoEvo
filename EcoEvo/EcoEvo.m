@@ -1752,7 +1752,7 @@ notEcoEvoSimOpts::usage="notEcoEvoSimOpts identifies non-options to EcoEvoSim.";
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.4\[Beta] (September 16, 2018)";
+$EcoEvoVersion="0.9.4\[Beta] (December 29, 2018)";
 
 
 Print["EcoEvo Package Version ",$EcoEvoVersion];
@@ -2825,7 +2825,7 @@ PlotDynamics[sol_,plotvarsin_List,opts___?OptionQ]:=
 
 Module[{
 (* options *)
-logged,plotstyle,plotmarkers,axeslabel,plotopts,(*plotrange,*)
+logged,plotstyle,plotmarkers,axeslabel,plotopts,plotrange,
 (* other variables *)
 lookup,vars,plotvars,yaxislabel,type,xinit,xfinal},
 	
@@ -2906,17 +2906,21 @@ If[plotstyle==={},
 
 (*Print["plotstyle=",plotstyle];*)
 
-(*plotrange=(IntervalUnion[Sequence@@Table[range[var],{var,plotvars}]]/.\[Infinity]\[Rule]All)\[LeftDoubleBracket]1\[RightDoubleBracket];*)
+If[logged==True,
+	plotrange=(IntervalUnion[Sequence@@Table[range[var],{var,plotvars}]]/.{\[Infinity]->All,0->All})[[1]],
+	plotrange=(IntervalUnion[Sequence@@Table[range[var],{var,plotvars}],Interval[{0,\[Infinity]}]]/.{-\[Infinity]->All,\[Infinity]->All})[[1]]
+];
+(*Print[plotrange];*)
 
 If[type==InterpolatingFunction,
 	plotopts=FilterRules[Flatten[{opts,AxesLabel->axeslabel,PlotStyle->plotstyle,Options[PlotDynamics]}],Options[Plot]];
-	(*Print["plotopts=",plotopts];
-	Print["plotvars=",plotvars];*)
+	(*Print["plotopts=",plotopts];*)
+	(*Print["plotvars=",plotvars];*)
 	{xinit,xfinal}=sol[[1,2,1,1]]; (* extract domain *)
 	If[logged==True,
-		Return[LogPlot[Evaluate[Table[var[x],{var,plotvars}]/.sol],{x,xinit,xfinal},Evaluate[Sequence@@plotopts],PlotRange->All]]
+		Return[LogPlot[Evaluate[Table[var[x],{var,plotvars}]/.sol],{x,xinit,xfinal},Evaluate[Sequence@@plotopts],PlotRange->plotrange]]
 	,
-		Return[Plot[Evaluate[Table[var[x],{var,plotvars}]/.sol],{x,xinit,xfinal},Evaluate[Sequence@@plotopts],(*AxesOrigin\[Rule]{xinit,0},*)PlotRange->All]]
+		Return[Plot[Evaluate[Table[var[x],{var,plotvars}]/.sol],{x,xinit,xfinal},Evaluate[Sequence@@plotopts],(*AxesOrigin\[Rule]{xinit,0},*)PlotRange->plotrange]]
 	];
 ];
 
@@ -2941,9 +2945,9 @@ If[type==List||type==TemporalData,
 	plotopts=FilterRules[Flatten[{opts,AxesLabel->axeslabel,PlotStyle->plotstyle,PlotMarkers->plotmarkers,Options[PlotDynamics]}],Options[ListPlot]];
 	xinit=InitialTime[sol];
 	If[logged==True,
-		Return[ListLogPlot[plotvars/.sol,Evaluate[Sequence@@plotopts],PlotRange->All]]
+		Return[ListLogPlot[plotvars/.sol,Evaluate[Sequence@@plotopts],PlotRange->plotrange]]
 	,
-		Return[ListPlot[plotvars/.sol,Evaluate[Sequence@@plotopts],AxesOrigin->{xinit,0},PlotRange->All]]
+		Return[ListPlot[plotvars/.sol,Evaluate[Sequence@@plotopts],AxesOrigin->{xinit,0},PlotRange->plotrange]]
 	];
 ];
 
