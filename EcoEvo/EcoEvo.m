@@ -6826,9 +6826,9 @@ FindEcoEvoEq[traits_?TraitsQ,pops_?VariablesQ,Gs:(_?GsQ):{},opts___?OptionQ]:=
 Module[{
 func=FuncStyle["FindEcoEvoEq"],
 (* options *)
-verbose,verboseall,percapita,delaydinv,fixed,findrootopts,chop,
+verbose,verboseall,method,boundarydetection,percapita,delaydinv,fixed,findrootopts,chop,
 (* other variables *)
-fixedvars,fixedtraits,fixedvariables,ecoeqns,evoeqns,eqns,unks,unksics,sol},
+fixedvars,fixedtraits,fixedvariables,ecoeqns,evoeqns,eqns,unks,newunk,unksics,sol},
 
 Block[{Nsp},
 
@@ -6842,6 +6842,8 @@ If[Global`debug,verbose=True];
 verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[FindEcoEvoEq]}]];
 If[verboseall,verbose=True];
 
+method=Evaluate[Method/.Flatten[{opts,Options[FindEcoEvoEq]}]];
+boundarydetection=Evaluate[BoundaryDetection/.Flatten[{opts,Options[FindEcoEvoEq]}]];
 percapita=Evaluate[PerCapita/.Flatten[{opts,Options[FindEcoEvoEq]}]];
 delaydinv=Evaluate[DelayDInv/.Flatten[{opts,Options[FindEcoEvoEq]}]];
 fixed=Evaluate[Fixed/.Flatten[{opts,Options[FindEcoEvoEq]}]];
@@ -6867,13 +6869,26 @@ Print[evoeqns];*)
 unks=Join[ecoeqns,evoeqns]/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]-var_[t]->var,var_[t+1]->var};
 (*Print["unks=",unks];*)
 
-If[delaydinv,
+(*If[delaydinv,
 	eqns=Join[ecoeqns/.Eq/.RemovePopts/.RemoveTraitts/.ToUnks,evoeqns/.Eq/.RemovePopts/.RemoveTraitts/.ToUnkRules];
 	unksics=Table[{var/.ToUnks,var/.traits/.pops},{var,unks}]
 ,
 	eqns=Join[ecoeqns,evoeqns]/.Eq/.RemoveTraitts/.RemovePopts;
 	unksics=Table[{var,var/.traits/.pops},{var,unks}]
+];*)
+
+eqns=If[delaydinv,
+	Join[ecoeqns/.Eq/.RemovePopts/.RemoveTraitts/.ToUnks,evoeqns/.Eq/.RemovePopts/.RemoveTraitts/.ToUnkRules],
+	Join[ecoeqns,evoeqns]/.Eq/.RemoveTraitts/.RemovePopts
 ];
+
+unksics={};
+Do[
+	newunk=If[delaydinv,{var/.ToUnks,var/.traits/.pops},{var,var/.traits/.pops}];
+	If[method=="Secant",AppendTo[newunk,var+0.001/.traits/.pops]];
+	If[boundarydetection,newunk=Join[newunk,{Min[range[var]],Max[range[var]]}]];
+	AppendTo[unksics,newunk];
+,{var,unks}];
 
 If[verbose,
 	Print[func,": eqns="];
@@ -7067,18 +7082,6 @@ boundarydetection=Evaluate[BoundaryDetection/.Flatten[{opts,Options[EvoEq]}]];
 (*SetNsp[Join[traits,fixedtraits],Join[sol,fixedvariables]];*)
 SetNsp[Join[sol,fixedvariables]];
 
-(* rules to convert to and from unks[] *)
-
-tounks=Flatten@Table[
-	(Subscript[trait[gu,tr],sp]->Subscript[trait[gu,tr],sp])->(Subscript[trait[gu,tr],sp]->unk[trait[gu,tr],sp])
-,{gu,guilds},{sp,If[Nsp[gu]==0,0,1],Nsp[gu]},{tr,ntraits[gu]}];
-
-fromunks=Flatten@Table[
-	unk[trait[gu,tr],sp]->Subscript[trait[gu,tr],sp]
-,{gu,guilds},{sp,If[Nsp[gu]==0,0,1],Nsp[gu]},{tr,ntraits[gu]}];
-
-(*fromunks=Flatten@Table[unk[trait[gu,tr],sp_]\[Rule]Subscript[trait[gu,tr],sp],{gu,guilds},{tr,ntraits[gu]}];*)
-
 eqns=EvoEqns[sol,Gs,opts]/.Eq/.RemoveTraitts/.RemovePopts;
 
 unks={};
@@ -7115,7 +7118,7 @@ Which[
 		If[verbose,
 			With[{eqns=eqns,unks=unks,op=Sequence@@findrootopts,fromunks=fromunks},
 			PrintCall[Global`res=FindRoot[eqns/.tounks,unks,op]/.fromunks]]];
-		res=FindRoot[eqns/.tounks,unks,Evaluate[Sequence@@findrootopts]]/.fromunks
+		res=FindRoot[eqns/.ToUnkRules,unks,Evaluate[Sequence@@findrootopts]]/.FromUnks
 	,
 		If[verbose,
 			With[{eqns=eqns,unks=unks,op=Sequence@@findrootopts},
