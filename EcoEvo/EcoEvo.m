@@ -1726,7 +1726,9 @@ EcoEq::nosol="Solve/NSolve couldn't find a solution.  Try FindEcoEq instead.";
 
 EvoEq::nosol="Solve/NSolve couldn't find a solution.  Try FindEcoEq instead.";
 
-EvoEq::badmtd="The Method option should be \"Solve\", \"NSolve\", or \"FindRoot\".";
+EvoEq::badmtd="The Method option should be \"Solve\", \"NSolve\", \"FindRoot\", or \"FindInstance\".";
+
+FindEvoEq::needic="Method FindInstance doesn't work with DelayDInv.  Give an initial guess to use Method FindRoot instead.";
 
 NInv::badmtd="The Method option should be a built-in method name.";
 
@@ -1764,10 +1766,10 @@ notEcoEvoSimOpts::usage="notEcoEvoSimOpts identifies non-options to EcoEvoSim.";
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.4X (February 9, 2019)";
+$EcoEvoVersion="0.9.4X (February 9b, 2019)";
 
 
-Print["EcoEvo Package Version ",$EcoEvoVersion];
+(*Print["EcoEvo Package Version ",$EcoEvoVersion];*)
 
 
 SetOptions[NDSolve,MaxSteps->Infinity];
@@ -2655,14 +2657,14 @@ ToUnks:=Flatten[{
 
 
 ToUnkRules:=Flatten[Join[
-	Table[Table[Table[
-		(Subscript[gcomp[gu,gco],sp]->Subscript[gcomp[gu,gco],sp])->(Subscript[gcomp[gu,gco],sp]->unk[gcomp[gu,gco],sp])
-	,{sp,Nsp[gu]}],{gco,ngcomps[gu]}],{gu,guilds}],
+	Table[Table[
+		(Subscript[gcomp[gu,gco],\[FormalS]_]->Subscript[gcomp[gu,gco],\[FormalS]_])->(Subscript[gcomp[gu,gco],\[FormalS]]->unk[gcomp[gu,gco],\[FormalS]])
+	,{gco,ngcomps[gu]}],{gu,guilds}],
 	Table[Table[pcomp[pop,pco]->unk[pcomp[pop,pco]],{pco,npcomps[pop]}],{pop,npops}],
 	Table[aux[au]->unk[aux[au]],{au,naux}],
-	Table[Table[Table[
-		(Subscript[trait[gu,tr],sp]->Subscript[trait[gu,tr],sp])->(Subscript[trait[gu,tr],sp]->unk[trait[gu,tr],sp])
-	,{sp,Nsp[gu]}],{tr,ntraits[gu]}],{gu,guilds}]
+	Table[Table[
+		(Subscript[trait[gu,tr],\[FormalS]_]->Subscript[trait[gu,tr],\[FormalS]_])->(Subscript[trait[gu,tr],\[FormalS]]->unk[trait[gu,tr],\[FormalS]])
+	,{tr,ntraits[gu]}],{gu,guilds}]
 ]]
 
 
@@ -2681,22 +2683,11 @@ BlankTraits:=Flatten[
 	Table[Table[Table[Subscript[trait[gu,tr],sp]->Subscript[trait[gu,tr],sp],{tr,ntraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}]];
 
 
-(*BlankUnkTraits:=Flatten[
-	Table[Table[Table[unk[trait[gu,tr],sp]\[Rule]Subscript[trait[gu,tr],sp],{tr,ntraits[gu]}],{sp,If[Nsp[gu]\[Equal]0,0,1],Nsp[gu]}],{gu,guilds}]];*)
-
-
 BlankVariables:=Flatten[Join[				
 	Table[Table[Table[Subscript[gcomp[gu,gco],sp]->Subscript[gcomp[gu,gco],sp],{gco,ngcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}],
 	Table[Table[pcomp[pop,pco]->pcomp[pop,pco],{pco,npcomps[pop]}],{pop,npops}],
 	Table[aux[au]->aux[au],{au,naux}]
 ]];
-
-
-(*BlankUnkVariables:=Flatten[Join[				
-	Table[Table[Table[unk[gcomp[gu,gco],sp]\[Rule]Subscript[gcomp[gu,gco],sp],{gco,ngcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}],
-	Table[Table[unk[pcomp[pop,pco]]\[Rule]pcomp[pop,pco],{pco,npcomps[pop]}],{pop,npops}],
-	Table[unk[aux[au]]\[Rule]aux[au],{au,naux}]
-]];*)
 
 
 ExpandNspInTraits[traits_]:=traits/.(Nsp[gu_]->nsp_):>
@@ -6836,7 +6827,6 @@ If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
-
 verbose=Evaluate[Verbose/.Flatten[{opts,Options[FindEcoEvoEq]}]];
 If[Global`debug,verbose=True];
 verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[FindEcoEvoEq]}]];
@@ -6858,30 +6848,16 @@ If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 (* figure out number of species in guilds *)
 SetNsp[Join[traits,fixedtraits],Join[pops,fixedvariables]];
 
+(* set up eqns *)
 ecoeqns=EcoEqns[BlankTraits,opts,PerCapita->percapita];
 evoeqns=EvoEqns[BlankVariables,Gs,opts];
-
-(*Print["ecoeqns="];
-Print[ecoeqns];
-Print["evoeqns="];
-Print[evoeqns];*)
-
-unks=Join[ecoeqns,evoeqns]/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]-var_[t]->var,var_[t+1]->var};
-(*Print["unks=",unks];*)
-
-(*If[delaydinv,
-	eqns=Join[ecoeqns/.Eq/.RemovePopts/.RemoveTraitts/.ToUnks,evoeqns/.Eq/.RemovePopts/.RemoveTraitts/.ToUnkRules];
-	unksics=Table[{var/.ToUnks,var/.traits/.pops},{var,unks}]
-,
-	eqns=Join[ecoeqns,evoeqns]/.Eq/.RemoveTraitts/.RemovePopts;
-	unksics=Table[{var,var/.traits/.pops},{var,unks}]
-];*)
-
 eqns=If[delaydinv,
 	Join[ecoeqns/.Eq/.RemovePopts/.RemoveTraitts/.ToUnks,evoeqns/.Eq/.RemovePopts/.RemoveTraitts/.ToUnkRules],
 	Join[ecoeqns,evoeqns]/.Eq/.RemoveTraitts/.RemovePopts
 ];
 
+(* set up unksics *)
+unks=Join[ecoeqns,evoeqns]/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]-var_[t]->var,var_[t+1]->var};
 unksics={};
 Do[
 	newunk=If[delaydinv,{var/.ToUnks,var/.traits/.pops},{var,var/.traits/.pops}];
@@ -6891,20 +6867,14 @@ Do[
 ,{var,unks}];
 
 If[verbose,
-	Print[func,": eqns="];
-	Print[eqns];
-	Print[func,": unksics="];
-	Print[unksics];
+	Print[func,": eqns="];Print[eqns];
+	Print[func,": unksics="];Print[unksics];
 ];
 
 (* solve it *)
-
 sol=FindRoot[eqns,unksics,Evaluate[Sequence@@findrootopts]];
 
-If[Global`debug,
-	Print[func,": sol="];
-	Print[sol];
-];
+If[Global`debug,Print[func,": sol="];Print[sol]];
 
 If[chop,
 	Return[VarSort[Chop[Join[sol,fixed]/.FromUnks],Join[AllVariables,AllTraits]]],
@@ -7049,7 +7019,7 @@ func=FuncStyle["EvoEq"],
 (* options *)
 verbose,verboseall,method,fixed,delaydinv,solveopts,nsolveopts,findrootopts,findinstanceopts,boundarydetection,
 (* other variables *)
-fixedvars,fixedtraits,fixedvariables,tounks,fromunks,eqns,unks,res},
+fixedvars,fixedtraits,fixedvariables,tounks,fromunks,evoeqns,eqns,unks,unksics,newunk,res},
    
 Block[{Nsp},
 
@@ -7071,6 +7041,7 @@ fixedtraits=ExtractTraits[fixed];
 fixedvariables=ExtractVariables[fixed];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 
+method=Evaluate[Method/.Flatten[{opts,Options[EvoEq]}]];
 delaydinv=Evaluate[DelayDInv/.Flatten[{opts,Options[EvoEq]}]];
 solveopts=Evaluate[SolveOpts/.Flatten[{opts,Options[EvoEq]}]];
 nsolveopts=Evaluate[NSolveOpts/.Flatten[{opts,Options[EvoEq]}]];
@@ -7079,29 +7050,23 @@ findinstanceopts=Evaluate[FindInstanceOpts/.Flatten[{opts,Options[EvoEq]}]];
 boundarydetection=Evaluate[BoundaryDetection/.Flatten[{opts,Options[EvoEq]}]];
 
 (* figure out number of species in guilds *)
-(*SetNsp[Join[traits,fixedtraits],Join[sol,fixedvariables]];*)
 SetNsp[Join[sol,fixedvariables]];
 
-eqns=EvoEqns[sol,Gs,opts]/.Eq/.RemoveTraitts/.RemovePopts;
+evoeqns=EvoEqns[sol,Gs,opts];
+eqns=evoeqns/.Eq/.RemoveTraitts/.RemovePopts;
 
-unks={};
-Do[Do[Do[
-	If[!MemberQ[fixedvars,Subscript[trait[gu,tr],sp]],
-		If[method=="FindRoot",
-			If[delaydinv,
-				AppendTo[unks,{unk[trait[gu,tr],sp],Subscript[trait[gu,tr],sp]/.traits}],
-				AppendTo[unks,{Subscript[trait[gu,tr],sp],Subscript[trait[gu,tr],sp]/.traits}]
-			],
-			AppendTo[unks,Subscript[trait[gu,tr],sp]]
-		]
-	]
-,{tr,ntraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}];
-
-(*If[verbose,Print["eqns="];Print[eqns]];
-If[verbose,Print["unks="];Print[unks]];*)
+(* set up unksics *)
+unks=evoeqns/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]-var_[t]->var,var_[t+1]->var};
+If[method=="FindRoot",
+	unksics={};
+	Do[
+		newunk={var,var/.traits};
+		If[boundarydetection,newunk=Join[newunk,{Min[range[var]],Max[range[var]]}]];
+		AppendTo[unksics,newunk];
+	,{var,unks}]
+];
 
 (* solve it *)
-
 Which[
 	method=="Solve",
 	If[verbose,
@@ -7116,20 +7081,24 @@ Which[
 	method=="FindRoot",
 	If[delaydinv,
 		If[verbose,
-			With[{eqns=eqns,unks=unks,op=Sequence@@findrootopts,fromunks=fromunks},
-			PrintCall[Global`res=FindRoot[eqns/.tounks,unks,op]/.fromunks]]];
-		res=FindRoot[eqns/.ToUnkRules,unks,Evaluate[Sequence@@findrootopts]]/.FromUnks
+			With[{eqns=eqns,unksics=unksics,op=Sequence@@findrootopts},
+			PrintCall[Global`res=FindRoot[eqns/.ToUnkRules,unksics/.ToUnks,op]/.FromUnks]]];
+		res=FindRoot[eqns/.ToUnkRules,unksics/.ToUnks,Evaluate[Sequence@@findrootopts]]/.FromUnks
 	,
 		If[verbose,
-			With[{eqns=eqns,unks=unks,op=Sequence@@findrootopts},
-			PrintCall[Global`res=FindRoot[eqns,unks,op]]]];
-		res=FindRoot[eqns,unks,Evaluate[Sequence@@findrootopts]]
+			With[{eqns=eqns,unksics=unksics,op=Sequence@@findrootopts},
+			PrintCall[Global`res=FindRoot[eqns,unksics,op]]]];
+		res=FindRoot[eqns,unksics,Evaluate[Sequence@@findrootopts]]
 	],
 	method=="FindInstance",
-	If[verbose,
-		With[{eqns=eqns,unks=unks,op=Sequence@findinstanceopts},
-		PrintCall[Global`res=FindInstance[eqns,unks,op]]]];
-	res=FindInstance[eqns,unks,Evaluate[Sequence@@findinstanceopts]],
+	If[delaydinv,
+		Msg[FindEvoEq::needic];Return[$Failed]
+	,
+		If[verbose,
+			With[{eqns=eqns,unks=unks,op=Sequence@findinstanceopts},
+			PrintCall[Global`res=FindInstance[eqns,unks,op][[1]]]]];
+		res=FindInstance[eqns,unks,Evaluate[Sequence@@findinstanceopts]][[1]]
+	],
 	Else, (* else *)
 	Msg[EvoEq::badmtd];Return[$Failed]
 ];
@@ -7144,13 +7113,13 @@ If[MemberQ[{Solve,NSolve},Head[res]],
 
 SolveEvoEq[args___]:=EvoEq[args,Method->"Solve"];
 NSolveEvoEq[args___]:=EvoEq[args,Method->"NSolve"];
-FindEvoEq[sol:(_?VariablesQ):{},Gs_List:{},opts___?OptionQ]:=EvoEq[sol,Gs,opts,Method->"FindInstance"];
+FindEvoEq[sol:(_?VariablesQ):{},Gs:(_?GsQ):{},opts___?OptionQ]:=EvoEq[sol,Gs,opts,Method->"FindInstance"];
 FindEvoEq[args___]:=EvoEq[args,Method->"FindRoot"];
 
 
 Options[EvoEq]={Method->"None",
 DelayDInv->False,DInvOpts->{},SolveOpts->{},NSolveOpts->{},FindRootOpts->{},FindInstanceOpts->{Reals},
-EvoEquation->"QG",BoundaryDetection->False,TraitShiftRate->{},Fixed->{},
+BoundaryDetection->False,Fixed->{},
 Verbose->False,VerboseAll->False};
 
 
