@@ -2573,12 +2573,10 @@ traits=Flatten[Table[Table[trait[gu,tr],{tr,ntraits[gu]}],{gu,guilds}]];
 Which[
 	modeltype=="ContinuousTime",
 	DT[var_]:=var'[t];
-	TraitDT[var_]:=var'[t];
 	modelinvthreshold=0
 ,
 	modeltype=="DiscreteTime",
 	DT[var_]:=var[t+1];
-	TraitDT[var_]:=var[t+1]-var[t];
 	modelinvthreshold=1
 ];
 
@@ -3080,7 +3078,6 @@ fixedvars=fixed[[All,1]];
 fixedvariables=ExtractVariables[fixed];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 
-
 (* handle blanks & figure out number of species in guilds *)
 traits=ExpandNspInTraits[traitsin];
 SetNsp[traits];
@@ -3089,7 +3086,7 @@ nonfixedvars=orderedComplement[AllVariables,fixedvars];
 If[Global`debug,Print["nonfixedvars=",nonfixedvars]];
 
 (* add [t] to constant fixed variables *)
-fixed2=ReplaceAll[fixed,(var_/;MemberQ[fixedvariables,var]->val_?NumericQ)->(var[t]->val)];
+fixed2=ReplaceAll[fixed,(var_/;MemberQ[fixedvariables[[All,1]],var]->val_?NumericQ)->(var[t]->val)];
 
 eqns=Table[
 	Which[
@@ -3127,7 +3124,7 @@ EcoSim[traits:(_?TraitsQ):{},pops:(_?VariablesQ):{},tmax_?NumericQ,opts___?Optio
 Module[{
 func=FuncStyle["EcoSim"],
 (* options *)
-verbose,verboseall,method,ndsolveopts,logged,interpolationpoints,interpolationorder,fixed,fixedvars,fixed2,whenevents,timescale,outputtmin,
+verbose,verboseall,method,ndsolveopts,logged,interpolationpoints,interpolationorder,fixed,fixedvars,whenevents,timescale,outputtmin,
 output,tmin,
 (* other variables *)
 nonfixedvars,luv,gu,gco,sp,pop,pco,au,eqns,unks,ics,tic,exprule,sol,res,fixedres},
@@ -3304,7 +3301,6 @@ nonfixedvars=orderedComplement[AllVariables,fixedvars];
 
 (* set eqns, unks and ics *)
 eqns=EcoEqns[traits,Fixed->fixed]/.Eq/.RemovePopts/.t->time/.fixed/.traits;
-(*Print["eqns=",eqns];*)
 
 Which[
 	MemberQ[{"Solve","NSolve"},method],
@@ -7072,27 +7068,14 @@ pops=ExpandNspInPops[popsin];
 (* figure out number of species in guilds *)
 SetNsp[Join[traits,fixedtraits],Join[pops,fixedvariables]];
 
-eqns=Join[EcoEqns[BlankTraits,opts],EvoEqns[BlankVariables,Gs,opts]]/.RHS/.RemoveTraitts/.RemovePopts;
-
-unks={};
-Do[Do[Do[
-	If[!MemberQ[fixedvars,Subscript[gcomp[gu,gco],sp]],AppendTo[unks,Subscript[gcomp[gu,gco],sp]]]
-,{gco,ngcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}];
-Do[Do[
-	If[!MemberQ[fixedvars,pcomp[pop,pco]],AppendTo[unks,pcomp[pop,pco]]]
-,{pco,npcomps[pop]}],{pop,npops}];
-Do[
-	If[!MemberQ[fixedvars,aux[au]],AppendTo[unks,aux[au]]]
-,{au,naux}];
-Do[Do[Do[
-	If[!MemberQ[fixedvars,Subscript[trait[gu,tr],sp]],AppendTo[unks,Subscript[trait[gu,tr],sp]]]
-,{tr,ntraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}];
+(* set up eqns & unks *)
+eqns=Join[EcoEqns[BlankTraits,opts],EvoEqns[BlankVariables,Gs,opts]];
+unks=eqns/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
+eqns=eqns/.RHS/.RemoveTraitts/.RemovePopts;
 
 If[verbose,
-	Print[func,": eqns="];
-	Print[eqns];
-	Print[func,": unks="];
-	Print[unks];
+	Print[func,": eqns="];Print[eqns];
+	Print[func,": unks="];Print[unks];
 ];
 
 (* set up jacobian *)
@@ -7173,18 +7156,14 @@ pops=ExpandNspInPops[popsin];
 (* figure out number of species in guilds *)
 SetNsp[Join[traits,fixedtraits],Join[pops,fixedvariables]];
 
-eqns=EvoEqns[BlankVariables,Gs,opts]/.RHS/.RemoveTraitts/.RemovePopts;
-
-unks={};
-Do[Do[Do[
-	If[!MemberQ[fixedvars,Subscript[trait[gu,tr],sp]],AppendTo[unks,Subscript[trait[gu,tr],sp]]]
-,{tr,ntraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}];
+(* set up eqns & unks *)
+eqns=EvoEqns[BlankVariables,Gs,opts];
+unks=eqns/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
+eqns=eqns/.RHS/.RemoveTraitts/.RemovePopts;
 
 If[verbose,
-	Print[func,": eqns="];
-	Print[eqns];
-	Print[func,": unks="];
-	Print[unks];
+	Print[func,": eqns="];Print[eqns];
+	Print[func,": unks="];Print[unks];
 ];
 
 (* set up jacobian *)
@@ -7387,7 +7366,7 @@ Return[res]
 With[{syms = Names["EcoEvo`*"]},
   SetAttributes[syms,Protected]
 ];
-Unprotect[t,LookUp,$findecocyclesteps,$invcount];
+Unprotect[t,LookUp,$findecocyclesteps,$invcount,$findecocycleevoeqthingcount];
 
 
 End[];
