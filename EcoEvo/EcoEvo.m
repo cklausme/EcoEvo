@@ -1270,8 +1270,20 @@ FindEcoCycleEvoEq::usage =
 StyleBox[\"traits\", \"TI\"]\), \!\(\*
 StyleBox[\"pops\", \"TI\"]\)] finds an evolutionary equilibrium with an ecological cycle, with initial guess \!\(\*
 StyleBox[\"traits\", \"TI\"]\) and \!\(\*
-StyleBox[\"pops\", \"TI\"]\).
+StyleBox[\"pops\", \"TI\"]\). An alias to FindEcoEvoCycle[\!\(\*
+StyleBox[\"traits\", \"TI\"]\), \!\(\*
+StyleBox[\"pops\", \"TI\"]\), EvoEq\[Rule]True].
 FindEcoCycleEvoEq[\!\(\*
+StyleBox[\"traitsandpops\", \"TI\"]\)] uses combined initial guess \!\(\*
+StyleBox[\"traitsandpops\", \"TI\"]\).";
+
+FindEcoEvoCycle::usage =
+"FindEcoEvoCycle[\!\(\*
+StyleBox[\"traits\", \"TI\"]\), \!\(\*
+StyleBox[\"pops\", \"TI\"]\)] finds an eco-evolutionary cycle, with initial guess \!\(\*
+StyleBox[\"traits\", \"TI\"]\) and \!\(\*
+StyleBox[\"pops\", \"TI\"]\).
+FindEcoEvoCycle[\!\(\*
 StyleBox[\"traitsandpops\", \"TI\"]\)] uses combined initial guess \!\(\*
 StyleBox[\"traitsandpops\", \"TI\"]\).";
 
@@ -1795,8 +1807,8 @@ FindEcoAttractor::nostst=
 "Warning: EcoSim did not find a steady state (d/dt=`1` at t=`2`). Trying FindEcoCycle.";
 (*Off[FindEcoAttractor::nostst];*)
 
-FindEcoCycleEvoEq::susmtd=
-"Warning: FitnessGradient=\"EcoEvoSim\" is likely to be inappropriate when there are multiple components.";
+FindEcoEvoCycle::susmtd=
+"Warning: FitnessGradient\[Rule]\"EcoEvoSim\" is likely to be inappropriate when there are multiple components. Try EvoEq\[Rule]True and FitnessGradient\[Rule]\"EcoEvoSim\".";
 
 
 notEcoEigenvaluesOpts::usage="nmotEcoEigenvaluesOpts identifies non-options to EcoEigenvalues.";
@@ -6855,135 +6867,14 @@ Options[FindEcoEvoEq]={Fixed->{},PerCapita->True,FindRootOpts->{},DelayDInv->Fal
 FindEcoEvoEq[sol_?TraitsAndVariablesQ,Gs_:{},opts___?OptionQ]:=FindEcoEvoEq[ExtractTraits[sol],ExtractVariables[sol],Gs,opts];
 
 
-FindEcoCycleEvoEq[traits_?TraitsQ,pops_?VariablesQ,Gs:(_?GsQ):{},opts___?OptionQ]:=
+FindEcoEvoCycle[traits_?TraitsQ,pops_?VariablesQ,Gs:(_?GsQ):{},opts___?OptionQ]:=
 
 Module[{
-func=FuncStyle["EcoCycleEvoEq (Periodic)"],
+func=FuncStyle["FindEcoEvoCycle (Periodic)"],
 (* options *)
-verbose,verboseall,method,findrootopts,dinvopts,ecosimopts,monitor,fixed,traitshiftrate,maxiterations,accuracygoal,
-(* other variables *)
-fixedvars,fixedtraits,nonfixedtraits,nonfixedvars,dtrait,v,popz,traitz,
-tstart,tinics,thing,eqns,popunks,unksics,traitunks,popics,traitics,sol,res,fromunks,nb},
-
-Block[{Nsp},
-
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
-If[Global`debug,Print["In ",func]];
-
-(* handle options *)
-
-verbose=Evaluate[Verbose/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-If[Global`debug,verbose=True];
-verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-If[verboseall,verbose=True];
-
-method=Evaluate[Method/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-findrootopts=Evaluate[FindRootOpts/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-dinvopts=Evaluate[DInvOpts/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-ecosimopts=Evaluate[EcoSimOpts/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-monitor=Evaluate[Monitor/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-fixed=Evaluate[Fixed/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-traitshiftrate=Evaluate[TraitShiftRate/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-maxiterations=Evaluate[MaxIterations/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-accuracygoal=Evaluate[AccuracyGoal/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-
-fixedtraits=ExtractTraits[fixed][[All,1]];
-fixedvars=ExtractVariables[fixed][[All,1]];
-
-(* figure out number of species in guilds *)
-SetNsp[Join[traits,ExtractTraits[fixed]],Join[pops,ExtractVariables[fixed]]];
-
-nonfixedtraits=orderedComplement[AllTraits,fixedtraits];
-nonfixedvars=orderedComplement[AllVariables,fixedvars];
-(*Print["nonfixedtraits=",nonfixedtraits];
-Print["nonfixedvars=",nonfixedvars];*)
-
-(* shifting traits *)
-Do[
-	dtrait[tr]=If[MemberQ[traitshiftrate[[All,1]],tr[[1]]],tr[[1]]/.traitshiftrate,0]
-,{tr,nonfixedtraits}];
-Print[func,": dtrait=",Table[dtrait[tr],{tr,nonfixedtraits}]];
-
-(* set up vs *)
-Do[v[tr]=V[DeleteSubscript@tr]/.Gs/.V[DeleteSubscript@tr]->1,{tr,nonfixedtraits}];
-
-thing[{ps_?NumericListQ,trs_?NumericListQ}]:=Module[{rez,fg},
-	$findecocycleevoeqthingcount++;
-	popz=Thread[nonfixedvars->ps];
-	traitz=Join[Thread[nonfixedtraits->trs],ExtractTraits@fixed];
-	sol=EcoSim[traitz,popz,modelperiod,Fixed->(ExtractVariables@fixed),Evaluate[Sequence@@ecosimopts]];
-	fg=Flatten[Table[
-		v[tr]*NDInv[Join[traitz,fixed//ExtractTraits],sol,tr//ZeroSubscript,{(tr//ZeroSubscript)->(tr/.traitz)},Evaluate[Sequence@@dinvopts]]-dtrait[tr]
-	,{tr,nonfixedtraits}]];
-	(*Print[fg];*)
-	Return[{nonfixedvars/.FinalSlice[sol],fg+trs}]
-];
-
-(* for Method FixedPoint *)
-popics=nonfixedvars/.pops;
-traitics=nonfixedtraits/.traits;
-
-(* for Method FindRoot *)
-popunks=nonfixedvars/.ToUnks;
-traitunks=nonfixedtraits/.ToUnks;
-unksics=Join[Transpose[{nonfixedvars,popics}],Transpose[{nonfixedtraits,traitics}]]/.ToUnks;
-
-If[Global`debug,Print[func,": popunks="];Print[popunks]];
-If[Global`debug,Print[func,": traitunks="];Print[traitunks]];
-If[Global`debug,Print[func,": unksics="];Print[unksics]];
-
-If[monitor,
-	nb=CreateWindow[DialogNotebook[{
-	TextCell["evaluation: "],
-	Dynamic[$findecocycleevoeqthingcount],
-	TextCell["traits:"],
-	Dynamic[traitz],
-	TextCell["pops:"],
-	Dynamic[popz]
-	},
-	WindowTitle->"FindEcoCycleEvoEq Progress..."]];
-];
-
-(* solve it*)
-
-$findecocycleevoeqthingcount=0;
-Which[
-	method=="FindRoot",
-	If[Global`debug,Print[func,": Method FindRoot"]];
-	res=FindRoot[thing[{popunks,traitunks}]=={popunks,traitunks},unksics,Evaluate[Sequence@@findrootopts]];
-	If[monitor,NotebookClose[nb]];
-	Return[Join[Sort[sol],ExtractTraits[res/.FromUnks],fixed]];
-,
-	method=="FixedPoint",
-	If[Global`debug,Print[func,": Method FixedPoint"]];
-	res=FixedPoint[thing[#]&,{popics,traitics},maxiterations,SameTest->(Max[Abs[#1-#2]]<10^-accuracygoal&)];
-	If[monitor,NotebookClose[nb]];
-	If[$findecocycleevoeqthingcount==maxiterations,Msg[FindEcoCycleEvoEq::cvmit,maxiterations]];
-	Return[Join[Sort[sol],Thread[nonfixedtraits->res[[2]]],fixed]]
-,
-	Else,
-	Msg[FindEcoCycleEvoEq::badmtd];Return[$Failed]
-];
-
-]]/;modelperiod=!=0;
-
-
-Options[FindEcoCycleEvoEq]={
-	BoundaryDetection->False,FindRootOpts->{},Method->"FindRoot",PerCapita->True,
-	DInvOpts->{},DelayDInv->False,EvoEquation->"QG",Fixed->{},TraitShiftRate->{},EcoSimOpts->{},Chop->True,MaxIterations->100,AccuracyGoal->6,
-	Verbose->False,VerboseAll->False};
-
-
-FindEcoCycleEvoEq[traitsandvariables_?TraitsAndVariablesQ,Gs_List:{},opts___?OptionQ]:=
-FindEcoCycleEvoEq[ExtractTraits[traitsandvariables],ExtractVariables[traitsandvariables],Gs,opts]
-
-
-FindEcoCycleEvoEq[traits_?TraitsQ,pops_?VariablesQ,Gs:(_?GsQ):{},opts___?OptionQ]:=
-
-Module[{
-func=FuncStyle["EcoCycleEvoEq (Periodic)"],
-(* options *)
-verbose,verboseall,method,fitnessgradient,ecosimopts,ndinvopts,ecoevosimopts,findrootopts,monitor,printtrace,fixed,maxiterations,accuracygoal,traitshiftrate,
+verbose,verboseall,
+method,fitnessgradient,evoeq,
+ecosimopts,ndinvopts,ecoevosimopts,findrootopts,monitor,printtrace,fixed,maxiterations,accuracygoal,traitshiftrate,
 (* other variables *)
 fixedvars,fixedtraits,fixedvariables,nonfixedtraits,nonfixedvars,nonfixedvariables,
 thing,sol,unks,unksics,res,dtrait,v,nb},
@@ -6995,26 +6886,28 @@ If[Global`debug,Print["In ",func]];
 
 (* handle options *)
 
-verbose=Evaluate[Verbose/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
 If[Global`debug,verbose=True];
-verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
+verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
 If[verboseall,verbose=True];
 
-method=Evaluate[Method/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-fitnessgradient=Evaluate[FitnessGradient/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-If[fitnessgradient===Automatic,If[Max[Table[ngcomps[gu],{gu,guilds}]]>1,fitnessgradient="NDInv",fitnessgradient="EcoEvoSim"]];
-If[Max[Table[ngcomps[gu],{gu,guilds}]]>1&&fitnessgradient=="EcoEvoSim",Msg[FindEcoCycleEvoEq::susmtd]];
+evoeq=Evaluate[EvoEq/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+method=Evaluate[Method/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+fitnessgradient=Evaluate[FitnessGradient/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+If[fitnessgradient===Automatic,If[evoeq==False||Max[Table[ngcomps[gu],{gu,guilds}]]==1,fitnessgradient="EcoEvoSim",fitnessgradient="NDInv"]];
+If[Max[Table[ngcomps[gu],{gu,guilds}]]>1&&fitnessgradient=="EcoEvoSim",Msg[FindEcoEvoCycle::susmtd]];
 If[verbose,Print[func,": FitnessGradient=",fitnessgradient]];
-ndinvopts=Evaluate[NDInvOpts/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-findrootopts=Evaluate[FindRootOpts/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-ecosimopts=Evaluate[EcoSimOpts/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-ecoevosimopts=Evaluate[EcoEvoSimOpts/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-monitor=Evaluate[Monitor/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-printtrace=Evaluate[PrintTrace/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-fixed=Evaluate[Fixed/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-maxiterations=Evaluate[MaxIterations/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-accuracygoal=Evaluate[AccuracyGoal/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
-traitshiftrate=Evaluate[TraitShiftRate/.Flatten[{opts,Options[FindEcoCycleEvoEq]}]];
+ndinvopts=Evaluate[NDInvOpts/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+findrootopts=Evaluate[FindRootOpts/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+ecosimopts=Evaluate[EcoSimOpts/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+ecoevosimopts=Evaluate[EcoEvoSimOpts/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+monitor=Evaluate[Monitor/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+printtrace=Evaluate[PrintTrace/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+fixed=Evaluate[Fixed/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+maxiterations=Evaluate[MaxIterations/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+accuracygoal=Evaluate[AccuracyGoal/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+traitshiftrate=Evaluate[TraitShiftRate/.Flatten[{opts,Options[FindEcoEvoCycle]}]];
+If[evoeq==True,AppendTo[ecoevosimopts,FreezeTraits->True]];
 
 fixedvars=fixed[[All,1]];
 fixedtraits=ExtractTraits[fixed];
@@ -7029,8 +6922,8 @@ SetNsp[Join[traits,fixedtraits],Join[pops,fixedvariables]];
 Which[
 	fitnessgradient=="EcoEvoSim",
 	thing[popsandtraits_?NumericRuleListQ]:=Module[{},
-		$findecocycleevoeqthingcount++;
-		sol=EcoEvoSim[popsandtraits,Gs,modelperiod,Fixed->fixed,FreezeTraits->True,TraitShiftRate->traitshiftrate,
+		$findecoevocyclethingcount++;
+		sol=EcoEvoSim[popsandtraits,Gs,modelperiod,Fixed->fixed,TraitShiftRate->traitshiftrate,
 			Evaluate[Sequence@@ecoevosimopts]];
 		If[printtrace,Print[$findecocycleevoeqthingcount," ",FinalSlice[sol]]];
 		Return[Select[FinalSlice[sol],MemberQ[nonfixedvars,#[[1]]]&]]
@@ -7043,24 +6936,24 @@ Which[
 	Do[v[tr]=V[DeleteSubscript@tr]/.Gs/.V[DeleteSubscript@tr]->1,{tr,nonfixedtraits}];
 
 	thing[popsandtraits_?NumericRuleListQ]:=Module[{fg},
-		$findecocycleevoeqthingcount++;
+		$findecoevocyclethingcount++;
 		sol=EcoSim[popsandtraits,modelperiod,Fixed->fixed,Evaluate[Sequence@@ecosimopts]];
 		fg=Flatten[Table[tr->
 			v[tr]*NDInv[Join[popsandtraits,fixed]//ExtractTraits,sol,tr//ZeroSubscript,{(tr//ZeroSubscript)->(tr/.popsandtraits)},
 			Evaluate[Sequence@@ndinvopts]]-dtrait[tr]
 		,{tr,nonfixedtraits}]];
-		If[printtrace,Print[$findecocycleevoeqthingcount," ",FinalSlice[sol]," ",RuleListAdd[ExtractTraits[popsandtraits],fg]]];
+		If[printtrace,Print[$findecoevocyclethingcount," ",FinalSlice[sol]," ",RuleListAdd[ExtractTraits[popsandtraits],fg]]];
 		Return[Join[
 			Select[FinalSlice[sol],MemberQ[nonfixedvars,#[[1]]]&],
 			RuleListAdd[ExtractTraits[popsandtraits],fg]
 		]]
 	],
 	Else,
-	Msg[FindEcoCycleEvoEq::badmtd];Return[$Failed]
+	Msg[FindEcoEvoCycle::badmtd];Return[$Failed]
 ];
 
 (* solve it*)
-$findecocycleevoeqthingcount=0;
+$findecoevocyclethingcount=0;
 Which[
 	method=="FindRoot",
 	If[verbose,Print[func,": Method FindRoot"]];
@@ -7069,24 +6962,30 @@ Which[
 	fw[l_?NumericListQ]:=nonfixedvars/.thing[Thread[nonfixedvars->l]];
 	res=FindRoot[fw[unks]==unks,unksics,Evaluate[Sequence@@findrootopts]];
 	If[monitor,NotebookClose[nb]];
-	Return[VarSort[Join[ExtractTraits[res/.FromUnks],ExtractVariables[sol],fixed],Join[AllVariables,AllTraits]]];
+	If[evoeq==True,
+		Return[VarSort[Join[ExtractTraits[res/.FromUnks],ExtractVariables[sol],fixed],Join[AllVariables,AllTraits]]],
+		Return[VarSort[Join[sol,fixed],Join[AllVariables,AllTraits]]]
+	]
 ,
 	method=="FixedPoint",
 	If[verbose,Print[func,": Method FixedPoint"]];
 	res=FixedPoint[thing[#]&,Join[pops,traits],maxiterations,SameTest->(RuleListDistance[#1,#2]<10^-accuracygoal&)];
 	If[monitor,NotebookClose[nb]];
-	If[$findecocycleevoeqthingcount==maxiterations,Msg[FindEcoCycleEvoEq::cvmit,maxiterations]];
-	Return[VarSort[Join[ExtractTraits[res],ExtractVariables[sol],fixed],Join[AllVariables,AllTraits]]];
+	If[$findecoevocyclethingcount==maxiterations,Msg[FindEcoEvoCycle::cvmit,maxiterations]];
+	If[evoeq==True,
+		Return[VarSort[Join[ExtractTraits[res],ExtractVariables[sol],fixed],Join[AllVariables,AllTraits]]],	
+		Return[VarSort[Join[sol,fixed],Join[AllVariables,AllTraits]]]
+	]
 ,
 	Else,
-	Msg[FindEcoCycleEvoEq::badmtd];Return[$Failed]
+	Msg[FindEcoEvoCycle::badmtd];Return[$Failed]
 ];
 
 ]]/;modelperiod=!=0;
 
 
-Options[FindEcoCycleEvoEq]={
-	Method->"FindRoot",FitnessGradient->Automatic,
+Options[FindEcoEvoCycle]={
+	Method->"FindRoot",FitnessGradient->Automatic,EvoEq->False,
 	BoundaryDetection->False,TraitShiftRate->{},
 	FindRootOpts->{},Fixed->{},EcoSimOpts->{},EcoEvoSimOpts->{},NDInvOpts->{},
 	Chop->True,MaxIterations->100,AccuracyGoal->6,
@@ -7094,8 +6993,9 @@ Options[FindEcoCycleEvoEq]={
 	Verbose->False,VerboseAll->False};
 
 
-FindEcoCycleEvoEq[traitsandvariables_?TraitsAndVariablesQ,Gs_List:{},opts___?OptionQ]:=
-FindEcoCycleEvoEq[ExtractTraits[traitsandvariables],ExtractVariables[traitsandvariables],Gs,opts]
+FindEcoEvoCycle[traitsandvariables_?TraitsAndVariablesQ,Gs_List:{},opts___?OptionQ]:=
+FindEcoEvoCycle[ExtractTraits[traitsandvariables],ExtractVariables[traitsandvariables],Gs,opts];
+FindEcoCycleEvoEq[stuff___]:=FindEcoEvoCycle[stuff,EvoEq->True];
 
 
 EvoEq[traits:(_?TraitsQ):{},sol:(_?VariablesQ):{},Gs_List:{},opts___?OptionQ] :=
