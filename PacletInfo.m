@@ -6,7 +6,7 @@
 
 Paclet[
     Name -> "EcoEvo",
-    Version -> "0.9.4",
+    Version -> "0.9.6",
     MathematicaVersion -> "10+",
     Description -> "Species- and trait-based ecological and eco-evolutionary modeling.",
     Creator -> "Christopher Klausmeier <klausme1@msu.edu>",
