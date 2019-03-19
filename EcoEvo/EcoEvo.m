@@ -7265,7 +7265,7 @@ Return[res]
 With[{syms = Names["EcoEvo`*"]},
   SetAttributes[syms,Protected]
 ];
-Unprotect[t,LookUp,$findecocyclesteps,$invcount,$findecocycleevoeqthingcount];
+Unprotect[Unk,t,LookUp,$findecocyclesteps,$invcount,$findecocycleevoeqthingcount];
 
 
 End[];
