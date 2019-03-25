@@ -31,6 +31,12 @@ Unprotect@@Names["EcoEvo`*"];
 ClearAll@@Names["EcoEvo`*"];
 
 
+SimplifyLogE::usage="SimplifyLogE is a replacement rule that simplifies Log[\!\(\*
+StyleBox[\"a\", \"TI\"]\) \!\(\*SuperscriptBox[\(E\), 
+StyleBox[\"x\", \"TI\"]]\)] to Log[\!\(\*
+StyleBox[\"a\", \"TI\"]\)]+\!\(\*
+StyleBox[\"x\", \"TI\"]\)."
+
 RestrictedTo::usage="RestrictedTo[\!\(\*
 StyleBox[\"x\", \"TI\"]\), {\!\(\*
 StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\), \!\(\*
@@ -1831,7 +1837,7 @@ notEcoEvoSimOpts::usage="notEcoEvoSimOpts identifies non-options to EcoEvoSim.";
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.6X (March 18, 2019)";
+$EcoEvoVersion="0.9.7X (March 25, 2019)";
 
 
 Print["EcoEvo Package Version ",$EcoEvoVersion];
@@ -1849,6 +1855,9 @@ $ecoevoeqthingcount=0;
 $roundofftolerance=10^-10;
 $tmax=10^4;
 modelloaded=False;
+
+
+SimplifyLogE=Log[(a_:1) E^x_]:>x+Log[a]
 
 
 RestrictedTo[x_,range_]:=Module[{xmin,xmax},
@@ -4813,10 +4822,10 @@ Which[
 		If[verbose,
 			With[{j=j/.invtraits,tend=tend,te=tend+1},
 			PrintCall[Global`invsol=listMultiplier[Table[j/.Global`sol/.Global`qsssol,{t,0,tend}]]];
-			PrintCall[Global`eval=Max@Re@Chop@Sort@Eigenvalues[Global`invsol]^(1/te)]
+			PrintCall[Global`eval=Log[Max@Re@Chop@Sort@Eigenvalues[Global`invsol]^(1/te)]]
 		]];
 		invsol=listMultiplier[Table[j/.invtraits/.sol/.qsssol,{t,0,tend}]];		
-		Return[{Max@Re@Chop@Sort@Eigenvalues[invsol]^(1/(tend+1)),"?"}];
+		Return[{Log[Max@Re@Chop@Sort@Eigenvalues[invsol]^(1/(tend+1))],"?"}];
 	]
 ,
 	(* Eigenvalue mode *)
@@ -4909,7 +4918,17 @@ Which[
 		]
 	,
 		modeltype=="DiscreteTime",
-		Return[{(*Log@*)Max@Chop@ComplexExpand[eval],evec}];
+		Which[
+			simplifyresult===True,
+			Return[Simplify[{Log@Max@Chop@ComplexExpand[eval]/.SimplifyLogE,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]},Assumptions:>{_\[Element]Reals}]]
+		,
+			simplifyresult===Full,
+			Return[FullSimplify[{Log@Max@Chop@ComplexExpand[eval]/.SimplifyLogE,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]},Assumptions:>{_\[Element]Reals}]]
+		,
+			Else,
+			Return[{(Log@Max@Chop@ComplexExpand[eval])/.SimplifyLogE,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]}]
+		]
+		(*Return[{Simplify[Log@Max@Chop@ComplexExpand[eval],Assumptions\[Rule]{_\[Element]Reals}],evec}];*)
 	];
 
 ];
@@ -4921,7 +4940,7 @@ Options[InvSPS]={
 Method->Automatic,Time->t,
 NIntegrateOpts->{Method->{Automatic,"SymbolicProcessing"->0}},IntegrateOpts->{},NDSolveOpts->{},SolveOpts->{},NSolveOpts->{},FindRootOpts->{},EigensystemOpts->{},FindEcoCycleOpts->{},
 QSSMethod->"NSolve",QSSICs->Automatic,
-SimplifyResult->False,Guild->Automatic,FromInv->False,RV->False,
+SimplifyResult->False(*True*),Guild->Automatic,FromInv->False,RV->False,
 Verbose->False,VerboseAll->False};
 
 
@@ -5239,7 +5258,7 @@ verbose,verboseall,monitor,
 delayinv,invopts,time,plotopts,plotspecies,markerstyle,axeslabel,
 (* other variables *)
 nb,x,
-gu1,tr1,per,res,inv,epi,zeroval},
+gu1,tr1,per,res,inv,epi},
 
 Block[{Nsp},
 
@@ -5277,12 +5296,11 @@ SetNsp[traits,sol];
 (*Print[markerstyle];*)
 
 If[plotspecies,
-	zeroval=If[modeltype=="DiscreteTime",1,0];
 	If[markerstyle===Automatic,
-		epi=Table[{PointSize[0.015],color[Subscript[tr1,sp]][SpFrac[sp,Nsp[gu1]]],Point[{Subscript[tr1,sp]/.traits,zeroval}]},{sp,Nsp[gu1]}]
+		epi=Table[{PointSize[0.015],color[Subscript[tr1,sp]][SpFrac[sp,Nsp[gu1]]],Point[{Subscript[tr1,sp]/.traits,0}]},{sp,Nsp[gu1]}]
 	,
 		epi=MapThread[Append,{PadRight[{},Nsp[gu1],
-		Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr1,sp]/.traits,zeroval}],{sp,Nsp[gu1]}]}]
+		Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr1,sp]/.traits,0}],{sp,Nsp[gu1]}]}]
 	]
 ,
 	epi={}
@@ -5538,7 +5556,6 @@ ics=Evaluate[ICs/.Flatten[{opts,Options[PlotPIP]}]];
 zerodiagonal=Evaluate[ZeroDiagonal/.Flatten[{opts,Options[PlotPIP]}]];
 subtractdiagonal=Evaluate[SubtractDiagonal/.Flatten[{opts,Options[PlotPIP]}]];
 invthreshold=Evaluate[InvThreshold/.Flatten[{opts,Options[PlotPIP]}]];
-If[invthreshold===Automatic,invthreshold=If[modeltype=="DiscreteTime",1,0]];
 boundarystyle=Evaluate[BoundaryStyle/.Flatten[{opts,Options[PlotPIP]}]];
 invstyle=Evaluate[InvStyle/.Flatten[{opts,Options[PlotPIP]}]];
 noninvstyle=Evaluate[NonInvStyle/.Flatten[{opts,Options[PlotPIP]}]];
@@ -5658,7 +5675,7 @@ Return[res]
 
 Options[PlotPIP]={
 	FindEcoAttractorOpts->{},InvOpts->{},
-	DelayInv->False,PlotType->"PIP",ICs->{},ZeroDiagonal->False,Fixed->{},SubtractDiagonal->False,InvThreshold->Automatic,
+	DelayInv->False,PlotType->"PIP",ICs->{},ZeroDiagonal->False,Fixed->{},SubtractDiagonal->False,InvThreshold->0,
 	PlotOpts->{MaxRecursion->3},FrameLabel->Automatic,
 	BoundaryStyle->Black,InvStyle->Gray,NonInvStyle->White,
 	Monitor->False,
@@ -5704,7 +5721,6 @@ icsin=Evaluate[ICs/.Flatten[{opts,Options[PlotMIP]}]];
 zerodiagonal=Evaluate[ZeroDiagonal/.Flatten[{opts,Options[PlotMIP]}]];
 subtractdiagonal=Evaluate[SubtractDiagonal/.Flatten[{opts,Options[PlotMIP]}]];
 invthreshold=Evaluate[InvThreshold/.Flatten[{opts,Options[PlotMIP]}]];
-If[invthreshold===Automatic,invthreshold=If[modeltype=="DiscreteTime",1,0]+$MachineEpsilon];
 boundarystyle=Evaluate[BoundaryStyle/.Flatten[{opts,Options[PlotMIP]}]];
 spcolors=Evaluate[SpeciesColors/.Flatten[{opts,Options[PlotMIP]}]];
 invstyle=Evaluate[InvStyle/.Flatten[{opts,Options[PlotMIP]}]];
@@ -5899,7 +5915,7 @@ PlotMIP[{trait1_,trait1min_?NumericQ,trait1max_?NumericQ},{trait2_,trait2min_?Nu
 
 
 Options[PlotMIP]={
-	PlotType->"MIP",DelayInv->False,FindEcoAttractorOpts->{},InvOpts->{},InvThreshold->Automatic,
+	PlotType->"MIP",DelayInv->False,FindEcoAttractorOpts->{},InvOpts->{},InvThreshold->0,
 	ICs->{},ZeroDiagonal->False,Fixed->{},
 	BoundaryStyle->Black,SpeciesColors->{Red,Blue},InvStyle->Gray,NonInvStyle->White,FrameLabel->Automatic,
 	PlotOpts->{MaxRecursion->3},
@@ -6267,9 +6283,9 @@ If[solin==="FindEcoAttractor",
 	dt[\[FormalX]_,\[FormalY]_]=(evoeqns/.solin/.{trait1->\[FormalX],trait2->\[FormalY]})
 ];
 
-Print["solin=",solin];
+(*Print["solin=",solin];
 Print[sol[0.1,0.2]];
-Print[dt[0.1,0.2]];
+Print[dt[0.1,0.2]];*)
 
 iso1=ContourPlot[dt[\[FormalX],\[FormalY]][[1]],{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Contours->{0},ContourShading->False,
 	ContourStyle->Flatten[{color1,style1}],Evaluate[Sequence@@plotopts],ContourLabels->{None,Tooltip[Null,trait1]&}
@@ -7203,7 +7219,6 @@ If[Global`debug,Print["In ",func]];
 
 maximizeinvopts=Evaluate[MaximizeInvOpts/.Flatten[{opts,Options[GlobalESSQ]}]];
 invthreshold=Evaluate[InvThreshold/.Flatten[{opts,Options[GlobalESSQ]}]];
-If[invthreshold===Automatic,invthreshold=modelinvthreshold+$roundofftolerance];
 verbose=Evaluate[Verbose/.Flatten[{opts,Options[GlobalESSQ]}]];
 If[Global`debug,verbose=True];
 verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[GlobalESSQ]}]];
@@ -7224,7 +7239,7 @@ Return[{
 ]];
 
 
-Options[GlobalESSQ]={MaximizeInvOpts->{},InvThreshold->Automatic,Verbose->False,VerboseAll->False};
+Options[GlobalESSQ]={MaximizeInvOpts->{},InvThreshold->$roundofftolerance,Verbose->False,VerboseAll->False};
 
 
 GlobalESSQ[eesol_?TraitsAndVariablesQ,opts___?OptionQ]:=GlobalESSQ[ExtractTraits[eesol],ExtractVariables[eesol],opts];
