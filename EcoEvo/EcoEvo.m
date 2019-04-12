@@ -1837,7 +1837,7 @@ notEcoEvoSimOpts::usage="notEcoEvoSimOpts identifies non-options to EcoEvoSim.";
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.7X (March 25, 2019)";
+$EcoEvoVersion="0.9.7X (April 12, 2019)";
 
 
 Print["EcoEvo Package Version ",$EcoEvoVersion];
@@ -2522,7 +2522,7 @@ UnsetModel:=(
 
 SetModel[model_?RuleListQ,opts___?OptionQ]:=Module[{
 (* options *)
-colors,linestyles,plotmarkers,gradients,
+colors,linestyles,plotmarkers,gradients,assumptions,
 (* other *)
 stylecount,basestyle,indexcount,in},
 
@@ -2531,6 +2531,7 @@ stylecount,basestyle,indexcount,in},
 colors=Evaluate[Colors/.Flatten[{opts,Options[SetModel]}]];
 linestyles=Evaluate[LineStyles/.Flatten[{opts,Options[SetModel]}]];
 plotmarkers=Evaluate[PlotMarkers/.Flatten[{opts,Options[SetModel]}]];
+assumptions=Evaluate[Assumptions/.Flatten[{model,Options[SetModel]}]];
 
 UnsetModel;
 
@@ -2545,9 +2546,6 @@ If[!MemberQ[{"ContinuousTime","DiscreteTime"},modeltype],Msg[SetModel::unktype]]
 
 (* model whenevents - default={} *)
 modelwhenevents:=WhenEvents/.Append[model,WhenEvents->{}];
-
-(* model assumptions - default={} *)
-$Assumptions=Assumptions/.Append[model,Assumptions->True];
 
 (* period - default=0 (unforced) *)
 modelperiod:=Period/.Append[model,Period->0];
@@ -2664,6 +2662,17 @@ pcompvars=Flatten[Table[Table[pcomp,{pcomp,pcomps[pop]}],{pop,pops}]];
 gcompvars=Flatten[Table[Table[gcomp,{gcomp,gcomps[gu]}],{gu,guilds}]];
 gtraitvars=Flatten[Table[Table[gtrait,{gtrait,gtraits[gu]}],{gu,guilds}]];
 
+(* model assumptions - default={} *)
+$Assumptions=Flatten[assumptions/.Automatic->Join[
+	Table[Region`SpecialRegionProperty[range[aux],{aux},"ImplicitDescription"],{aux,auxs}],
+	Table[Table[Region`SpecialRegionProperty[range[pcomp],{pcomp},"ImplicitDescription"],{pcomp,pcomps[pop]}],{pop,pops}],
+	Table[Table[Table[
+		Region`SpecialRegionProperty[range[gcomp],{Subscript[gcomp,sp]},"ImplicitDescription"],{sp,0,2}],{gcomp,gcomps[gu]}],{gu,guilds}],
+	Table[Table[Table[
+		Region`SpecialRegionProperty[range[gtrait],{Subscript[gtrait,sp]},"ImplicitDescription"],{sp,0,2}],{gtrait,gtraits[gu]}],{gu,guilds}]
+]];
+(*Print["$Assumptions=",$Assumptions];*)
+
 Which[
 	modeltype=="ContinuousTime",
 	DT[var_]:=var'[t];modelinvthreshold=0
@@ -2683,7 +2692,11 @@ eqn[var_]:=Module[{luv=LookUp[var]},
 ]
 
 
-Options[SetModel]={Colors->ColorData[97,"ColorList"],LineStyles->{{}},PlotMarkers->Graphics`PlotMarkers[],Gradient->"Rainbow",Gradients->{"EEGreens","EEReds","EEBlues"}};
+Options[SetModel]={
+	LineStyles->{{}},PlotMarkers->Graphics`PlotMarkers[],
+	Colors->ColorData[97,"ColorList"],Gradient->"Rainbow",Gradients->{"EEGreens","EEReds","EEBlues"},
+	Assumptions->{Automatic}
+};
 
 
 ModelInfo:=(
@@ -2979,7 +2992,7 @@ VariablesQ[list_]:=list==="FindEcoAttractor"||VectorQ[list,(#[[0]]===Rule||#[[0]
 
 
 TraitsAndVariablesQ[list_]:=
-If[ListQ[list]&&ExpandNspInTraits[ExtractTraits[list]]=!=list&&ExpandNspInPops[ExtractVariables[list]]=!=list,True,False,False]
+If[RuleListQ[list]&&ExpandNspInTraits[ExtractTraits[list]]=!=list&&ExpandNspInPops[ExtractVariables[list]]=!=list,True,False,False]
 
 
 ListOfVariablesQ[x_]:=If[x==={},False,VectorQ[x,VariablesQ[#]&]];
@@ -3911,8 +3924,8 @@ FindEcoCycle[traitsandvariables_?TraitsAndVariablesQ,opts:OptionsPattern[]]:=
 FindEcoCycle[ExtractTraits[traitsandvariables],ExtractVariables[traitsandvariables],opts];
 
 
-(*FindEcoAttractor[traits:(_?TraitsQ):{},variables:(_?VariablesQ):{},opts___?OptionQ]:=*)
-FindEcoAttractor[traits_?NumericRuleListQ,variables:(_?VariablesQ):{},opts___?OptionQ]:=
+FindEcoAttractor[traits:(_?TraitsQ):{},variables:(_?VariablesQ):{},opts___?OptionQ]:=
+(*FindEcoAttractor[traits_?NumericRuleListQ,variables:(_?VariablesQ):{},opts___?OptionQ]:=*)
 
 Module[{
 func=FuncStyle["FindEcoAttactor"],
@@ -5182,12 +5195,12 @@ DInv[traits_?TraitsQ,solin_?VariablesQ,var:(_Subscript|_List|_Symbol):All,pointi
 );
 
 
-(*(* no point syntax *)
+(* no point syntax *)
 DInv[traits_?TraitsQ,solin_?VariablesQ,{var:(_Subscript|_List|_Symbol):All,ord_?NumberQ},opts___?OptionQ]:=(
-	AppendTo[Global`uses,2];
+	(*AppendTo[Global`uses,2];*)
 	If[Global`debug,Print["DInv: no point given"]];
-	DInv[traits,solin,{var,ord},Guild\[Rule]Automatic,opts]
-);*)
+	DInv[traits,solin,{var,ord},Guild->Automatic,opts]
+);
 
 
 (* no order *)
@@ -5230,12 +5243,12 @@ DInv[eesol_?TraitsAndVariablesQ,{var:(_Subscript|_List|_Symbol):All,ord_Integer}
 );
 
 
-(*(* break up traitsandpops *)
+(* break up traitsandpops *)
 DInv[eesol_?TraitsAndVariablesQ,rest___]:=(
-	AppendTo[Global`uses,8];
+	(*AppendTo[Global`uses,8];*)
 	If[Global`debug,Print["DInv: break up traitsandpops"]];
 	DInv[ExtractTraits[eesol],ExtractVariables[eesol],rest]
-);*)
+);
 
 
 (* first derivative abbreviated syntax, no traits or variables *)
@@ -6108,8 +6121,10 @@ If[modeltype=="DiscreteTime",
 If[verbose,Print[func,": evoeqns=",evoeqns]];
 
 If[solin==="FindEcoAttractor",
-	sol[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=sol[\[FormalX],\[FormalY]]=FindEcoAttractor[BlankUnkTraits,ics,Time->time,Evaluate[Sequence@@findecoattractoropts],VerboseAll->verboseall]
-		/.fixed/.{Unk[trait1]->\[FormalX],Unk[trait2]->\[FormalY]};
+	(*sol[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=sol[\[FormalX],\[FormalY]]=FindEcoAttractor[BlankUnkTraits,ics,Time\[Rule]time,Evaluate[Sequence@@findecoattractoropts],VerboseAll\[Rule]verboseall]
+		/.fixed/.{Unk[trait1]\[Rule]\[FormalX],Unk[trait2]\[Rule]\[FormalY]};*)
+	sol[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=sol[\[FormalX],\[FormalY]]=FindEcoAttractor[{trait1->\[FormalX],trait2->\[FormalY]},ics,Time->time,Evaluate[Sequence@@findecoattractoropts],VerboseAll->verboseall]/.fixed;
+
 	If[delaydinv,
 		dt[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=(evoeqns/."FindEcoAttractor"->sol[\[FormalX],\[FormalY]]/.{Unk[trait1]->\[FormalX],Unk[trait2]->\[FormalY]}/.t->time)
 		/;(trait1min<=\[FormalX]<=trait1max&&trait2min<=\[FormalY]<=trait2max&&\[FormalX]!=\[FormalY])
@@ -6121,6 +6136,7 @@ If[solin==="FindEcoAttractor",
 	dt[\[FormalX]_,\[FormalY]_]=(evoeqns/.solin/.{trait1->\[FormalX],trait2->\[FormalY]})
 ];
 (*Print[sol[12,18]];Print[dt[12,18]];*)
+(*Print[sol[0.5,0]];Print[dt[0.5,0]];*)
 
 res=myStreamPlot[dt[\[FormalX],\[FormalY]],{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Evaluate[Sequence@@streamplotopts]];
 
