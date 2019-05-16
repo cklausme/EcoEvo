@@ -1031,7 +1031,10 @@ PlotTAD::usage =
 StyleBox[\"traits\", \"TI\"]\), \!\(\*
 StyleBox[\"pops\", \"TI\"]\)] plots abundance vs trait for the species in \!\(\*
 StyleBox[\"traits\", \"TI\"]\) and \!\(\*
-StyleBox[\"pops\", \"TI\"]\).";
+StyleBox[\"pops\", \"TI\"]\).
+PlotTAD[\!\(\*
+StyleBox[\"traitsandpops\", \"TI\"]\)] uses combined community state \!\(\*
+StyleBox[\"traitsandpops\", \"TI\"]\).";
 
 PlotZIP::usage =
 "PlotZIP[{\!\(\*
@@ -1837,10 +1840,11 @@ notEcoEvoSimOpts::usage="notEcoEvoSimOpts identifies non-options to EcoEvoSim.";
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.7X (April 12, 2019)";
+$EcoEvoVersion="0.9.7X (May 16, 2019)";
 
 
 Print["EcoEvo Package Version ",$EcoEvoVersion];
+Print["(c) 2019 Christopher A. Klausmeier <christopher.klausmeier@gmail.com>"];
 
 
 SetOptions[NDSolve,MaxSteps->Infinity];
@@ -4547,6 +4551,9 @@ If[logged==False,
 ]];
 
 Options[PlotTAD]={Logged->False,Guild->Automatic,Trait->Automatic,Component->Automatic,MinPop->0,MarkerStyle->Automatic,PlotStyle->{}};
+
+
+PlotTAD[sol_?TraitsAndVariablesQ,opts___?OptionQ]:=PlotTAD[ExtractTraits[sol],ExtractVariables[sol],opts];
 
 
 InvSPS[traitsandpops_?TraitsAndVariablesQ,invaderin:(_?InvaderQ):{},opts:OptionsPattern[]]:=
