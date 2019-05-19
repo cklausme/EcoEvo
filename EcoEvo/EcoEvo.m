@@ -1843,8 +1843,8 @@ Begin["`Private`"];
 $EcoEvoVersion="0.9.7X (May 16, 2019)";
 
 
-Print["EcoEvo Package Version ",$EcoEvoVersion];
-Print["(c) 2019 Christopher A. Klausmeier <christopher.klausmeier@gmail.com>"];
+Print["EcoEvo Package Version ",$EcoEvoVersion,"
+Christopher A. Klausmeier <christopher.klausmeier@gmail.com>"];
 
 
 SetOptions[NDSolve,MaxSteps->Infinity];
@@ -3528,7 +3528,7 @@ SetNsp[traits];
 fixedvars=fixed[[All,1]];
 nonfixedvars=orderedComplement[AllVariables,fixedvars];
 
-eqns=EcoEqns[BlankTraits,opts]/.RHS/.RemoveVariablets/.t->time;
+eqns=EcoEqns[traits,opts]/.RHS/.RemoveVariablets/.t->time;
 unks=nonfixedvars;
 
 If[verbose,
@@ -3539,23 +3539,23 @@ If[verbose,
 ];
 
 (* set up jacobian *)
-jmat=D[eqns/.traits,{unks}];
+jmat=D[eqns,{unks}];
 If[verbose,Print[func,": jmat=",jmat]];
 
 Which[
 	(* DiscreteTime cycle *)
 	variables!={}&&(variables[[1,2,0]]===TemporalData||(modeltype=="DiscreteTime"&&modelperiod=!=0))&&time===t,
-	Return[TD[Table[{t\[Prime],jmat/.AddVariablets/.t->t\[Prime]},{t\[Prime],variables[[1,2]]["Times"]}]/.variables]];
+	Return[TD[Table[{t\[Prime],jmat/.AddVariablets/.t->t\[Prime]},{t\[Prime],variables[[1,2]]["Times"]}]/.variables/.traits]];
 ,
 	(* ContinuousTime cycle *)
 	variables!={}&&(variables[[1,2,0]]===InterpolatingFunction||(modeltype=="ContinuousTime"&&modelperiod=!=0))&&time===t,
-	Return[jmat/.AddVariablets/.variables];
+	Return[jmat/.AddVariablets/.variables/.traits];
 ,
 	(* ContinuousTime or DiscreteTime equilibrium *)
 	Else,
 	If[time===t,
-		Return[jmat/.variables],
-		Return[jmat/.Slice[variables,time]]
+		Return[jmat/.variables/.traits],
+		Return[jmat/.Slice[variables,time]/.traits]
 	];
 ];
 
