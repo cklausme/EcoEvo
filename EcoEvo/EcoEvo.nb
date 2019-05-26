@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[   1675211,      37105]
-NotebookOptionsPosition[   1623821,      36294]
-NotebookOutlinePosition[   1624760,      36326]
-CellTagsIndexPosition[   1624717,      36323]
+NotebookDataLength[   1710541,      37821]
+NotebookOptionsPosition[   1659048,      37009]
+NotebookOutlinePosition[   1659987,      37041]
+CellTagsIndexPosition[   1659944,      37038]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -23604,6 +23604,758 @@ Cell["PlotInv", "Subsection",
   "\[FivePointedStar]",ExpressionUUID->"ccf8610d-5377-4e92-9781-2bfddc133343"],
 
 Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"PlotInv", "[", 
+     RowBox[{
+      RowBox[{"traits", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "TraitsQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"sol", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "VariablesQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"{", 
+       RowBox[{"trait1_", ",", 
+        RowBox[{"trait1min_", "?", "NumericQ"}], ",", 
+        RowBox[{"trait1max_", "?", "NumericQ"}]}], "}"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\n", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\n", 
+       RowBox[{
+        RowBox[{"func", "=", 
+         RowBox[{"FuncStyle", "[", "\"\<PlotInv\>\"", "]"}]}], ",", "\n", 
+        RowBox[{"(*", " ", "options", " ", "*)"}], "\n", "verbose", ",", 
+        "verboseall", ",", "monitor", ",", "\n", "delayinv", ",", "invopts", 
+        ",", "time", ",", "plotopts", ",", "plotspecies", ",", "markerstyle", 
+        ",", "plottadopts", ",", "tf", ",", "axeslabel", ",", "plotrange", 
+        ",", "tadplotrange", ",", "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{"other", " ", "variables"}], " ", "*)"}], "\n", "nb", ",", 
+        "x", ",", "iplot", ",", "\n", "iopts", ",", "imin", ",", "imax", ",", 
+        "tmin", ",", "tmax", ",", "s", ",", "iaspectratio", ",", "iticks", 
+        ",", "iaxesorigin", ",", "iplotrangepadding", ",", "resplotrange", 
+        ",", "lmin", ",", "\n", "gu1", ",", "tr1", ",", "per", ",", "res", 
+        ",", "inv", ",", "epilog", ",", "tad"}], "}"}], ",", "\n", "\n", 
+      RowBox[{"Block", "[", 
+       RowBox[{
+        RowBox[{"{", "Nsp", "}"}], ",", "\n", "\n", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"\"\<traits=\>\"", ",", "traits"}], "]"}], ";", "\n", 
+          RowBox[{"Print", "[", 
+           RowBox[{"\"\<sol=\>\"", ",", "sol"}], "]"}], ";", "\n", 
+          RowBox[{"Print", "[", 
+           RowBox[{"\"\<{trait1,trait1min,trait1max}=\>\"", ",", 
+            RowBox[{"{", 
+             RowBox[{"trait1", ",", "trait1min", ",", "trait1max"}], "}"}]}], 
+           "]"}], ";"}], "*)"}], "\n", "\n", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"modelloaded", "\[NotEqual]", "True"}], ",", 
+           RowBox[{
+            RowBox[{"Msg", "[", 
+             RowBox[{"EcoEvoGeneral", "::", "nomodel"}], "]"}], ";", 
+            RowBox[{"Return", "[", "$Failed", "]"}]}]}], "]"}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"Global`debug", ",", 
+           RowBox[{"Print", "[", 
+            RowBox[{"\"\<In \>\"", ",", "func"}], "]"}]}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"handle", " ", "options"}], " ", "*)"}], "\n", "\n", 
+         RowBox[{"verbose", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Verbose", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"Global`debug", ",", 
+           RowBox[{"verbose", "=", "True"}]}], "]"}], ";", "\n", 
+         RowBox[{"verboseall", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"VerboseAll", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"verboseall", ",", 
+           RowBox[{"verbose", "=", "True"}]}], "]"}], ";", "\n", "\n", 
+         RowBox[{"monitor", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Monitor", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"delayinv", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"DelayInv", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"delayinv", "===", "Automatic"}], ",", 
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{"modelperiod", "=!=", "0"}], ",", 
+             RowBox[{"delayinv", "=", "True"}], ",", 
+             RowBox[{"delayinv", "=", "False"}]}], "]"}]}], "]"}], ";", "\n", 
+         
+         RowBox[{"invopts", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"InvOpts", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"time", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Time", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"plotspecies", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"PlotSpecies", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"markerstyle", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"MarkerStyle", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"plotrange", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"PlotRange", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"plottadopts", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"PlotTADOpts", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"tadplotrange", "=", 
+          RowBox[{"PlotRange", "/.", "plottadopts"}]}], ";", "\n", 
+         RowBox[{"tf", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"TADVerticalScale", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"plotopts", "=", 
+          RowBox[{"FilterRules", "[", 
+           RowBox[{
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}], ",", 
+            
+            RowBox[{"Options", "[", "Plot", "]"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"axeslabel", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"AxesLabel", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"axeslabel", "===", "Automatic"}], ",", 
+           RowBox[{"axeslabel", "=", 
+            RowBox[{"{", "trait1", "}"}]}]}], "]"}], ";", "\n", "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{
+           RowBox[{
+           "figure", " ", "out", " ", "what", " ", "trait", " ", "is", " ", 
+            "on", " ", "the", " ", "x"}], "-", "axis"}], " ", "*)"}], "\n", 
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"gu1", ",", "tr1"}], "}"}], "=", 
+          RowBox[{
+           RowBox[{"LookUp", "[", "trait1", "]"}], "\[LeftDoubleBracket]", 
+           RowBox[{"2", ";;", "3"}], "\[RightDoubleBracket]"}]}], ";", "\n", 
+         "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{
+          "figure", " ", "out", " ", "number", " ", "of", " ", "species", " ",
+            "in", " ", "guilds"}], " ", "*)"}], "\n", 
+         RowBox[{"SetNsp", "[", 
+          RowBox[{"traits", ",", "sol"}], "]"}], ";", "\n", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"monitor", ",", "\n", "\t", 
+           RowBox[{
+            RowBox[{"nb", "=", 
+             RowBox[{"CreateDialog", "[", 
+              RowBox[{"DialogNotebook", "[", 
+               RowBox[{
+                RowBox[{"Grid", "[", 
+                 RowBox[{"{", 
+                  RowBox[{"{", 
+                   RowBox[{"\"\<\[FormalX]=\>\"", ",", 
+                    RowBox[{"Dynamic", "[", "x", "]"}]}], "}"}], "}"}], "]"}],
+                 ",", 
+                RowBox[{
+                "WindowTitle", "\[Rule]", "\"\<PlotInv Progress...\>\""}]}], 
+               "]"}], "]"}]}], ";"}]}], "\n", "]"}], ";", "\n", 
+         "\[IndentingNewLine]", 
+         RowBox[{"If", "[", 
+          RowBox[{"delayinv", ",", "\n", "\t", 
+           RowBox[{"(*", " ", 
+            RowBox[{"delay", " ", "inv"}], " ", "*)"}], "\n", "\t", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"inv", "[", 
+              RowBox[{"\[FormalX]_", "?", "NumberQ"}], "]"}], ":=", 
+             RowBox[{"Inv", "[", 
+              RowBox[{"traits", ",", "sol", ",", 
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"Subscript", "[", 
+                  RowBox[{"tr1", ",", "0"}], "]"}], "\[Rule]", "\[FormalX]"}],
+                 "}"}], ",", 
+               RowBox[{"Guild", "\[Rule]", "gu1"}], ",", 
+               RowBox[{"Evaluate", "[", 
+                RowBox[{"Sequence", "@@", "invopts"}], "]"}], ",", 
+               RowBox[{"Time", "\[Rule]", "time"}], ",", 
+               RowBox[{"VerboseAll", "\[Rule]", "verboseall"}]}], "]"}]}], 
+            ";", "\n", "\t", 
+            RowBox[{"iplot", "=", 
+             RowBox[{"Plot", "[", 
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{
+                 RowBox[{"x", "=", "\[FormalX]"}], ";", 
+                 RowBox[{"Evaluate", "[", 
+                  RowBox[{"inv", "[", "\[FormalX]", "]"}], "]"}]}], ")"}], 
+               ",", 
+               RowBox[{"{", 
+                RowBox[{"\[FormalX]", ",", "trait1min", ",", "trait1max"}], 
+                "}"}], ",", "\n", "\t\t", 
+               RowBox[{"AxesLabel", "\[Rule]", "axeslabel"}], ",", 
+               RowBox[{"PlotRange", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
+                  "plotrange"}], "}"}]}], ",", "\n", "\t\t", 
+               RowBox[{"Evaluate", "[", 
+                RowBox[{"Sequence", "@@", "plotopts"}], "]"}], ",", 
+               RowBox[{"AxesOrigin", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{"trait1min", ",", "0"}], "}"}]}]}], "]"}]}], ";"}], 
+           "\n", ",", "\n", "\t", 
+           RowBox[{"(*", " ", 
+            RowBox[{"nondelay", " ", "inv"}], " ", "*)"}], "\n", "\t", 
+           RowBox[{
+            RowBox[{"Off", "[", 
+             RowBox[{"NIntegrate", "::", "inumr"}], "]"}], ";", "\n", "\t", 
+            RowBox[{"inv", "=", 
+             RowBox[{"Inv", "[", 
+              RowBox[{"traits", ",", "sol", ",", 
+               RowBox[{"Guild", "\[Rule]", "gu1"}], ",", 
+               RowBox[{"Evaluate", "[", 
+                RowBox[{"Sequence", "@@", "invopts"}], "]"}], ",", 
+               RowBox[{"Time", "\[Rule]", "time"}], ",", 
+               RowBox[{"VerboseAll", "\[Rule]", "verboseall"}]}], "]"}]}], 
+            ";", "\n", "\t", 
+            RowBox[{"iplot", "=", 
+             RowBox[{"Plot", "[", 
+              RowBox[{"inv", ",", 
+               RowBox[{"{", 
+                RowBox[{"trait1", ",", "trait1min", ",", "trait1max"}], "}"}],
+                ",", "\n", "\t\t", 
+               RowBox[{"AxesLabel", "\[Rule]", "axeslabel"}], ",", 
+               RowBox[{"PlotRange", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
+                  "plotrange"}], "}"}]}], ",", "\n", "\t\t", 
+               RowBox[{"Evaluate", "[", 
+                RowBox[{"Sequence", "@@", "plotopts"}], "]"}], ",", 
+               RowBox[{"AxesOrigin", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{"trait1min", ",", "0"}], "}"}]}]}], "]"}]}], ";", 
+            "\n", "\t", 
+            RowBox[{"On", "[", 
+             RowBox[{"NIntegrate", "::", "inumr"}], "]"}]}]}], "\n", "]"}], 
+         ";", "\n", "\n", 
+         RowBox[{"Which", "[", 
+          RowBox[{
+           RowBox[{"plotspecies", "===", "\"\<Axis\>\""}], ",", "\n", "\t", 
+           RowBox[{
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"markerstyle", "===", "Automatic"}], ",", 
+              "\[IndentingNewLine]", "\t\t", 
+              RowBox[{"epilog", "=", 
+               RowBox[{"Table", "[", 
+                RowBox[{
+                 RowBox[{"{", 
+                  RowBox[{
+                   RowBox[{"PointSize", "[", "0.015", "]"}], ",", 
+                   RowBox[{
+                    RowBox[{"color", "[", 
+                    RowBox[{"Subscript", "[", 
+                    RowBox[{"tr1", ",", "sp"}], "]"}], "]"}], "[", 
+                    RowBox[{"SpFrac", "[", 
+                    RowBox[{"sp", ",", 
+                    RowBox[{"Nsp", "[", "gu1", "]"}]}], "]"}], "]"}], ",", 
+                   RowBox[{"Point", "[", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Subscript", "[", 
+                    RowBox[{"tr1", ",", "sp"}], "]"}], "/.", "traits"}], ",", 
+                    "0"}], "}"}], "]"}]}], "}"}], ",", 
+                 RowBox[{"{", 
+                  RowBox[{"sp", ",", 
+                   RowBox[{"Nsp", "[", "gu1", "]"}]}], "}"}]}], "]"}]}], ",", 
+              "\[IndentingNewLine]", "\t\t", 
+              RowBox[{"epilog", "=", 
+               RowBox[{"MapThread", "[", 
+                RowBox[{"Append", ",", 
+                 RowBox[{"{", 
+                  RowBox[{
+                   RowBox[{"PadRight", "[", 
+                    RowBox[{
+                    RowBox[{"{", "}"}], ",", 
+                    RowBox[{"Nsp", "[", "gu1", "]"}], ",", "\n", "\t\t\t", 
+                    RowBox[{"Map", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Flatten", "[", 
+                    RowBox[{"{", "#", "}"}], "]"}], "&"}], ",", 
+                    "markerstyle"}], "]"}]}], "]"}], ",", 
+                   RowBox[{"Table", "[", 
+                    RowBox[{
+                    RowBox[{"Point", "[", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"Subscript", "[", 
+                    RowBox[{"tr1", ",", "sp"}], "]"}], "/.", "traits"}], ",", 
+                    "0"}], "}"}], "]"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"sp", ",", 
+                    RowBox[{"Nsp", "[", "gu1", "]"}]}], "}"}]}], "]"}]}], 
+                  "}"}]}], "]"}]}]}], "\n", "\t", "]"}], ";", "\n", "\t", 
+            RowBox[{"res", "=", 
+             RowBox[{"Show", "[", 
+              RowBox[{"iplot", ",", 
+               RowBox[{"Epilog", "\[Rule]", "epilog"}]}], "]"}]}]}], "\n", 
+           "\t", ",", "\n", "\t", 
+           RowBox[{"plotspecies", "===", "\"\<TAD\>\""}], ",", "\n", "\t", 
+           RowBox[{
+            RowBox[{"epilog", "=", 
+             RowBox[{"{", "}"}]}], ";", "\n", "\t", 
+            RowBox[{"tad", "=", 
+             RowBox[{"PlotTAD", "[", 
+              RowBox[{"traits", ",", "sol", ",", 
+               RowBox[{"PlotRange", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
+                  "tadplotrange"}], "}"}]}], ",", 
+               RowBox[{"Evaluate", "[", 
+                RowBox[{"Sequence", "@@", "plottadopts"}], "]"}], ",", 
+               RowBox[{"ImagePadding", "\[Rule]", "0"}], ",", "\n", "\t\t", 
+               RowBox[{"Axes", "\[Rule]", "False"}], ",", 
+               RowBox[{"Guild", "\[Rule]", "gu1"}]}], "]"}]}], ";", "\n", 
+            "\t", 
+            RowBox[{"(*", 
+             RowBox[{
+              RowBox[{"Print", "[", "tad", "]"}], ";"}], "*)"}], "\n", "\t", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{"tmin", ",", "tmax"}], "}"}], "=", 
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{"PlotRange", "/.", 
+                RowBox[{"AbsoluteOptions", "[", 
+                 RowBox[{"tad", ",", "PlotRange"}], "]"}]}], ")"}], 
+              "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}]}], ";", 
+            "\n", "\t", 
+            RowBox[{"iopts", "=", 
+             RowBox[{"AbsoluteOptions", "[", "iplot", "]"}]}], ";", "\n", 
+            "\t", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{"imin", ",", "imax"}], "}"}], "=", 
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{"PlotRange", "/.", "iopts"}], ")"}], 
+              "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}]}], ";", 
+            "\n", "\t", 
+            RowBox[{"(*", 
+             RowBox[{
+              RowBox[{"Print", "[", 
+               RowBox[{"\"\<{imin,imax}=\>\"", ",", 
+                RowBox[{"{", 
+                 RowBox[{"imin", ",", "imax"}], "}"}]}], "]"}], ";", "\n", 
+              "\t", 
+              RowBox[{"Print", "[", 
+               RowBox[{"\"\<{tmin,tmax}=\>\"", ",", 
+                RowBox[{"{", 
+                 RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], ";"}], "*)"}],
+             "\n", "\t", 
+            RowBox[{"iaspectratio", "=", 
+             RowBox[{"AspectRatio", "/.", "iopts"}]}], ";", "\n", "\t", 
+            RowBox[{"iticks", "=", 
+             RowBox[{"Ticks", "/.", "iopts"}]}], ";", "\n", "\t", 
+            RowBox[{"iaxesorigin", "=", 
+             RowBox[{"AxesOrigin", "/.", "iopts"}]}], ";", "\n", "\t", 
+            RowBox[{"iplotrangepadding", "=", 
+             RowBox[{"PlotRangePadding", "/.", "iopts"}]}], ";", "\n", "\t", 
+            RowBox[{"(*", 
+             RowBox[{
+              RowBox[{"Print", "[", 
+               RowBox[{"\"\<iaxesorigin=\>\"", ",", "iaxesorigin"}], "]"}], 
+              ";", "\n", "\t", 
+              RowBox[{"Print", "[", 
+               RowBox[{
+               "\"\<iplotrangepadding=\>\"", ",", "iplotrangepadding"}], 
+               "]"}], ";"}], "*)"}], "\n", "\t", 
+            RowBox[{"s", "=", 
+             RowBox[{"Max", "[", 
+              RowBox[{
+               RowBox[{"tf", "*", 
+                RowBox[{"imin", "/", 
+                 RowBox[{"(", 
+                  RowBox[{"tmax", 
+                   RowBox[{"(", 
+                    RowBox[{"tf", "-", "1"}], ")"}]}], ")"}]}]}], ",", 
+               RowBox[{"tf", "*", 
+                RowBox[{
+                 RowBox[{"(", 
+                  RowBox[{"imax", "-", 
+                   RowBox[{"Min", "[", 
+                    RowBox[{"0", ",", "imin"}], "]"}]}], ")"}], "/", 
+                 "tmax"}]}]}], "]"}]}], ";", " ", 
+            RowBox[{"(*", " ", 
+             RowBox[{"scale", " ", "TAD"}], " ", "*)"}], "\n", "\t", 
+            RowBox[{"(*", 
+             RowBox[{
+              RowBox[{"Print", "[", 
+               RowBox[{"\"\<s=\>\"", ",", "s"}], "]"}], ";"}], "*)"}], "\n", 
+            "\t", 
+            RowBox[{"resplotrange", "=", 
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"Min", "[", 
+                RowBox[{"imin", ",", "tmin"}], "]"}], ",", 
+               RowBox[{"Max", "[", 
+                RowBox[{"imax", ",", 
+                 RowBox[{"s", "*", "tmax"}]}], "]"}]}], "}"}]}], ";", "\n", 
+            "\t", 
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"Head", "[", 
+                RowBox[{"iplotrangepadding", "\[LeftDoubleBracket]", 
+                 RowBox[{"2", ",", "2"}], "\[RightDoubleBracket]"}], "]"}], "===",
+                "Scaled"}], ",", "\n", "\t\t", 
+              RowBox[{"lmin", "=", 
+               RowBox[{"imax", "+", 
+                RowBox[{"1.01", "*", 
+                 RowBox[{
+                  RowBox[{"Differences", "[", "resplotrange", "]"}], 
+                  "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], "*", 
+                 RowBox[{"iplotrangepadding", "\[LeftDoubleBracket]", 
+                  RowBox[{"2", ",", "2", ",", "1"}], 
+                  "\[RightDoubleBracket]"}]}]}]}], ",", "\n", "\t\t", 
+              RowBox[{"lmin", "=", 
+               RowBox[{"imax", "+", 
+                RowBox[{"iplotrangepadding", "\[LeftDoubleBracket]", 
+                 RowBox[{"2", ",", "2"}], "\[RightDoubleBracket]"}], "+", 
+                RowBox[{"0.01", "*", 
+                 RowBox[{
+                  RowBox[{"Differences", "[", "resplotrange", "]"}], 
+                  "\[LeftDoubleBracket]", "1", 
+                  "\[RightDoubleBracket]"}]}]}]}]}], "\n", "\t", "]"}], ";", 
+            "\n", "\t", 
+            RowBox[{"(*", 
+             RowBox[{
+              RowBox[{"Print", "[", 
+               RowBox[{"\"\<lmin=\>\"", ",", "lmin"}], "]"}], ";"}], "*)"}], 
+            "\n", "\t", 
+            RowBox[{"res", "=", 
+             RowBox[{"Show", "[", 
+              RowBox[{"iplot", ",", "\n", "\t\t", 
+               RowBox[{"PlotRange", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
+                  "resplotrange"}], "}"}]}], ",", 
+               RowBox[{"Ticks", "\[Rule]", "iticks"}], ",", "\n", "\t\t", 
+               RowBox[{"Epilog", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"White", ",", 
+                    RowBox[{"Line", "[", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    "iaxesorigin", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], ",", "lmin"}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    "iaxesorigin", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], ",", 
+                    RowBox[{"10", "^", "10"}]}], "}"}]}], "}"}], "]"}]}], 
+                   "}"}], ",", "\n", "\t\t", 
+                  RowBox[{"Inset", "[", 
+                   RowBox[{
+                    RowBox[{"Show", "[", 
+                    RowBox[{"tad", ",", 
+                    RowBox[{"AspectRatio", "\[Rule]", 
+                    RowBox[{"iaspectratio", "*", "tf"}]}]}], "]"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"0", ",", "0"}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"0", ",", "0"}], "}"}], ",", 
+                    RowBox[{"Scaled", "[", "1", "]"}]}], "]"}]}], "}"}]}]}], 
+              "]"}]}], ";"}], "\n", "\t", 
+           RowBox[{"(*", 
+            RowBox[{"res", "=", 
+             RowBox[{"Show", "[", "\n", "\t\t", 
+              RowBox[{"iplot", ",", "\n", "\t\t", 
+               RowBox[{"PlotRange", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
+                  "plotrange"}], "}"}]}], ",", 
+               RowBox[{"Ticks", "\[Rule]", "iticks"}], ",", "\n", "\t\t", 
+               RowBox[{"Epilog", "\[Rule]", 
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"White", ",", 
+                    RowBox[{"Line", "[", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    "iaxesorigin", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], ",", "lmin"}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    "iaxesorigin", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], ",", 
+                    RowBox[{"10", "^", "10"}]}], "}"}]}], "}"}], "]"}]}], 
+                   "}"}], ",", "\n", "\t\t", 
+                  RowBox[{"Inset", "[", 
+                   RowBox[{
+                    RowBox[{"Show", "[", 
+                    RowBox[{"tad", ",", 
+                    RowBox[{"AspectRatio", "\[Rule]", 
+                    RowBox[{"iaspectratio", "*", "tf"}]}]}], "]"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"0", ",", "0"}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"0", ",", "0"}], "}"}], ",", 
+                    RowBox[{"Scaled", "[", "1", "]"}]}], "]"}], ",", "\n", 
+                  "\t\t", 
+                  RowBox[{"Inset", "[", 
+                   RowBox[{
+                    RowBox[{"Show", "[", 
+                    RowBox[{"iplot", ",", 
+                    RowBox[{"Axes", "\[Rule]", "False"}], ",", 
+                    RowBox[{"PlotRange", "\[Rule]", 
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
+                    "resplotrange"}], "}"}]}]}], "]"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"0", ",", "0"}], "}"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"0", ",", "0"}], "}"}], ",", 
+                    RowBox[{"Scaled", "[", "1", "]"}]}], "]"}]}], "}"}]}]}], 
+              "]"}]}], "*)"}], "\n", "\t", ",", "\n", "\t", "Else", ",", "\n",
+            "\t", 
+           RowBox[{"res", "=", "iplot"}]}], "\n", "]"}], ";", "\n", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"monitor", ",", 
+           RowBox[{"NotebookClose", "[", "nb", "]"}]}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"Return", "[", "res", "]"}]}]}], "\n", "]"}]}], "]"}]}], 
+   ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.687822515057189*^9, 3.687822530773478*^9}, {
+   3.687822625324526*^9, 3.687822698958035*^9}, {3.6878236899075813`*^9, 
+   3.687823777026969*^9}, {3.687858288554859*^9, 3.687858379316575*^9}, 
+   3.687859034131632*^9, {3.687859081281536*^9, 3.687859085028665*^9}, {
+   3.6878592216893463`*^9, 3.687859227539363*^9}, {3.687859260960005*^9, 
+   3.6878592676681757`*^9}, 3.687881459180863*^9, {3.687972052514495*^9, 
+   3.687972079063807*^9}, {3.687972196418675*^9, 3.6879722087865877`*^9}, {
+   3.6879722540377913`*^9, 3.687972258321142*^9}, {3.687972345209043*^9, 
+   3.687972350459255*^9}, {3.687972402572905*^9, 3.687972407607215*^9}, {
+   3.687972472313492*^9, 3.687972474706842*^9}, {3.688065178156893*^9, 
+   3.6880651786355457`*^9}, {3.6880655342479753`*^9, 3.688065544159995*^9}, 
+   3.688078874572472*^9, {3.6885716915065823`*^9, 3.688571691947671*^9}, {
+   3.688571767697315*^9, 3.6885717678709517`*^9}, 3.688571807380752*^9, {
+   3.689078898055829*^9, 3.689078898347412*^9}, {3.689079052886949*^9, 
+   3.6890790620368347`*^9}, {3.689079283066757*^9, 3.689079369029817*^9}, {
+   3.68907982857856*^9, 3.689079842628839*^9}, {3.689080906961464*^9, 
+   3.68908091853683*^9}, {3.689081027869495*^9, 3.689081040196702*^9}, {
+   3.689085649134398*^9, 3.689085659181603*^9}, {3.689250618177328*^9, 
+   3.689250624127245*^9}, {3.689250654786996*^9, 3.6892506922458267`*^9}, {
+   3.693750523154491*^9, 3.693750536879137*^9}, 3.696162142155159*^9, {
+   3.70933678368288*^9, 3.709336785075458*^9}, 3.710105986287383*^9, {
+   3.7102562236106052`*^9, 3.710256245763166*^9}, {3.7102620179583797`*^9, 
+   3.710262025221158*^9}, {3.71026517976542*^9, 3.710265183399001*^9}, {
+   3.711221366000457*^9, 3.711221407610972*^9}, {3.7127385348473587`*^9, 
+   3.712738534856024*^9}, 3.722029501119842*^9, {3.7220341275926533`*^9, 
+   3.722034131610355*^9}, {3.7251409583231916`*^9, 3.725140958338376*^9}, 
+   3.725141965387879*^9, {3.726014195927367*^9, 3.726014197180872*^9}, {
+   3.726016667043661*^9, 3.726016710633573*^9}, {3.7260183058312263`*^9, 
+   3.726018316028738*^9}, {3.7280015915478487`*^9, 3.7280016081604033`*^9}, {
+   3.728001998267466*^9, 3.7280020111772213`*^9}, {3.728002980789393*^9, 
+   3.7280030587312393`*^9}, {3.728003100706468*^9, 3.728003137954404*^9}, {
+   3.728003238050528*^9, 3.728003244288938*^9}, {3.7280032798515577`*^9, 
+   3.72800328026143*^9}, {3.729205960608561*^9, 3.729206000014824*^9}, {
+   3.729253188925953*^9, 3.7292532162997437`*^9}, {3.7297102940324783`*^9, 
+   3.729710299129622*^9}, 3.729710368438281*^9, {3.729710425885874*^9, 
+   3.729710432792466*^9}, {3.7340134237861423`*^9, 3.734013435317161*^9}, {
+   3.734014523342512*^9, 3.7340145235148563`*^9}, {3.734176664236327*^9, 
+   3.7341766880011806`*^9}, {3.734176719961142*^9, 3.734176777770238*^9}, {
+   3.7341768179016657`*^9, 3.734176820363332*^9}, {3.734177106189267*^9, 
+   3.7341771298672657`*^9}, {3.734177836604755*^9, 3.734177866258082*^9}, {
+   3.734177976093787*^9, 3.734177980561645*^9}, {3.734178023125246*^9, 
+   3.734178089466783*^9}, {3.734178137296987*^9, 3.734178208076991*^9}, 
+   3.734178624045022*^9, {3.734178749007515*^9, 3.73417881313762*^9}, {
+   3.734178849453348*^9, 3.734178861872795*^9}, {3.734179280127408*^9, 
+   3.734179288469619*^9}, 3.734179335413727*^9, {3.734182832951275*^9, 
+   3.734182853692371*^9}, {3.734183923689186*^9, 3.7341839279183187`*^9}, {
+   3.734184034952119*^9, 3.734184049062687*^9}, {3.734184187018696*^9, 
+   3.734184262697177*^9}, {3.734184312551462*^9, 3.734184316960545*^9}, {
+   3.7427538252731533`*^9, 3.742753826195713*^9}, {3.742769274111416*^9, 
+   3.742769276909334*^9}, {3.742770184650483*^9, 3.7427701868838167`*^9}, {
+   3.74277144874271*^9, 3.742771487111938*^9}, {3.742771976719841*^9, 
+   3.742771978691617*^9}, {3.742772275702368*^9, 3.74277229116921*^9}, {
+   3.7427723268293123`*^9, 3.7427723303579807`*^9}, {3.742772484186269*^9, 
+   3.7427725148708057`*^9}, {3.742772548591604*^9, 3.742772585532236*^9}, {
+   3.742772636301237*^9, 3.742772643048668*^9}, {3.742811207726762*^9, 
+   3.742811210204801*^9}, {3.742811769513678*^9, 3.742811781348051*^9}, {
+   3.742812228960372*^9, 3.7428122311487503`*^9}, {3.742812355161635*^9, 
+   3.742812358811573*^9}, {3.742813176083551*^9, 3.7428131772276783`*^9}, {
+   3.742813281143999*^9, 3.7428132882665*^9}, {3.755039062835951*^9, 
+   3.7550390858923597`*^9}, {3.7587200270174828`*^9, 
+   3.7587200491680937`*^9}, {3.760771354670401*^9, 3.760771363862617*^9}, {
+   3.760771426573275*^9, 3.760771434936987*^9}, {3.760771470173852*^9, 
+   3.760771473213044*^9}, {3.760771895997445*^9, 3.760772011928965*^9}, {
+   3.760772042762755*^9, 3.760772076436163*^9}, {3.760772964622822*^9, 
+   3.7607730107485743`*^9}, {3.760790678462947*^9, 3.7607906790117064`*^9}, {
+   3.762406660037051*^9, 3.7624066892591133`*^9}, {3.767680831878668*^9, 
+   3.7676808461869307`*^9}, {3.767681249054401*^9, 3.7676812509733973`*^9}, {
+   3.767681564650297*^9, 3.767681566475297*^9}, {3.767681618805065*^9, 
+   3.767681719481382*^9}, {3.767681802009488*^9, 3.7676818996495256`*^9}, {
+   3.767682102447146*^9, 3.7676821162564497`*^9}, {3.767682283949895*^9, 
+   3.767682287562471*^9}, {3.767682648132848*^9, 3.767682674954535*^9}, {
+   3.767682809048053*^9, 3.7676828513705683`*^9}, {3.767682884605277*^9, 
+   3.76768291060604*^9}, {3.767685585020913*^9, 3.767685616475292*^9}, {
+   3.767686041822577*^9, 3.767686071370371*^9}, {3.767686228514377*^9, 
+   3.767686229534124*^9}, {3.767686388285735*^9, 3.7676864075201797`*^9}, {
+   3.767686548030298*^9, 3.7676865505845823`*^9}, {3.767686692536628*^9, 
+   3.767686692869727*^9}, {3.767686872551299*^9, 3.7676868949834948`*^9}, {
+   3.767709792927574*^9, 3.767709818667453*^9}, {3.767710134642276*^9, 
+   3.767710357425305*^9}, {3.767711020382333*^9, 3.767711178225119*^9}, {
+   3.767711287264325*^9, 3.767711323896446*^9}, {3.767711357770249*^9, 
+   3.7677113747335377`*^9}, {3.767711453508485*^9, 3.767711498365184*^9}, {
+   3.767716496573887*^9, 3.767716584904101*^9}, {3.7677166592913713`*^9, 
+   3.767716663250008*^9}, {3.767761004083555*^9, 3.7677611104949923`*^9}, {
+   3.767761160700287*^9, 3.767761171673183*^9}, {3.767766167534769*^9, 
+   3.767766196304922*^9}, {3.767797354399763*^9, 3.767797527809264*^9}, {
+   3.767797727503951*^9, 3.767797732400609*^9}, {3.7677978233305807`*^9, 
+   3.76779786215329*^9}, {3.767797905806987*^9, 3.7677979497523937`*^9}, {
+   3.767800306838687*^9, 3.767800307715334*^9}, 3.7678003407452507`*^9, 
+   3.767800419663095*^9, {3.767800513387594*^9, 3.767800533804984*^9}, 
+   3.767800611513537*^9, 3.76780070947401*^9, 3.767800748174323*^9, 
+   3.767800822733968*^9, 3.767800876898302*^9, {3.767800924837017*^9, 
+   3.7678009278084803`*^9}, 3.7678009914280987`*^9, {3.767801196514477*^9, 
+   3.76780119752626*^9}, {3.767801245071178*^9, 3.767801248536579*^9}, {
+   3.767801282380724*^9, 3.767801284783654*^9}, {3.7678013390239363`*^9, 
+   3.767801365845296*^9}, {3.7678014759794273`*^9, 3.767801581791115*^9}, {
+   3.7678016990606947`*^9, 3.7678017318382998`*^9}, {3.767801833581894*^9, 
+   3.7678018426932497`*^9}, {3.767802064470463*^9, 3.767802064880796*^9}, {
+   3.767806606111394*^9, 3.7678066429205837`*^9}, {3.767812364755934*^9, 
+   3.767812409737759*^9}, {3.767848711889349*^9, 3.767848739735091*^9}, {
+   3.767850429938011*^9, 3.767850433996773*^9}, {3.767852731708167*^9, 
+   3.767852782240037*^9}, {3.7678528556761417`*^9, 3.767852889902894*^9}, {
+   3.767852980499613*^9, 3.767853028955917*^9}, {3.7678531771488667`*^9, 
+   3.7678532209154387`*^9}, {3.767853425622162*^9, 3.767853426130178*^9}, {
+   3.767853718869217*^9, 3.767853752576302*^9}, {3.767854610042391*^9, 
+   3.767854649246014*^9}, {3.767854712673901*^9, 3.7678547365957613`*^9}, {
+   3.767854769658827*^9, 3.767854788180448*^9}, {3.767855581490903*^9, 
+   3.767855581977477*^9}, {3.767855620910554*^9, 3.767855622908681*^9}, {
+   3.767855850468823*^9, 3.76785596680791*^9}, {3.767856081996241*^9, 
+   3.767856129160697*^9}, {3.76785623737878*^9, 3.767856249843039*^9}, {
+   3.7678563685727*^9, 3.767856381155963*^9}, {3.767856427950753*^9, 
+   3.7678564498184147`*^9}, {3.767856623764406*^9, 3.7678566408669453`*^9}, {
+   3.7678568993918753`*^9, 3.7678569114937763`*^9}, {3.767856946184546*^9, 
+   3.767857057768154*^9}, {3.767857101777231*^9, 3.767857108371316*^9}, {
+   3.767857328837831*^9, 3.767857398698447*^9}, {3.76785760888587*^9, 
+   3.767857624299809*^9}, {3.767858016886936*^9, 3.767858255030161*^9}, {
+   3.767858287036371*^9, 3.767858336367559*^9}, {3.767858701227467*^9, 
+   3.767858712978614*^9}, {3.767859654888299*^9, 3.7678596621542273`*^9}, {
+   3.7678606954897346`*^9, 3.767860757188814*^9}, {3.7678607960546722`*^9, 
+   3.767860878471367*^9}, {3.767860944029777*^9, 3.767860974901649*^9}, {
+   3.7678610325467176`*^9, 3.767861040567409*^9}, {3.767861091061575*^9, 
+   3.767861101735209*^9}, {3.7678611405387506`*^9, 3.767861191438055*^9}, {
+   3.767861232296989*^9, 3.767861280243404*^9}, 3.76786305885012*^9, {
+   3.767863131117711*^9, 3.7678631395989*^9}, {3.7678631805200253`*^9, 
+   3.767863184054022*^9}, {3.767863610866002*^9, 3.767863613199786*^9}, {
+   3.767863660874543*^9, 3.7678637099016314`*^9}, {3.767863751873288*^9, 
+   3.767863761239665*^9}, {3.7678638007515163`*^9, 3.7678638044748783`*^9}, {
+   3.767864211467849*^9, 3.767864234815189*^9}, {3.767864305906537*^9, 
+   3.767864327639039*^9}, {3.7678644025222178`*^9, 3.767864406587122*^9}, {
+   3.767867290777543*^9, 3.767867294455392*^9}, {3.767867536408732*^9, 
+   3.767867656996372*^9}},ExpressionUUID->"8d184767-4ef9-4449-8fb3-\
+0c5b4b01b74e"],
+
+Cell[BoxData[
  RowBox[{
   RowBox[{
    RowBox[{"PlotInv", "[", 
@@ -23630,12 +24382,13 @@ Cell[BoxData[
        RowBox[{"(*", " ", "options", " ", "*)"}], "\n", "verbose", ",", 
        "verboseall", ",", "monitor", ",", "\n", "delayinv", ",", "invopts", 
        ",", "time", ",", "plotopts", ",", "plotspecies", ",", "markerstyle", 
-       ",", "plottadopts", ",", "tf", ",", "axeslabel", ",", "\n", 
+       ",", "plottadopts", ",", "tf", ",", "axeslabel", ",", "plotrange", ",",
+        "tadplotrange", ",", "\n", 
        RowBox[{"(*", " ", 
         RowBox[{"other", " ", "variables"}], " ", "*)"}], "\n", "nb", ",", 
        "x", ",", "iplot", ",", "\n", "iopts", ",", "imin", ",", "imax", ",", 
        "tmin", ",", "tmax", ",", "s", ",", "iaspectratio", ",", "iticks", ",",
-        "iaxesorigin", ",", "iplotrangepadding", ",", "plotrange", ",", 
+        "iaxesorigin", ",", "iplotrangepadding", ",", "resplotrange", ",", 
        "lmin", ",", "\n", "gu1", ",", "tr1", ",", "per", ",", "res", ",", 
        "inv", ",", "epilog", ",", "tad"}], "}"}], ",", "\n", "\n", 
      RowBox[{"Block", "[", 
@@ -23745,6 +24498,14 @@ Cell[BoxData[
              RowBox[{"opts", ",", 
               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
           "]"}]}], ";", "\n", 
+        RowBox[{"plotrange", "=", 
+         RowBox[{"Evaluate", "[", 
+          RowBox[{"PlotRange", "/.", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
+          "]"}]}], ";", "\n", 
         RowBox[{"plottadopts", "=", 
          RowBox[{"Evaluate", "[", 
           RowBox[{"PlotTADOpts", "/.", 
@@ -23753,6 +24514,8 @@ Cell[BoxData[
              RowBox[{"opts", ",", 
               RowBox[{"Options", "[", "PlotInv", "]"}]}], "}"}], "]"}]}], 
           "]"}]}], ";", "\n", 
+        RowBox[{"tadplotrange", "=", 
+         RowBox[{"PlotRange", "/.", "plottadopts"}]}], ";", "\n", 
         RowBox[{"tf", "=", 
          RowBox[{"Evaluate", "[", 
           RowBox[{"TADVerticalScale", "/.", 
@@ -23848,13 +24611,20 @@ Cell[BoxData[
                  RowBox[{"inv", "[", "\[FormalX]", "]"}], "]"}]}], ")"}], ",", 
               RowBox[{"{", 
                RowBox[{"\[FormalX]", ",", "trait1min", ",", "trait1max"}], 
-               "}"}], ",", 
+               "}"}], ",", "\n", "\t\t", 
               RowBox[{"AxesLabel", "\[Rule]", "axeslabel"}], ",", 
+              RowBox[{"PlotRange", "\[Rule]", 
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"{", 
+                  RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
+                 "plotrange"}], "}"}]}], ",", "\n", "\t\t", 
               RowBox[{"Evaluate", "[", 
                RowBox[{"Sequence", "@@", "plotopts"}], "]"}], ",", 
-              RowBox[{"Epilog", "\[Rule]", "epilog"}], ",", 
-              RowBox[{"Prolog", "\[Rule]", "prolog"}]}], "]"}]}], ";"}], "\n",
-           ",", "\n", "\t", 
+              RowBox[{"AxesOrigin", "\[Rule]", 
+               RowBox[{"{", 
+                RowBox[{"trait1min", ",", "0"}], "}"}]}]}], "]"}]}], ";"}], 
+          "\n", ",", "\n", "\t", 
           RowBox[{"(*", " ", 
            RowBox[{"nondelay", " ", "inv"}], " ", "*)"}], "\n", "\t", 
           RowBox[{
@@ -23874,20 +24644,20 @@ Cell[BoxData[
              RowBox[{"inv", ",", 
               RowBox[{"{", 
                RowBox[{"trait1", ",", "trait1min", ",", "trait1max"}], "}"}], 
-              ",", 
+              ",", "\n", "\t\t", 
               RowBox[{"AxesLabel", "\[Rule]", "axeslabel"}], ",", 
-              RowBox[{"Evaluate", "[", 
-               RowBox[{"Sequence", "@@", "plotopts"}], "]"}], ",", "\n", 
-              "\t\t", 
-              RowBox[{"AxesOrigin", "\[Rule]", 
-               RowBox[{"{", 
-                RowBox[{"trait1min", ",", "0"}], "}"}]}], ",", 
               RowBox[{"PlotRange", "\[Rule]", 
                RowBox[{"{", 
                 RowBox[{
                  RowBox[{"{", 
                   RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
-                 "Automatic"}], "}"}]}]}], "]"}]}], ";", "\n", "\t", 
+                 "plotrange"}], "}"}]}], ",", "\n", "\t\t", 
+              RowBox[{"Evaluate", "[", 
+               RowBox[{"Sequence", "@@", "plotopts"}], "]"}], ",", 
+              RowBox[{"AxesOrigin", "\[Rule]", 
+               RowBox[{"{", 
+                RowBox[{"trait1min", ",", "0"}], "}"}]}]}], "]"}]}], ";", 
+           "\n", "\t", 
            RowBox[{"On", "[", 
             RowBox[{"NIntegrate", "::", "inumr"}], "]"}]}]}], "\n", "]"}], 
         ";", "\n", "\n", 
@@ -23963,15 +24733,24 @@ Cell[BoxData[
            RowBox[{"tad", "=", 
             RowBox[{"PlotTAD", "[", 
              RowBox[{"traits", ",", "sol", ",", 
-              RowBox[{"Evaluate", "[", 
-               RowBox[{"Sequence", "@@", "plottadopts"}], "]"}], ",", 
               RowBox[{"PlotRange", "\[Rule]", 
                RowBox[{"{", 
                 RowBox[{
                  RowBox[{"{", 
                   RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
-                 "All"}], "}"}]}], ",", 
-              RowBox[{"ImagePadding", "\[Rule]", "0"}], ",", "\n", "\t\t", 
+                 "tadplotrange"}], "}"}]}], ",", 
+              RowBox[{"Evaluate", "[", 
+               RowBox[{"Sequence", "@@", "plottadopts"}], "]"}], ",", "\n", 
+              "\t\t", 
+              RowBox[{"ImagePadding", "\[Rule]", 
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"{", 
+                  RowBox[{"0", ",", "0"}], "}"}], ",", 
+                 RowBox[{"{", 
+                  RowBox[{"0", ",", 
+                   RowBox[{"Scaled", "[", "0.05", "]"}]}], "}"}]}], "}"}]}], 
+              ",", 
               RowBox[{"Axes", "\[Rule]", "False"}], ",", 
               RowBox[{"Guild", "\[Rule]", "gu1"}]}], "]"}]}], ";", "\n", "\t", 
            RowBox[{"(*", 
@@ -24049,7 +24828,7 @@ Cell[BoxData[
              RowBox[{"Print", "[", 
               RowBox[{"\"\<s=\>\"", ",", "s"}], "]"}], ";"}], "*)"}], "\n", 
            "\t", 
-           RowBox[{"plotrange", "=", 
+           RowBox[{"resplotrange", "=", 
             RowBox[{"{", 
              RowBox[{
               RowBox[{"Min", "[", 
@@ -24069,7 +24848,7 @@ Cell[BoxData[
               RowBox[{"imax", "+", 
                RowBox[{"1.01", "*", 
                 RowBox[{
-                 RowBox[{"Differences", "[", "plotrange", "]"}], 
+                 RowBox[{"Differences", "[", "resplotrange", "]"}], 
                  "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], "*", 
                 
                 RowBox[{"iplotrangepadding", "\[LeftDoubleBracket]", 
@@ -24081,7 +24860,7 @@ Cell[BoxData[
                 RowBox[{"2", ",", "2"}], "\[RightDoubleBracket]"}], "+", 
                RowBox[{"0.01", "*", 
                 RowBox[{
-                 RowBox[{"Differences", "[", "plotrange", "]"}], 
+                 RowBox[{"Differences", "[", "resplotrange", "]"}], 
                  "\[LeftDoubleBracket]", "1", 
                  "\[RightDoubleBracket]"}]}]}]}]}], "\n", "\t", "]"}], ";", 
            "\n", "\t", 
@@ -24090,24 +24869,22 @@ Cell[BoxData[
              RowBox[{"Print", "[", 
               RowBox[{"\"\<lmin=\>\"", ",", "lmin"}], "]"}], ";"}], "*)"}], 
            "\n", "\t", 
-           RowBox[{"(*", 
-            RowBox[{
-             RowBox[{"res", "=", 
-              RowBox[{"Show", "[", 
-               RowBox[{"iplot", ",", "\n", "\t\t", 
-                RowBox[{"PlotRange", "\[Rule]", 
+           RowBox[{"res", "=", 
+            RowBox[{"Show", "[", 
+             RowBox[{"iplot", ",", "\n", "\t\t", 
+              RowBox[{"PlotRange", "\[Rule]", 
+               RowBox[{"{", 
+                RowBox[{
                  RowBox[{"{", 
-                  RowBox[{
-                   RowBox[{"{", 
-                    RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
-                   "plotrange"}], "}"}]}], ",", 
-                RowBox[{"Ticks", "\[Rule]", "iticks"}], ",", "\n", "\t\t", 
-                RowBox[{"Epilog", "\[Rule]", 
+                  RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
+                 "resplotrange"}], "}"}]}], ",", 
+              RowBox[{"Ticks", "\[Rule]", "iticks"}], ",", "\n", "\t\t", 
+              RowBox[{"Epilog", "\[Rule]", 
+               RowBox[{"{", 
+                RowBox[{
                  RowBox[{"{", 
-                  RowBox[{
-                   RowBox[{"{", 
-                    RowBox[{"White", ",", 
-                    RowBox[{"Line", "[", 
+                  RowBox[{"White", ",", 
+                   RowBox[{"Line", "[", 
                     RowBox[{"{", 
                     RowBox[{
                     RowBox[{"{", 
@@ -24121,100 +24898,23 @@ Cell[BoxData[
                     "iaxesorigin", "\[LeftDoubleBracket]", "1", 
                     "\[RightDoubleBracket]"}], ",", 
                     RowBox[{"10", "^", "10"}]}], "}"}]}], "}"}], "]"}]}], 
-                    "}"}], ",", "\n", "\t\t", 
-                   RowBox[{"Inset", "[", 
-                    RowBox[{
-                    RowBox[{"Show", "[", 
+                  "}"}], ",", "\n", "\t\t", 
+                 RowBox[{"Inset", "[", 
+                  RowBox[{
+                   RowBox[{"Show", "[", 
                     RowBox[{"tad", ",", 
                     RowBox[{"AspectRatio", "\[Rule]", 
                     RowBox[{"iaspectratio", "*", "tf"}]}]}], "]"}], ",", 
-                    RowBox[{"{", 
+                   RowBox[{"{", 
                     RowBox[{"0", ",", "0"}], "}"}], ",", 
-                    RowBox[{"{", 
+                   RowBox[{"{", 
                     RowBox[{"0", ",", "0"}], "}"}], ",", 
-                    RowBox[{"Scaled", "[", "1", "]"}]}], "]"}]}], "}"}]}]}], 
-               "]"}]}], ";"}], "*)"}], "\n", "\t", 
-           RowBox[{"(*", 
-            RowBox[{"res", "=", 
-             RowBox[{"Show", "[", 
-              RowBox[{"iplot", ",", "\n", "\t\t", 
-               RowBox[{"PlotRange", "\[Rule]", 
-                RowBox[{"{", 
-                 RowBox[{
-                  RowBox[{"{", 
-                   RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
-                  "plotrange"}], "}"}]}], ",", 
-               RowBox[{"Ticks", "\[Rule]", "iticks"}], ",", "\n", "\t\t", 
-               RowBox[{"Epilog", "\[Rule]", 
-                RowBox[{"{", 
-                 RowBox[{
-                  RowBox[{"{", 
-                   RowBox[{"White", ",", 
-                    RowBox[{"Line", "[", 
-                    RowBox[{"{", 
-                    RowBox[{
-                    RowBox[{"{", 
-                    RowBox[{
-                    RowBox[{
-                    "iaxesorigin", "\[LeftDoubleBracket]", "1", 
-                    "\[RightDoubleBracket]"}], ",", "lmin"}], "}"}], ",", 
-                    RowBox[{"{", 
-                    RowBox[{
-                    RowBox[{
-                    "iaxesorigin", "\[LeftDoubleBracket]", "1", 
-                    "\[RightDoubleBracket]"}], ",", 
-                    RowBox[{"10", "^", "10"}]}], "}"}]}], "}"}], "]"}]}], 
-                   "}"}], ",", "\n", "\t\t", 
-                  RowBox[{"Inset", "[", 
-                   RowBox[{
-                    RowBox[{"Show", "[", 
-                    RowBox[{"tad", ",", 
-                    RowBox[{"AspectRatio", "\[Rule]", 
-                    RowBox[{"iaspectratio", "*", "tf"}]}]}], "]"}], ",", 
-                    RowBox[{"{", 
-                    RowBox[{"0", ",", "0"}], "}"}], ",", 
-                    RowBox[{"{", 
-                    RowBox[{"0", ",", "0"}], "}"}], ",", 
-                    RowBox[{"Scaled", "[", "1", "]"}]}], "]"}], ",", "\n", 
-                  "\t\t", 
-                  RowBox[{"Inset", "[", 
-                   RowBox[{
-                    RowBox[{"Show", "[", 
-                    RowBox[{"iplot", ",", 
-                    RowBox[{"Axes", "\[Rule]", "False"}], ",", 
-                    RowBox[{"PlotRange", "\[Rule]", 
-                    RowBox[{"{", 
-                    RowBox[{
-                    RowBox[{"{", 
-                    RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
-                    "plotrange"}], "}"}]}]}], "]"}], ",", 
-                    RowBox[{"{", 
-                    RowBox[{"0", ",", "0"}], "}"}], ",", 
-                    RowBox[{"{", 
-                    RowBox[{"0", ",", "0"}], "}"}], ",", 
-                    RowBox[{"Scaled", "[", "1", "]"}]}], "]"}]}], "}"}]}]}], 
-              "]"}]}], "*)"}], "\n", "\t", 
+                   RowBox[{"Scaled", "[", "1", "]"}]}], "]"}]}], "}"}]}]}], 
+             "]"}]}], ";"}], "\n", "\t", 
+          RowBox[{"(*", 
            RowBox[{"res", "=", 
             RowBox[{"Show", "[", "\n", "\t\t", 
-             RowBox[{
-              RowBox[{"Plot", "[", 
-               RowBox[{"Null", ",", 
-                RowBox[{"{", 
-                 RowBox[{"trait1", ",", "trait1min", ",", "trait1max"}], 
-                 "}"}], ",", 
-                RowBox[{"AxesLabel", "\[Rule]", "axeslabel"}], ",", 
-                RowBox[{"Evaluate", "[", 
-                 RowBox[{"Sequence", "@@", "plotopts"}], "]"}], ",", "\n", 
-                "\t\t\t", 
-                RowBox[{"AxesOrigin", "\[Rule]", 
-                 RowBox[{"{", 
-                  RowBox[{"trait1min", ",", "0"}], "}"}]}], ",", 
-                RowBox[{"PlotRange", "\[Rule]", 
-                 RowBox[{"{", 
-                  RowBox[{
-                   RowBox[{"{", 
-                    RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
-                   "Automatic"}], "}"}]}]}], "]"}], ",", "\n", "\t\t", 
+             RowBox[{"iplot", ",", "\n", "\t\t", 
               RowBox[{"PlotRange", "\[Rule]", 
                RowBox[{"{", 
                 RowBox[{
@@ -24264,14 +24964,14 @@ Cell[BoxData[
                     RowBox[{
                     RowBox[{"{", 
                     RowBox[{"trait1min", ",", "trait1max"}], "}"}], ",", 
-                    "plotrange"}], "}"}]}]}], "]"}], ",", 
+                    "resplotrange"}], "}"}]}]}], "]"}], ",", 
                    RowBox[{"{", 
                     RowBox[{"0", ",", "0"}], "}"}], ",", 
                    RowBox[{"{", 
                     RowBox[{"0", ",", "0"}], "}"}], ",", 
                    RowBox[{"Scaled", "[", "1", "]"}]}], "]"}]}], "}"}]}]}], 
-             "]"}]}]}], "\n", "\t", ",", "\n", "\t", "Else", ",", "\n", "\t", 
-          
+             "]"}]}], "*)"}], "\n", "\t", ",", "\n", "\t", "Else", ",", "\n", 
+          "\t", 
           RowBox[{"res", "=", "iplot"}]}], "\n", "]"}], ";", "\n", "\n", 
         RowBox[{"If", "[", 
          RowBox[{"monitor", ",", 
@@ -24399,8 +25099,18 @@ Cell[BoxData[
    3.767860878471367*^9}, {3.767860944029777*^9, 3.767860974901649*^9}, {
    3.7678610325467176`*^9, 3.767861040567409*^9}, {3.767861091061575*^9, 
    3.767861101735209*^9}, {3.7678611405387506`*^9, 3.767861191438055*^9}, {
-   3.767861232296989*^9, 
-   3.767861280243404*^9}},ExpressionUUID->"372e60e0-9cf7-4681-9b44-\
+   3.767861232296989*^9, 3.767861280243404*^9}, 3.76786305885012*^9, {
+   3.767863131117711*^9, 3.7678631395989*^9}, {3.7678631805200253`*^9, 
+   3.767863184054022*^9}, {3.767863610866002*^9, 3.767863613199786*^9}, {
+   3.767863660874543*^9, 3.7678637099016314`*^9}, {3.767863751873288*^9, 
+   3.767863761239665*^9}, {3.7678638007515163`*^9, 3.7678638044748783`*^9}, {
+   3.767864211467849*^9, 3.767864234815189*^9}, {3.767864305906537*^9, 
+   3.767864327639039*^9}, {3.7678644025222178`*^9, 3.767864406587122*^9}, {
+   3.767867290777543*^9, 3.767867294455392*^9}, {3.767867536408732*^9, 
+   3.767867656996372*^9}, {3.767868235305931*^9, 3.767868245179212*^9}, {
+   3.7678683536725073`*^9, 3.767868434307798*^9}, {3.767868497031457*^9, 
+   3.767868570854002*^9}, {3.767868620401626*^9, 
+   3.767868622932773*^9}},ExpressionUUID->"372e60e0-9cf7-4681-9b44-\
 76cc0d300941"],
 
 Cell[CellGroupData[{
@@ -24453,9 +25163,13 @@ Cell[BoxData[
      RowBox[{"MarkerStyle", "\[Rule]", "Automatic"}], ",", 
      RowBox[{"PlotSpecies", "\[Rule]", "\"\<TAD\>\""}], ",", 
      RowBox[{"PlotTADOpts", "\[Rule]", 
-      RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"{", 
+       RowBox[{"PlotRange", "\[Rule]", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "All"}], "}"}]}], "}"}]}], ",", 
      RowBox[{"TADVerticalScale", "\[Rule]", "0.25"}], ",", "\n", "\t", 
-     RowBox[{"AxesLabel", "\[Rule]", "Automatic"}], ",", "\n", "\t", 
+     RowBox[{"AxesLabel", "\[Rule]", "Automatic"}], ",", 
+     RowBox[{"PlotRange", "\[Rule]", "Automatic"}], ",", "\n", "\t", 
      RowBox[{"PlotStyle", "\[Rule]", "Gray"}], ",", 
      RowBox[{"PlotPoints", "\[Rule]", "5"}], ",", "\n", "\t", 
      RowBox[{"Monitor", "\[Rule]", "False"}], ",", "\n", "\t", 
@@ -24466,8 +25180,9 @@ Cell[BoxData[
   3.7587200413365297`*^9, {3.767681285835305*^9, 3.767681310154229*^9}, {
    3.767681880812373*^9, 3.767681886250182*^9}, 3.767686393246468*^9, 
    3.767686531101912*^9, {3.767797707873724*^9, 3.767797715339979*^9}, {
-   3.767800636504181*^9, 3.767800636841601*^9}, 
-   3.7678576344317408`*^9},ExpressionUUID->"ba35b3f6-262a-431f-af36-\
+   3.767800636504181*^9, 3.767800636841601*^9}, 3.7678576344317408`*^9, {
+   3.767863725820301*^9, 3.767863729342362*^9}, {3.7678676269746227`*^9, 
+   3.7678676308673143`*^9}},ExpressionUUID->"ba35b3f6-262a-431f-af36-\
 3a894f9f8687"]
 }, Open  ]]
 }, Open  ]],
@@ -36915,197 +37630,198 @@ Cell[1023445, 23586, 342, 10, 78, "Code",ExpressionUUID->"a667433d-0d72-4502-817
 }, Closed]],
 Cell[CellGroupData[{
 Cell[1023824, 23601, 123, 2, 55, "Subsection",ExpressionUUID->"ccf8610d-5377-4e92-9781-2bfddc133343"],
-Cell[1023950, 23605, 38280, 798, 3597, "Code",ExpressionUUID->"372e60e0-9cf7-4681-9b44-76cc0d300941"],
+Cell[1023950, 23605, 36676, 750, 3571, "Code",ExpressionUUID->"8d184767-4ef9-4449-8fb3-0c5b4b01b74e"],
+Cell[1060629, 24357, 36562, 756, 3571, "Code",ExpressionUUID->"372e60e0-9cf7-4681-9b44-76cc0d300941"],
 Cell[CellGroupData[{
-Cell[1062255, 24407, 159, 3, 67, "Subsubsection",ExpressionUUID->"deb5085a-78f1-4d57-81c2-9dee7e0083ad"],
-Cell[1062417, 24412, 715, 18, 31468, "Code",ExpressionUUID->"780a9da2-2cb2-471d-9275-5e0cc51d6ab0"]
+Cell[1097216, 25117, 159, 3, 67, "Subsubsection",ExpressionUUID->"deb5085a-78f1-4d57-81c2-9dee7e0083ad"],
+Cell[1097378, 25122, 715, 18, 31468, "Code",ExpressionUUID->"780a9da2-2cb2-471d-9275-5e0cc51d6ab0"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1063169, 24435, 158, 3, 53, "Subsubsection",ExpressionUUID->"1f014808-33f3-46cf-beab-01d799cbd6dc"],
-Cell[1063330, 24440, 1418, 30, 311, "Code",ExpressionUUID->"ba35b3f6-262a-431f-af36-3a894f9f8687"]
+Cell[1098130, 25145, 158, 3, 53, "Subsubsection",ExpressionUUID->"1f014808-33f3-46cf-beab-01d799cbd6dc"],
+Cell[1098291, 25150, 1684, 35, 311, "Code",ExpressionUUID->"ba35b3f6-262a-431f-af36-3a894f9f8687"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[1064797, 24476, 189, 4, 81, "Subsection",ExpressionUUID->"0b68945e-8a4d-432f-baef-03706e1edae9"],
-Cell[1064989, 24482, 49553, 991, 1628048, "Code",ExpressionUUID->"dbd6a2ae-05ac-4fca-b4cb-7851cdb91c8e"]
+Cell[1100024, 25191, 189, 4, 81, "Subsection",ExpressionUUID->"0b68945e-8a4d-432f-baef-03706e1edae9"],
+Cell[1100216, 25197, 49553, 991, 1628048, "Code",ExpressionUUID->"dbd6a2ae-05ac-4fca-b4cb-7851cdb91c8e"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1114579, 25478, 123, 2, 55, "Subsection",ExpressionUUID->"250940ff-72a0-443a-8400-719da27fb0c0"],
-Cell[1114705, 25482, 51708, 1049, 26228, "Code",ExpressionUUID->"6b3b5376-6301-40f3-a430-f16919723f6a"]
+Cell[1149806, 26193, 123, 2, 55, "Subsection",ExpressionUUID->"250940ff-72a0-443a-8400-719da27fb0c0"],
+Cell[1149932, 26197, 51708, 1049, 26228, "Code",ExpressionUUID->"6b3b5376-6301-40f3-a430-f16919723f6a"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1166450, 26536, 123, 2, 55, "Subsection",ExpressionUUID->"725f0102-bbe0-4d21-9d25-fde00f9c1526"],
-Cell[1166576, 26540, 68028, 1430, 35361, "Code",ExpressionUUID->"de95846c-962c-4bdc-a4ce-20f6f61e3568"],
-Cell[1234607, 27972, 1748, 43, 693, "Code",ExpressionUUID->"743c95d1-1551-4a5b-b52c-eed945de3bc7"],
-Cell[1236358, 28017, 1524, 39, 546, "Code",ExpressionUUID->"b133be9d-1a23-4e59-9809-838bd001fe32"],
-Cell[1237885, 28058, 1219, 31, 693, "Code",ExpressionUUID->"cc7e603e-8b37-43dc-9bec-96db8bb31df6"],
-Cell[1239107, 28091, 2372, 46, 1280, "Code",ExpressionUUID->"3ff51124-5065-48c2-b8fc-7fc6eddc2c1d"]
+Cell[1201677, 27251, 123, 2, 55, "Subsection",ExpressionUUID->"725f0102-bbe0-4d21-9d25-fde00f9c1526"],
+Cell[1201803, 27255, 68028, 1430, 35361, "Code",ExpressionUUID->"de95846c-962c-4bdc-a4ce-20f6f61e3568"],
+Cell[1269834, 28687, 1748, 43, 693, "Code",ExpressionUUID->"743c95d1-1551-4a5b-b52c-eed945de3bc7"],
+Cell[1271585, 28732, 1524, 39, 546, "Code",ExpressionUUID->"b133be9d-1a23-4e59-9809-838bd001fe32"],
+Cell[1273112, 28773, 1219, 31, 693, "Code",ExpressionUUID->"cc7e603e-8b37-43dc-9bec-96db8bb31df6"],
+Cell[1274334, 28806, 2372, 46, 1280, "Code",ExpressionUUID->"3ff51124-5065-48c2-b8fc-7fc6eddc2c1d"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1241516, 28142, 265, 5, 55, "Subsection",ExpressionUUID->"91164660-6832-410b-9a6e-7dc73876d9ef"],
-Cell[1241784, 28149, 35406, 699, 35583, "Code",ExpressionUUID->"8c7b7079-c31b-45b5-834d-e38d28dc3286"],
+Cell[1276743, 28857, 265, 5, 55, "Subsection",ExpressionUUID->"91164660-6832-410b-9a6e-7dc73876d9ef"],
+Cell[1277011, 28864, 35406, 699, 35583, "Code",ExpressionUUID->"8c7b7079-c31b-45b5-834d-e38d28dc3286"],
 Cell[CellGroupData[{
-Cell[1277215, 28852, 157, 3, 758, "Subsubsection",ExpressionUUID->"a806768f-ff76-47a1-aba6-629149705eac"],
-Cell[1277375, 28857, 1323, 29, 1228, "Code",ExpressionUUID->"d6b56ab5-fedd-4366-a538-aa0acb6aa5e8"]
+Cell[1312442, 29567, 157, 3, 758, "Subsubsection",ExpressionUUID->"a806768f-ff76-47a1-aba6-629149705eac"],
+Cell[1312602, 29572, 1323, 29, 1228, "Code",ExpressionUUID->"d6b56ab5-fedd-4366-a538-aa0acb6aa5e8"]
 }, Open  ]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1278747, 28892, 198, 4, 55, "Subsection",ExpressionUUID->"a2a2707c-131a-48a8-b69c-858d4f8048e2"],
-Cell[1278948, 28898, 38188, 722, 3013, "Code",ExpressionUUID->"715cba62-30a3-474b-aa87-a195f2a53694"],
-Cell[1317139, 29622, 1348, 33, 108, "Code",ExpressionUUID->"eb3e3a2f-0b40-4a2f-ba7a-ee449062cb0e"],
+Cell[1313974, 29607, 198, 4, 55, "Subsection",ExpressionUUID->"a2a2707c-131a-48a8-b69c-858d4f8048e2"],
+Cell[1314175, 29613, 38188, 722, 3013, "Code",ExpressionUUID->"715cba62-30a3-474b-aa87-a195f2a53694"],
+Cell[1352366, 30337, 1348, 33, 108, "Code",ExpressionUUID->"eb3e3a2f-0b40-4a2f-ba7a-ee449062cb0e"],
 Cell[CellGroupData[{
-Cell[1318512, 29659, 158, 3, 67, "Subsubsection",ExpressionUUID->"d880ed02-37db-4bbf-b78a-3080d1645452"],
-Cell[1318673, 29664, 1245, 28, 166, "Code",ExpressionUUID->"d9f621e1-ad11-4969-a3b9-73b458cc9c96"]
+Cell[1353739, 30374, 158, 3, 67, "Subsubsection",ExpressionUUID->"d880ed02-37db-4bbf-b78a-3080d1645452"],
+Cell[1353900, 30379, 1245, 28, 166, "Code",ExpressionUUID->"d9f621e1-ad11-4969-a3b9-73b458cc9c96"]
 }, Open  ]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1319967, 29698, 132, 2, 55, "Subsection",ExpressionUUID->"95908736-6e20-4608-8281-6142e72c8099"],
-Cell[1320102, 29702, 69460, 1421, 6855, "Code",ExpressionUUID->"863835c9-e3ee-4817-ab32-188bab86501d"],
-Cell[1389565, 31125, 1443, 35, 108, "Code",ExpressionUUID->"aeeb44f6-0e44-4419-9b3b-38951b48ed21"]
+Cell[1355194, 30413, 132, 2, 55, "Subsection",ExpressionUUID->"95908736-6e20-4608-8281-6142e72c8099"],
+Cell[1355329, 30417, 69460, 1421, 6855, "Code",ExpressionUUID->"863835c9-e3ee-4817-ab32-188bab86501d"],
+Cell[1424792, 31840, 1443, 35, 108, "Code",ExpressionUUID->"aeeb44f6-0e44-4419-9b3b-38951b48ed21"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1391045, 31165, 250, 5, 55, "Subsection",ExpressionUUID->"31f8cf0a-32b4-4d00-be2f-2fd2072a2ade"],
-Cell[1391298, 31172, 10280, 228, 61402, "Code",ExpressionUUID->"652f12f1-ec5b-4ec5-a966-1d2f27a6f5df"],
-Cell[1401581, 31402, 8982, 195, 302382, "Code",ExpressionUUID->"6f9bb147-4beb-4291-839c-51da4dceac41"],
-Cell[1410566, 31599, 11523, 248, 327685, "Code",ExpressionUUID->"0332d0e0-1cfb-4e93-a060-16cd76de0fef"],
-Cell[1422092, 31849, 1725, 43, 48350, "Code",ExpressionUUID->"b0e38398-155e-41ae-9925-43f1aaa63f30"],
-Cell[1423820, 31894, 686, 18, 22653, "Code",ExpressionUUID->"5be71ed4-d6c8-4862-804c-ba5e024d4598"]
+Cell[1426272, 31880, 250, 5, 55, "Subsection",ExpressionUUID->"31f8cf0a-32b4-4d00-be2f-2fd2072a2ade"],
+Cell[1426525, 31887, 10280, 228, 61402, "Code",ExpressionUUID->"652f12f1-ec5b-4ec5-a966-1d2f27a6f5df"],
+Cell[1436808, 32117, 8982, 195, 302382, "Code",ExpressionUUID->"6f9bb147-4beb-4291-839c-51da4dceac41"],
+Cell[1445793, 32314, 11523, 248, 327685, "Code",ExpressionUUID->"0332d0e0-1cfb-4e93-a060-16cd76de0fef"],
+Cell[1457319, 32564, 1725, 43, 48350, "Code",ExpressionUUID->"b0e38398-155e-41ae-9925-43f1aaa63f30"],
+Cell[1459047, 32609, 686, 18, 22653, "Code",ExpressionUUID->"5be71ed4-d6c8-4862-804c-ba5e024d4598"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1424543, 31917, 125, 2, 55, "Subsection",ExpressionUUID->"9aa466c4-fcbb-4363-9c3d-4e50b9fff8d0"],
-Cell[1424671, 31921, 39031, 827, 19190, "Code",ExpressionUUID->"429613b2-3475-4284-bcda-ea8f3ea9726a"],
+Cell[1459770, 32632, 125, 2, 55, "Subsection",ExpressionUUID->"9aa466c4-fcbb-4363-9c3d-4e50b9fff8d0"],
+Cell[1459898, 32636, 39031, 827, 19190, "Code",ExpressionUUID->"429613b2-3475-4284-bcda-ea8f3ea9726a"],
 Cell[CellGroupData[{
-Cell[1463727, 32752, 159, 3, 758, "Subsubsection",ExpressionUUID->"c4607337-c462-460f-bef3-fd92e8009768"],
-Cell[1463889, 32757, 1560, 32, 56790, "Code",ExpressionUUID->"46e2797c-f123-42db-965b-b8163a583c30"]
+Cell[1498954, 33467, 159, 3, 758, "Subsubsection",ExpressionUUID->"c4607337-c462-460f-bef3-fd92e8009768"],
+Cell[1499116, 33472, 1560, 32, 56790, "Code",ExpressionUUID->"46e2797c-f123-42db-965b-b8163a583c30"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1465486, 32794, 87, 0, 600, "Subsubsection",ExpressionUUID->"b44c9488-5aa4-4641-9cb7-e65a92b5b15e"],
-Cell[1465576, 32796, 943, 23, 31468, "Code",ExpressionUUID->"2c4b67ba-a3e7-47a0-b68b-e0741b6d89e2"]
+Cell[1500713, 33509, 87, 0, 600, "Subsubsection",ExpressionUUID->"b44c9488-5aa4-4641-9cb7-e65a92b5b15e"],
+Cell[1500803, 33511, 943, 23, 31468, "Code",ExpressionUUID->"2c4b67ba-a3e7-47a0-b68b-e0741b6d89e2"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1466568, 32825, 247, 5, 55, "Subsection",ExpressionUUID->"4d7dd79d-2e81-4488-8ac9-44fc9fa7c3c4"],
-Cell[1466818, 32832, 19179, 393, 2080, "Code",ExpressionUUID->"00400901-ccbb-466c-84c3-6ed320dadb3e"],
+Cell[1501795, 33540, 247, 5, 55, "Subsection",ExpressionUUID->"4d7dd79d-2e81-4488-8ac9-44fc9fa7c3c4"],
+Cell[1502045, 33547, 19179, 393, 2080, "Code",ExpressionUUID->"00400901-ccbb-466c-84c3-6ed320dadb3e"],
 Cell[CellGroupData[{
-Cell[1486022, 33229, 87, 0, 67, "Subsubsection",ExpressionUUID->"89050da3-74be-4ba3-9dce-62cc62b9fa47"],
-Cell[1486112, 33231, 948, 21, 22653, "Code",ExpressionUUID->"37038112-6241-40be-920c-f6bfb93e3fbf"]
+Cell[1521249, 33944, 87, 0, 67, "Subsubsection",ExpressionUUID->"89050da3-74be-4ba3-9dce-62cc62b9fa47"],
+Cell[1521339, 33946, 948, 21, 22653, "Code",ExpressionUUID->"37038112-6241-40be-920c-f6bfb93e3fbf"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1487097, 33257, 87, 0, 53, "Subsubsection",ExpressionUUID->"990b7bc7-982c-474b-a6ad-1a65fdb5ecb3"],
-Cell[1487187, 33259, 737, 18, 78, "Code",ExpressionUUID->"2a71f4dd-182b-4504-a9dc-017521939500"]
+Cell[1522324, 33972, 87, 0, 53, "Subsubsection",ExpressionUUID->"990b7bc7-982c-474b-a6ad-1a65fdb5ecb3"],
+Cell[1522414, 33974, 737, 18, 78, "Code",ExpressionUUID->"2a71f4dd-182b-4504-a9dc-017521939500"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1487973, 33283, 356, 6, 55, "Subsection",ExpressionUUID->"2cdd0838-2ebd-4dd2-baae-d3ace1c006fd"],
+Cell[1523200, 33998, 356, 6, 55, "Subsection",ExpressionUUID->"2cdd0838-2ebd-4dd2-baae-d3ace1c006fd"],
 Cell[CellGroupData[{
-Cell[1488354, 33293, 135, 3, 3836, "Subsubsection",ExpressionUUID->"27f6f011-13b3-4dee-a416-a100e393c8d5"],
-Cell[1488492, 33298, 37198, 730, 195189, "Code",ExpressionUUID->"caac3509-e984-4019-99d6-456845cefb34"]
+Cell[1523581, 34008, 135, 3, 3836, "Subsubsection",ExpressionUUID->"27f6f011-13b3-4dee-a416-a100e393c8d5"],
+Cell[1523719, 34013, 37198, 730, 195189, "Code",ExpressionUUID->"caac3509-e984-4019-99d6-456845cefb34"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[1525727, 34033, 87, 0, 3836, "Subsubsection",ExpressionUUID->"d553aa7d-b596-4ae7-bfe0-8de86b74e0e0"],
-Cell[1525817, 34035, 2338, 44, 73500, "Code",ExpressionUUID->"0661ac18-2c3c-4079-8420-7d3678d09b41"]
+Cell[1560954, 34748, 87, 0, 3836, "Subsubsection",ExpressionUUID->"d553aa7d-b596-4ae7-bfe0-8de86b74e0e0"],
+Cell[1561044, 34750, 2338, 44, 73500, "Code",ExpressionUUID->"0661ac18-2c3c-4079-8420-7d3678d09b41"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1528192, 34084, 160, 3, 3037, "Subsubsection",ExpressionUUID->"889676e9-4bf5-4423-9f50-aa7a1df8f7d2"],
-Cell[1528355, 34089, 1159, 26, 39669, "Code",ExpressionUUID->"93516ea1-90b1-4c80-a544-866458c861f0"]
+Cell[1563419, 34799, 160, 3, 3037, "Subsubsection",ExpressionUUID->"889676e9-4bf5-4423-9f50-aa7a1df8f7d2"],
+Cell[1563582, 34804, 1159, 26, 39669, "Code",ExpressionUUID->"93516ea1-90b1-4c80-a544-866458c861f0"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1529563, 34121, 279, 5, 55, "Subsection",ExpressionUUID->"40dfd640-0212-4454-9cbd-b77220008346"],
-Cell[1529845, 34128, 27379, 540, 371409, "Code",ExpressionUUID->"6d27d783-39dc-4c80-80d2-54518a3ed583"],
+Cell[1564790, 34836, 279, 5, 55, "Subsection",ExpressionUUID->"40dfd640-0212-4454-9cbd-b77220008346"],
+Cell[1565072, 34843, 27379, 540, 371409, "Code",ExpressionUUID->"6d27d783-39dc-4c80-80d2-54518a3ed583"],
 Cell[CellGroupData[{
-Cell[1557249, 34672, 160, 3, 8631, "Subsubsection",ExpressionUUID->"3eb13cb0-62d6-48c0-92e6-9eab4b04ea28"],
-Cell[1557412, 34677, 1602, 44, 48078, "Code",ExpressionUUID->"823ffeb0-80f4-493d-8d16-bb933eb0f127"]
+Cell[1592476, 35387, 160, 3, 8631, "Subsubsection",ExpressionUUID->"3eb13cb0-62d6-48c0-92e6-9eab4b04ea28"],
+Cell[1592639, 35392, 1602, 44, 48078, "Code",ExpressionUUID->"823ffeb0-80f4-493d-8d16-bb933eb0f127"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1559051, 34726, 157, 3, 6833, "Subsubsection",ExpressionUUID->"265d7a1b-9b03-4e3a-b339-1c5179e7182d"],
-Cell[1559211, 34731, 1425, 31, 48078, "Code",ExpressionUUID->"29885eb5-1849-40f1-a04c-3e06fd8fffca"]
+Cell[1594278, 35441, 157, 3, 6833, "Subsubsection",ExpressionUUID->"265d7a1b-9b03-4e3a-b339-1c5179e7182d"],
+Cell[1594438, 35446, 1425, 31, 48078, "Code",ExpressionUUID->"29885eb5-1849-40f1-a04c-3e06fd8fffca"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1560685, 34768, 130, 2, 55, "Subsection",ExpressionUUID->"4bce4d5b-d870-4abf-8f1a-c919feb9e0ce"],
-Cell[1560818, 34772, 10876, 233, 232195, "Code",ExpressionUUID->"91185ca6-a1c4-481d-852a-fbf349eb972c"],
+Cell[1595912, 35483, 130, 2, 55, "Subsection",ExpressionUUID->"4bce4d5b-d870-4abf-8f1a-c919feb9e0ce"],
+Cell[1596045, 35487, 10876, 233, 232195, "Code",ExpressionUUID->"91185ca6-a1c4-481d-852a-fbf349eb972c"],
 Cell[CellGroupData[{
-Cell[1571719, 35009, 87, 0, 8631, "Subsubsection",ExpressionUUID->"7f89a814-576e-4acd-842a-c9db5299ea5b"],
-Cell[1571809, 35011, 761, 18, 2147483647, "Code",ExpressionUUID->"e20cfd66-d9e9-44b6-a80d-f31ae114d25a"]
+Cell[1606946, 35724, 87, 0, 8631, "Subsubsection",ExpressionUUID->"7f89a814-576e-4acd-842a-c9db5299ea5b"],
+Cell[1607036, 35726, 761, 18, 2147483647, "Code",ExpressionUUID->"e20cfd66-d9e9-44b6-a80d-f31ae114d25a"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1572607, 35034, 87, 0, 6833, "Subsubsection",ExpressionUUID->"0799de86-7434-452f-bc3c-639a9eafcaa0"],
-Cell[1572697, 35036, 1097, 27, 2147483647, "Code",ExpressionUUID->"f5491eb1-4246-455c-a14b-c3a836b2fcff"]
+Cell[1607834, 35749, 87, 0, 6833, "Subsubsection",ExpressionUUID->"0799de86-7434-452f-bc3c-639a9eafcaa0"],
+Cell[1607924, 35751, 1097, 27, 2147483647, "Code",ExpressionUUID->"f5491eb1-4246-455c-a14b-c3a836b2fcff"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1573843, 35069, 133, 2, 55, "Subsection",ExpressionUUID->"1f123f0a-20ec-4bcb-95e8-04909875b67a"],
-Cell[1573979, 35073, 2095, 57, 90416, "Code",ExpressionUUID->"90f4e859-f4da-4060-9e59-9faa205993b0"],
+Cell[1609070, 35784, 133, 2, 55, "Subsection",ExpressionUUID->"1f123f0a-20ec-4bcb-95e8-04909875b67a"],
+Cell[1609206, 35788, 2095, 57, 90416, "Code",ExpressionUUID->"90f4e859-f4da-4060-9e59-9faa205993b0"],
 Cell[CellGroupData[{
-Cell[1576099, 35134, 87, 0, 19190, "Subsubsection",ExpressionUUID->"772939a9-b1c8-474e-94cf-5fded27a4b5e"],
-Cell[1576189, 35136, 707, 17, 22653, "Code",ExpressionUUID->"c904b69d-6e37-4367-bc31-2887f8b450be"]
+Cell[1611326, 35849, 87, 0, 19190, "Subsubsection",ExpressionUUID->"772939a9-b1c8-474e-94cf-5fded27a4b5e"],
+Cell[1611416, 35851, 707, 17, 22653, "Code",ExpressionUUID->"c904b69d-6e37-4367-bc31-2887f8b450be"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1576933, 35158, 87, 0, 19190, "Subsubsection",ExpressionUUID->"49f5b039-1f0f-40a2-8dff-c247535e3abf"],
-Cell[1577023, 35160, 678, 17, 31468, "Code",ExpressionUUID->"22f95fc4-03a8-4d56-bb02-8dcbeb9c4fa7"]
+Cell[1612160, 35873, 87, 0, 19190, "Subsubsection",ExpressionUUID->"49f5b039-1f0f-40a2-8dff-c247535e3abf"],
+Cell[1612250, 35875, 678, 17, 31468, "Code",ExpressionUUID->"22f95fc4-03a8-4d56-bb02-8dcbeb9c4fa7"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1577750, 35183, 127, 2, 55, "Subsection",ExpressionUUID->"0d343083-a116-4ea4-a8ab-3d69eb542d71"],
-Cell[1577880, 35187, 9453, 212, 232195, "Code",ExpressionUUID->"36217579-b395-4e1f-95cc-850588f56e6f"],
+Cell[1612977, 35898, 127, 2, 55, "Subsection",ExpressionUUID->"0d343083-a116-4ea4-a8ab-3d69eb542d71"],
+Cell[1613107, 35902, 9453, 212, 232195, "Code",ExpressionUUID->"36217579-b395-4e1f-95cc-850588f56e6f"],
 Cell[CellGroupData[{
-Cell[1587358, 35403, 87, 0, 8631, "Subsubsection",ExpressionUUID->"fc2d3a6d-6d5c-460c-bf88-6f5fc457590f"],
-Cell[1587448, 35405, 1102, 28, 31468, "Code",ExpressionUUID->"51fab449-1b84-41a7-b468-44d5114d56fd"]
+Cell[1622585, 36118, 87, 0, 8631, "Subsubsection",ExpressionUUID->"fc2d3a6d-6d5c-460c-bf88-6f5fc457590f"],
+Cell[1622675, 36120, 1102, 28, 31468, "Code",ExpressionUUID->"51fab449-1b84-41a7-b468-44d5114d56fd"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1588587, 35438, 87, 0, 6833, "Subsubsection",ExpressionUUID->"ac2f350b-78dd-4bf0-a2bc-0b3250cf2c1f"],
-Cell[1588677, 35440, 726, 17, 31468, "Code",ExpressionUUID->"e0ce4515-ed97-4dac-a863-6bb52c3f50b3"]
+Cell[1623814, 36153, 87, 0, 6833, "Subsubsection",ExpressionUUID->"ac2f350b-78dd-4bf0-a2bc-0b3250cf2c1f"],
+Cell[1623904, 36155, 726, 17, 31468, "Code",ExpressionUUID->"e0ce4515-ed97-4dac-a863-6bb52c3f50b3"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1589452, 35463, 130, 2, 55, "Subsection",ExpressionUUID->"08361093-baa7-4fb2-80e4-06c98c44ae80"],
-Cell[1589585, 35467, 2508, 66, 107637, "Code",ExpressionUUID->"7f9aa6a9-15bc-4eac-bf54-973d21216c4c"],
+Cell[1624679, 36178, 130, 2, 55, "Subsection",ExpressionUUID->"08361093-baa7-4fb2-80e4-06c98c44ae80"],
+Cell[1624812, 36182, 2508, 66, 107637, "Code",ExpressionUUID->"7f9aa6a9-15bc-4eac-bf54-973d21216c4c"],
 Cell[CellGroupData[{
-Cell[1592118, 35537, 87, 0, 19190, "Subsubsection",ExpressionUUID->"f08c104e-41ad-425f-9d28-705730ba62a0"],
-Cell[1592208, 35539, 758, 20, 22653, "Code",ExpressionUUID->"d3cb501f-9d29-4b61-982f-5e1850730e09"]
+Cell[1627345, 36252, 87, 0, 19190, "Subsubsection",ExpressionUUID->"f08c104e-41ad-425f-9d28-705730ba62a0"],
+Cell[1627435, 36254, 758, 20, 22653, "Code",ExpressionUUID->"d3cb501f-9d29-4b61-982f-5e1850730e09"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1593003, 35564, 87, 0, 19190, "Subsubsection",ExpressionUUID->"6140255f-ec9a-4f56-a54e-c498c484f33d"],
-Cell[1593093, 35566, 704, 17, 22653, "Code",ExpressionUUID->"e19cbf5c-09b2-4d0d-b98b-fac97241bd8c"]
+Cell[1628230, 36279, 87, 0, 19190, "Subsubsection",ExpressionUUID->"6140255f-ec9a-4f56-a54e-c498c484f33d"],
+Cell[1628320, 36281, 704, 17, 22653, "Code",ExpressionUUID->"e19cbf5c-09b2-4d0d-b98b-fac97241bd8c"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1593846, 35589, 127, 2, 55, "Subsection",ExpressionUUID->"9b77cb63-9ca9-456e-916e-d9dc3d943132"],
-Cell[1593976, 35593, 13274, 269, 10676, "Code",ExpressionUUID->"820cb510-753c-4d93-9ef5-22c0fcfad9e8"],
+Cell[1629073, 36304, 127, 2, 55, "Subsection",ExpressionUUID->"9b77cb63-9ca9-456e-916e-d9dc3d943132"],
+Cell[1629203, 36308, 13274, 269, 10676, "Code",ExpressionUUID->"820cb510-753c-4d93-9ef5-22c0fcfad9e8"],
 Cell[CellGroupData[{
-Cell[1607275, 35866, 160, 3, 758, "Subsubsection",ExpressionUUID->"47f42bbd-3ed1-41bc-92cb-37ce439bec8e"],
-Cell[1607438, 35871, 976, 21, 31468, "Code",ExpressionUUID->"442e4a0f-15f6-4975-811b-75ef7acfa376"]
+Cell[1642502, 36581, 160, 3, 758, "Subsubsection",ExpressionUUID->"47f42bbd-3ed1-41bc-92cb-37ce439bec8e"],
+Cell[1642665, 36586, 976, 21, 31468, "Code",ExpressionUUID->"442e4a0f-15f6-4975-811b-75ef7acfa376"]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1608451, 35897, 87, 0, 600, "Subsubsection",ExpressionUUID->"2cf07424-5ed3-420e-9c5c-482b05882c79"],
-Cell[1608541, 35899, 687, 16, 22653, "Code",ExpressionUUID->"194cc427-a92d-44cd-adbd-b548bcfcf6d7"]
+Cell[1643678, 36612, 87, 0, 600, "Subsubsection",ExpressionUUID->"2cf07424-5ed3-420e-9c5c-482b05882c79"],
+Cell[1643768, 36614, 687, 16, 22653, "Code",ExpressionUUID->"194cc427-a92d-44cd-adbd-b548bcfcf6d7"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1609277, 35921, 191, 4, 55, "Subsection",ExpressionUUID->"6a883ecb-2b8e-46fc-8d0b-9024ceb15c91"],
-Cell[1609471, 35927, 7092, 162, 5683, "Code",ExpressionUUID->"2348fe4c-7262-485f-aded-0b8ce99151fd"],
+Cell[1644504, 36636, 191, 4, 55, "Subsection",ExpressionUUID->"6a883ecb-2b8e-46fc-8d0b-9024ceb15c91"],
+Cell[1644698, 36642, 7092, 162, 5683, "Code",ExpressionUUID->"2348fe4c-7262-485f-aded-0b8ce99151fd"],
 Cell[CellGroupData[{
-Cell[1616588, 36093, 158, 3, 337, "Subsubsection",ExpressionUUID->"6c84921f-635d-4d2d-b6b2-6e7a7a893c67"],
-Cell[1616749, 36098, 594, 14, 393, "Code",ExpressionUUID->"40259bc3-e984-408a-a233-dacd44817654"]
+Cell[1651815, 36808, 158, 3, 337, "Subsubsection",ExpressionUUID->"6c84921f-635d-4d2d-b6b2-6e7a7a893c67"],
+Cell[1651976, 36813, 594, 14, 393, "Code",ExpressionUUID->"40259bc3-e984-408a-a233-dacd44817654"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[1617380, 36117, 158, 3, 337, "Subsubsection",ExpressionUUID->"05dbf07b-e4dc-4e16-abbe-44b0713a72e7"],
-Cell[1617541, 36122, 591, 15, 22653, "Code",ExpressionUUID->"4fdc0545-cda9-4fce-ab94-9ec400977145"]
+Cell[1652607, 36832, 158, 3, 337, "Subsubsection",ExpressionUUID->"05dbf07b-e4dc-4e16-abbe-44b0713a72e7"],
+Cell[1652768, 36837, 591, 15, 22653, "Code",ExpressionUUID->"4fdc0545-cda9-4fce-ab94-9ec400977145"]
 }, Closed]]
 }, Closed]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[1618193, 36144, 159, 3, 101, "Section",ExpressionUUID->"d0d18567-f470-414c-a3a2-57257a8292f8"],
+Cell[1653420, 36859, 159, 3, 101, "Section",ExpressionUUID->"d0d18567-f470-414c-a3a2-57257a8292f8"],
 Cell[CellGroupData[{
-Cell[1618377, 36151, 160, 3, 23575, "Subsection",ExpressionUUID->"0314a57b-65e2-4408-8e1d-db2b2ec67c13"],
-Cell[1618540, 36156, 3557, 87, 864558596, "Code",ExpressionUUID->"bc47dce4-b2ef-4b22-b415-108d8661e282"]
+Cell[1653604, 36866, 160, 3, 23575, "Subsection",ExpressionUUID->"0314a57b-65e2-4408-8e1d-db2b2ec67c13"],
+Cell[1653767, 36871, 3557, 87, 864558596, "Code",ExpressionUUID->"bc47dce4-b2ef-4b22-b415-108d8661e282"]
 }, Closed]]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[1622146, 36249, 77, 0, 78, "Section",ExpressionUUID->"9e7a41c9-f14c-410a-a386-1b3b18771802"],
-Cell[1622226, 36251, 1232, 30, 985, "Code",ExpressionUUID->"24dd4262-847d-4354-b33f-0afd48df8d8e"],
-Cell[1623461, 36283, 344, 8, 546, "Code",ExpressionUUID->"93d977e5-d294-4f2d-88fd-a7663acfa234"]
+Cell[1657373, 36964, 77, 0, 78, "Section",ExpressionUUID->"9e7a41c9-f14c-410a-a386-1b3b18771802"],
+Cell[1657453, 36966, 1232, 30, 985, "Code",ExpressionUUID->"24dd4262-847d-4354-b33f-0afd48df8d8e"],
+Cell[1658688, 36998, 344, 8, 546, "Code",ExpressionUUID->"93d977e5-d294-4f2d-88fd-a7663acfa234"]
 }, Closed]]
 }
 ]

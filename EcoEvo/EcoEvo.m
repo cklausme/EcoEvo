@@ -5273,16 +5273,138 @@ DInv[var:(_Subscript|_List|_Symbol):All,pointin:notDInvOpts:{},opts___?OptionQ]:
 NDInv[args___]:=DInv[args,Method->"NDInv"];
 
 
+(*PlotInv[traits:(_?TraitsQ):{},sol:(_?VariablesQ):{},{trait1_,trait1min_?NumericQ,trait1max_?NumericQ},opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["PlotInv"],
+(* options *)
+verbose,verboseall,monitor,
+delayinv,invopts,time,plotopts,plotspecies,markerstyle,plottadopts,tf,axeslabel,plotrange,tadplotrange,
+(* other variables *)
+nb,x,iplot,
+iopts,imin,imax,tmin,tmax,s,iaspectratio,iticks,iaxesorigin,iplotrangepadding,resplotrange,lmin,
+gu1,tr1,per,res,inv,epilog,tad},
+
+Block[{Nsp},
+
+(*Print["traits=",traits];
+Print["sol=",sol];
+Print["{trait1,trait1min,trait1max}=",{trait1,trait1min,trait1max}];*)
+
+If[modelloaded\[NotEqual]True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[PlotInv]}]];
+If[Global`debug,verbose=True];
+verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[PlotInv]}]];
+If[verboseall,verbose=True];
+
+monitor=Evaluate[Monitor/.Flatten[{opts,Options[PlotInv]}]];
+delayinv=Evaluate[DelayInv/.Flatten[{opts,Options[PlotInv]}]];
+If[delayinv===Automatic,If[modelperiod=!=0,delayinv=True,delayinv=False]];
+invopts=Evaluate[InvOpts/.Flatten[{opts,Options[PlotInv]}]];
+time=Evaluate[Time/.Flatten[{opts,Options[PlotInv]}]];
+plotspecies=Evaluate[PlotSpecies/.Flatten[{opts,Options[PlotInv]}]];
+markerstyle=Evaluate[MarkerStyle/.Flatten[{opts,Options[PlotInv]}]];
+plotrange=Evaluate[PlotRange/.Flatten[{opts,Options[PlotInv]}]];
+plottadopts=Evaluate[PlotTADOpts/.Flatten[{opts,Options[PlotInv]}]];
+tadplotrange=PlotRange/.plottadopts;
+tf=Evaluate[TADVerticalScale/.Flatten[{opts,Options[PlotInv]}]];
+plotopts=FilterRules[Flatten[{opts,Options[PlotInv]}],Options[Plot]];
+axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[PlotInv]}]];
+If[axeslabel===Automatic,axeslabel={trait1}];
+
+(* figure out what trait is on the x-axis *)
+{gu1,tr1}=LookUp[trait1]\[LeftDoubleBracket]2;;3\[RightDoubleBracket];
+
+(* figure out number of species in guilds *)
+SetNsp[traits,sol];
+
+If[monitor,
+	nb=CreateDialog[DialogNotebook[Grid[{{"\[FormalX]=",Dynamic[x]}}],WindowTitle\[Rule]"PlotInv Progress..."]];
+];
+
+If[delayinv,
+	(* delay inv *)
+	inv[\[FormalX]_?NumberQ]:=Inv[traits,sol,{Subscript[tr1,0]\[Rule]\[FormalX]},Guild\[Rule]gu1,Evaluate[Sequence@@invopts],Time\[Rule]time,VerboseAll\[Rule]verboseall];
+	iplot=Plot[(x=\[FormalX];Evaluate[inv[\[FormalX]]]),{\[FormalX],trait1min,trait1max},
+		AxesLabel\[Rule]axeslabel,PlotRange\[Rule]{{trait1min,trait1max},plotrange},
+		Evaluate[Sequence@@plotopts],AxesOrigin\[Rule]{trait1min,0}];
+,
+	(* nondelay inv *)
+	Off[NIntegrate::inumr];
+	inv=Inv[traits,sol,Guild\[Rule]gu1,Evaluate[Sequence@@invopts],Time\[Rule]time,VerboseAll\[Rule]verboseall];
+	iplot=Plot[inv,{trait1,trait1min,trait1max},
+		AxesLabel\[Rule]axeslabel,PlotRange\[Rule]{{trait1min,trait1max},plotrange},
+		Evaluate[Sequence@@plotopts],AxesOrigin\[Rule]{trait1min,0}];
+	On[NIntegrate::inumr]
+];
+
+Which[plotspecies==="Axis",
+	If[markerstyle===Automatic,
+		epilog=Table[{PointSize[0.015],color[Subscript[tr1,sp]][SpFrac[sp,Nsp[gu1]]],Point[{Subscript[tr1,sp]/.traits,0}]},{sp,Nsp[gu1]}],
+		epilog=MapThread[Append,{PadRight[{},Nsp[gu1],
+			Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr1,sp]/.traits,0}],{sp,Nsp[gu1]}]}]
+	];
+	res=Show[iplot,Epilog\[Rule]epilog]
+	,
+	plotspecies==="TAD",
+	epilog={};
+	tad=PlotTAD[traits,sol,PlotRange\[Rule]{{trait1min,trait1max},tadplotrange},Evaluate[Sequence@@plottadopts],ImagePadding\[Rule]0,
+		Axes\[Rule]False,Guild\[Rule]gu1];
+	(*Print[tad];*)
+	{tmin,tmax}=(PlotRange/.AbsoluteOptions[tad,PlotRange])\[LeftDoubleBracket]2\[RightDoubleBracket];
+	iopts=AbsoluteOptions[iplot];
+	{imin,imax}=(PlotRange/.iopts)\[LeftDoubleBracket]2\[RightDoubleBracket];
+	(*Print["{imin,imax}=",{imin,imax}];
+	Print["{tmin,tmax}=",{tmin,tmax}];*)
+	iaspectratio=AspectRatio/.iopts;
+	iticks=Ticks/.iopts;
+	iaxesorigin=AxesOrigin/.iopts;
+	iplotrangepadding=PlotRangePadding/.iopts;
+	(*Print["iaxesorigin=",iaxesorigin];
+	Print["iplotrangepadding=",iplotrangepadding];*)
+	s=Max[tf*imin/(tmax(tf-1)),tf*(imax-Min[0,imin])/tmax]; (* scale TAD *)
+	(*Print["s=",s];*)
+	resplotrange={Min[imin,tmin],Max[imax,s*tmax]};
+	If[Head[iplotrangepadding\[LeftDoubleBracket]2,2\[RightDoubleBracket]]===Scaled,
+		lmin=imax+1.01*Differences[resplotrange]\[LeftDoubleBracket]1\[RightDoubleBracket]*iplotrangepadding\[LeftDoubleBracket]2,2,1\[RightDoubleBracket],
+		lmin=imax+iplotrangepadding\[LeftDoubleBracket]2,2\[RightDoubleBracket]+0.01*Differences[resplotrange]\[LeftDoubleBracket]1\[RightDoubleBracket]
+	];
+	(*Print["lmin=",lmin];*)
+	res=Show[iplot,
+		PlotRange\[Rule]{{trait1min,trait1max},resplotrange},Ticks\[Rule]iticks,
+		Epilog\[Rule]{{White,Line[{{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],lmin},{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],10^10}}]},
+		Inset[Show[tad,AspectRatio\[Rule]iaspectratio*tf],{0,0},{0,0},Scaled[1]]}];
+	(*res=Show[
+		iplot,
+		PlotRange\[Rule]{{trait1min,trait1max},plotrange},Ticks\[Rule]iticks,
+		Epilog\[Rule]{{White,Line[{{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],lmin},{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],10^10}}]},
+		Inset[Show[tad,AspectRatio\[Rule]iaspectratio*tf],{0,0},{0,0},Scaled[1]],
+		Inset[Show[iplot,Axes\[Rule]False,PlotRange\[Rule]{{trait1min,trait1max},resplotrange}],{0,0},{0,0},Scaled[1]]}]*)
+	,
+	Else,
+	res=iplot
+];
+
+If[monitor,NotebookClose[nb]];
+
+Return[res]
+]];*)
+
+
 PlotInv[traits:(_?TraitsQ):{},sol:(_?VariablesQ):{},{trait1_,trait1min_?NumericQ,trait1max_?NumericQ},opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["PlotInv"],
 (* options *)
 verbose,verboseall,monitor,
-delayinv,invopts,time,plotopts,plotspecies,markerstyle,plottadopts,tf,axeslabel,
+delayinv,invopts,time,plotopts,plotspecies,markerstyle,plottadopts,tf,axeslabel,plotrange,tadplotrange,
 (* other variables *)
 nb,x,iplot,
-iopts,imin,imax,tmin,tmax,s,iaspectratio,iticks,iaxesorigin,iplotrangepadding,plotrange,lmin,
+iopts,imin,imax,tmin,tmax,s,iaspectratio,iticks,iaxesorigin,iplotrangepadding,resplotrange,lmin,
 gu1,tr1,per,res,inv,epilog,tad},
 
 Block[{Nsp},
@@ -5308,7 +5430,9 @@ invopts=Evaluate[InvOpts/.Flatten[{opts,Options[PlotInv]}]];
 time=Evaluate[Time/.Flatten[{opts,Options[PlotInv]}]];
 plotspecies=Evaluate[PlotSpecies/.Flatten[{opts,Options[PlotInv]}]];
 markerstyle=Evaluate[MarkerStyle/.Flatten[{opts,Options[PlotInv]}]];
+plotrange=Evaluate[PlotRange/.Flatten[{opts,Options[PlotInv]}]];
 plottadopts=Evaluate[PlotTADOpts/.Flatten[{opts,Options[PlotInv]}]];
+tadplotrange=PlotRange/.plottadopts;
 tf=Evaluate[TADVerticalScale/.Flatten[{opts,Options[PlotInv]}]];
 plotopts=FilterRules[Flatten[{opts,Options[PlotInv]}],Options[Plot]];
 axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[PlotInv]}]];
@@ -5327,13 +5451,16 @@ If[monitor,
 If[delayinv,
 	(* delay inv *)
 	inv[\[FormalX]_?NumberQ]:=Inv[traits,sol,{Subscript[tr1,0]->\[FormalX]},Guild->gu1,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall];
-	iplot=Plot[(x=\[FormalX];Evaluate[inv[\[FormalX]]]),{\[FormalX],trait1min,trait1max},AxesLabel->axeslabel,Evaluate[Sequence@@plotopts],Epilog->epilog,Prolog->prolog];
+	iplot=Plot[(x=\[FormalX];Evaluate[inv[\[FormalX]]]),{\[FormalX],trait1min,trait1max},
+		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},
+		Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
 ,
 	(* nondelay inv *)
 	Off[NIntegrate::inumr];
 	inv=Inv[traits,sol,Guild->gu1,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall];
-	iplot=Plot[inv,{trait1,trait1min,trait1max},AxesLabel->axeslabel,Evaluate[Sequence@@plotopts],
-		AxesOrigin->{trait1min,0},PlotRange->{{trait1min,trait1max},Automatic}];
+	iplot=Plot[inv,{trait1,trait1min,trait1max},
+		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},
+		Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
 	On[NIntegrate::inumr]
 ];
 
@@ -5347,8 +5474,8 @@ Which[plotspecies==="Axis",
 	,
 	plotspecies==="TAD",
 	epilog={};
-	tad=PlotTAD[traits,sol,Evaluate[Sequence@@plottadopts],PlotRange->{{trait1min,trait1max},All},ImagePadding->0,
-		Axes->False,Guild->gu1];
+	tad=PlotTAD[traits,sol,PlotRange->{{trait1min,trait1max},tadplotrange},Evaluate[Sequence@@plottadopts],
+		ImagePadding->{{0,0},{0,Scaled[0.05]}},Axes->False,Guild->gu1];
 	(*Print[tad];*)
 	{tmin,tmax}=(PlotRange/.AbsoluteOptions[tad,PlotRange])[[2]];
 	iopts=AbsoluteOptions[iplot];
@@ -5363,28 +5490,22 @@ Which[plotspecies==="Axis",
 	Print["iplotrangepadding=",iplotrangepadding];*)
 	s=Max[tf*imin/(tmax(tf-1)),tf*(imax-Min[0,imin])/tmax]; (* scale TAD *)
 	(*Print["s=",s];*)
-	plotrange={Min[imin,tmin],Max[imax,s*tmax]};
+	resplotrange={Min[imin,tmin],Max[imax,s*tmax]};
 	If[Head[iplotrangepadding[[2,2]]]===Scaled,
-		lmin=imax+1.01*Differences[plotrange][[1]]*iplotrangepadding[[2,2,1]],
-		lmin=imax+iplotrangepadding[[2,2]]+0.01*Differences[plotrange][[1]]
+		lmin=imax+1.01*Differences[resplotrange][[1]]*iplotrangepadding[[2,2,1]],
+		lmin=imax+iplotrangepadding[[2,2]]+0.01*Differences[resplotrange][[1]]
 	];
 	(*Print["lmin=",lmin];*)
-	(*res=Show[iplot,
-		PlotRange\[Rule]{{trait1min,trait1max},plotrange},Ticks\[Rule]iticks,
-		Epilog\[Rule]{{White,Line[{{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],lmin},{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],10^10}}]},
-		Inset[Show[tad,AspectRatio\[Rule]iaspectratio*tf],{0,0},{0,0},Scaled[1]]}];*)
-	(*res=Show[iplot,
+	res=Show[iplot,
+		PlotRange->{{trait1min,trait1max},resplotrange},Ticks->iticks,
+		Epilog->{{White,Line[{{iaxesorigin[[1]],lmin},{iaxesorigin[[1]],10^10}}]},
+		Inset[Show[tad,AspectRatio->iaspectratio*tf],{0,0},{0,0},Scaled[1]]}];
+	(*res=Show[
+		iplot,
 		PlotRange\[Rule]{{trait1min,trait1max},plotrange},Ticks\[Rule]iticks,
 		Epilog\[Rule]{{White,Line[{{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],lmin},{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],10^10}}]},
 		Inset[Show[tad,AspectRatio\[Rule]iaspectratio*tf],{0,0},{0,0},Scaled[1]],
-		Inset[Show[iplot,Axes\[Rule]False,PlotRange\[Rule]{{trait1min,trait1max},plotrange}],{0,0},{0,0},Scaled[1]]}]*)
-	res=Show[
-		Plot[Null,{trait1,trait1min,trait1max},AxesLabel->axeslabel,Evaluate[Sequence@@plotopts],
-			AxesOrigin->{trait1min,0},PlotRange->{{trait1min,trait1max},Automatic}],
-		PlotRange->{{trait1min,trait1max},plotrange},Ticks->iticks,
-		Epilog->{{White,Line[{{iaxesorigin[[1]],lmin},{iaxesorigin[[1]],10^10}}]},
-		Inset[Show[tad,AspectRatio->iaspectratio*tf],{0,0},{0,0},Scaled[1]],
-		Inset[Show[iplot,Axes->False,PlotRange->{{trait1min,trait1max},plotrange}],{0,0},{0,0},Scaled[1]]}]
+		Inset[Show[iplot,Axes\[Rule]False,PlotRange\[Rule]{{trait1min,trait1max},resplotrange}],{0,0},{0,0},Scaled[1]]}]*)
 	,
 	Else,
 	res=iplot
@@ -5403,8 +5524,8 @@ PlotInv[ExtractTraits[eesol],ExtractVariables[eesol],{trait1,trait1min,trait1max
 Options[PlotInv]={
 	InvOpts->{},Fixed->{},
 	DelayInv->Automatic,Time->t,
-	MarkerStyle->Automatic,PlotSpecies->"TAD",PlotTADOpts->{},TADVerticalScale->0.25,
-	AxesLabel->Automatic,
+	MarkerStyle->Automatic,PlotSpecies->"TAD",PlotTADOpts->{PlotRange->{0,All}},TADVerticalScale->0.25,
+	AxesLabel->Automatic,PlotRange->Automatic,
 	PlotStyle->Gray,PlotPoints->5,
 	Monitor->False,
 	Verbose->False,VerboseAll->False
