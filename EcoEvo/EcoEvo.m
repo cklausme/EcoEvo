@@ -158,7 +158,7 @@ StyleBox[\"var\", \"TI\"], \(i\)]\) ranges from \!\(\*SubscriptBox[
 StyleBox[\"min\", \"TI\"], \(i\)]\) to \!\(\*SubscriptBox[
 StyleBox[\"max\", \"TI\"], \(i\)]\).";
 
-\[IGrave]::usage="\[IGrave] is a placeholder index in RuleList and PlotTAD.";
+\[IGrave]::usage="\[IGrave] is a placeholder index in RuleList.";
 
 ClearCache::usage="ClearCache[\!\(\*
 StyleBox[\"f\", \"TI\"]\), \!\(\*
@@ -166,15 +166,19 @@ StyleBox[\"g\", \"TI\"]\), ...] removes memoized DownValues of \!\(\*
 StyleBox[\"f\", \"TI\"]\), \!\(\*
 StyleBox[\"g\", \"TI\"]\), etc.";
 
-IFFQ::usage="IFFQ[\!\(\*
+IntepolatingFunctionFunctionQ::usage="IntepolatingFunctionFunctionQ[\!\(\*
 StyleBox[\"x\", \"TI\"]\)] is True if \!\(\*
 StyleBox[\"x\", \"TI\"]\) is a InterpolatingFunction function.";
+
+TemporalDataFunctionQ::usage="TemporalDataFunctionQ[\!\(\*
+StyleBox[\"x\", \"TI\"]\)] is True if \!\(\*
+StyleBox[\"x\", \"TI\"]\) is a TemporalData function.";
 
 Avg::usage=
 "Avg[\!\(\*
 StyleBox[\"f\", \"TI\"]\), \!\(\*
-StyleBox[\"var\", \"TI\"]\)] gives the average of the function \!\(\*
-StyleBox[\"f\", \"TI\"]\), which contains an InterpolatingFunction, with respect to \!\(\*
+StyleBox[\"var\", \"TI\"]\)] gives the average of \!\(\*
+StyleBox[\"f\", \"TI\"]\) with respect to \!\(\*
 StyleBox[\"var\", \"TI\"]\)\!\(\*
 StyleBox[\" \", \"TI\"]\)(default \!\(\*
 StyleBox[\"var\", \"TI\"]\)=t).
@@ -182,11 +186,14 @@ Avg[\!\(\*
 StyleBox[\"f\", \"TI\"]\), {\!\(\*
 StyleBox[\"var\", \"TI\"]\), \!\(\*
 StyleBox[\"varmin\", \"TI\"]\), \!\(\*
-StyleBox[\"varmax\", \"TI\"]\)}] gives the average of the function \!\(\*
+StyleBox[\"varmax\", \"TI\"]\)}] gives the average of \!\(\*
 StyleBox[\"f\", \"TI\"]\) with respect to \!\(\*
 StyleBox[\"var\", \"TI\"]\), ranging from \!\(\*
 StyleBox[\"varmin\", \"TI\"]\) to \!\(\*
-StyleBox[\"varmax\", \"TI\"]\).";
+StyleBox[\"varmax\", \"TI\"]\).
+Avg[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
 
 Var::usage=
 "Var[\!\(\*
@@ -624,8 +631,14 @@ AddTraitts::usage="Internal usage only ;)";
 AddUnkts::usage="Internal usage only ;)";
 
 
-EcoEqns::usage="EcoEqns[traits]";
-EvoEqns::usage="EvoEqns[sol,Gs]";
+EcoEqns::usage="EcoEqns[\!\(\*
+StyleBox[\"traits\", \"TI\"]\)] sets up ecological equations corresponding to species with \!\(\*
+StyleBox[\"traits\", \"TI\"]\).";
+EvoEqns::usage="EvoEqns[\!\(\*
+StyleBox[\"sol\", \"TI\"]\), \!\(\*
+StyleBox[\"Gs\", \"TI\"]\)] set up trait equations with ecological solution \!\(\*
+StyleBox[\"sol\", \"TI\"]\) and G matrices \!\(\*
+StyleBox[\"Gs\", \"TI\"]\).";
 
 
 SetModel::usage=
@@ -1844,7 +1857,7 @@ notEcoEvoSimOpts::usage="notEcoEvoSimOpts identifies non-options to EcoEvoSim.";
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.7X (May 26, 2019)";
+$EcoEvoVersion="0.9.7X (June 7, 2019)";
 
 
 Print["EcoEvo Package Version ",$EcoEvoVersion,"
@@ -2068,31 +2081,45 @@ ClearCache[f_]:=(DownValues[f]=DeleteCases[DownValues[f],_?(FreeQ[First[#],Patte
 ClearCache[f__]:=(Map[ClearCache,{f}];);
 
 
-IFFQ[x_]:=If[Length[Cases[x,_InterpolatingFunction,\[Infinity],Heads->True]]!=0,True,False];
-(*IFFQ[x_]:=If[Head[Head[x]]===InterpolatingFunction,True,False];*) (* why did I write this? <- breaks (c[t]/.sol)^2 *)
+IntepolatingFunctionFunctionQ[x_]:=If[Length[Cases[x,_InterpolatingFunction,\[Infinity],Heads->True]]!=0,True,False];
+(*IntepolatingFunctionFunctionQ[x_]:=If[Head[Head[x]]===InterpolatingFunction,True,False];*) (* why did I write this? <- breaks (c[t]/.sol)^2 *)
 
 
+TemporalDataFunctionQ[x_]:=If[Length[Cases[x,_TemporalData,\[Infinity],Heads->True]]!=0,True,False];
+
+
+(* main *)
 Avg[f_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{integrateopts,nintegrateopts,method},
+(*Print["main"];*)
 	method=Evaluate[Method/.Flatten[{opts,Options[Avg]}]];
-	If[IFFQ[f]==True,method="NIntegrate"];
+	If[IntepolatingFunctionFunctionQ[f]==True,method="NIntegrate"];
+	If[TemporalDataFunctionQ[f]==True,method="Sum"];
 	integrateopts=Evaluate[IntegrateOpts/.Flatten[{opts,Options[Avg]}]];
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Avg]}]];
-	
 	Which[
 		method=="Integrate",
 		Return[Integrate[f,{var,varmin,varmax},Evaluate[Sequence@@integrateopts]]/(varmax-varmin)],
 		method=="NIntegrate",
 		Return[NIntegrate[f,{var,varmin,varmax},Evaluate[Sequence@@nintegrateopts]]/(varmax-varmin)],
+		method=="Sum",
+		Return[Sum[f,{var,varmin,varmax}]/(varmax-varmin+1)],
 		Else,
 		Msg[General::badmtd];Return[$Failed]
 	];
 ];
 
 
-Avg[if_?IFFQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,ifdomains,numifdomains,varmin,varmax},
+(* thread over RuleLists *)
+Avg[f_?RuleListQ,opts___?OptionQ]:=((*Print["rulelist1"];*)f/.(x_->val_):>(x->Avg[val,opts]));
+Avg[f_?RuleListQ,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=((*Print["rulelist2"];*)
+f/.(x_->val_):>(x->Avg[val,{var,varmin,varmax},opts]));
+
+
+(* InterpolatingFunctionFunctions *)
+Avg[f_?IntepolatingFunctionFunctionQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,ifdomains,numifdomains,varmin,varmax},
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Avg]}]];
 	
-	ifdomains=Map[#["Domain"][[1]]&,Cases[if,_InterpolatingFunction,\[Infinity],Heads->True]];
+	ifdomains=Map[#["Domain"][[1]]&,Cases[f,_InterpolatingFunction,\[Infinity],Heads->True]];
 	numifdomains=Length[Union[ifdomains]];
 	
 	Which[
@@ -2102,9 +2129,23 @@ Avg[if_?IFFQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,ifdomains,numifdoma
 		Msg[Avg::unkrange],
 		Else,
 		{varmin,varmax}=ifdomains[[1]];
-		Return[Avg[if,{var,varmin,varmax},Method->"NIntegrate",NIntegrateOpts->nintegrateopts]]
+		Return[Avg[f,{var,varmin,varmax},Method->"NIntegrate",NIntegrateOpts->nintegrateopts]]
 	];
 ];
+
+
+(* InterpolatingFunctions *)
+Avg[f_InterpolatingFunction,opts___?OptionQ]:=((*Print["raw IF"];*)Avg[f[t],opts]);
+
+
+(* TemporalData *)
+Avg[f_TemporalData,opts___?OptionQ]:=((*Print["td"];*)Mean[f]);
+Avg[f_TemporalData,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=((*Print["td2"];*)
+Mean[TimeSeriesWindow[f,{varmin,varmax}]]);
+
+
+(* fallthrough *)
+Avg[f_?((!RuleListQ[#]&&!IntepolatingFunctionFunctionQ[#])&),opts___?OptionQ]:=((*Print["otherwise"];*)f);
 
 
 Options[Avg]={Method->"Integrate",IntegrateOpts->{},NIntegrateOpts->{}};
@@ -2112,7 +2153,7 @@ Options[Avg]={Method->"Integrate",IntegrateOpts->{},NIntegrateOpts->{}};
 
 Var[f_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{integrateopts,nintegrateopts,avgopts,method,avg},
 	method=Evaluate[Method/.Flatten[{opts,Options[Var]}]];
-	If[IFFQ[f]==True,method="NIntegrate"];
+	If[IntepolatingFunctionFunctionQ[f]==True,method="NIntegrate"];
 	integrateopts=Evaluate[IntegrateOpts/.Flatten[{opts,Options[Var]}]];
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Var]}]];
 	avgopts=Evaluate[AvgOpts/.Flatten[{opts,Options[Var]}]];
@@ -2130,7 +2171,7 @@ Var[f_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{integrateopts,nintegrate
 ];
 
 
-Var[if_?IFFQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,avgopts,ifdomains,numifdomains,varmin,varmax},
+Var[if_?IntepolatingFunctionFunctionQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,avgopts,ifdomains,numifdomains,varmin,varmax},
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Var]}]];
 	avgopts=Evaluate[AvgOpts/.Flatten[{opts,Options[Var]}]];
 		
@@ -2154,7 +2195,7 @@ Options[Var]={IntegrateOpts->{},NIntegrateOpts->{},AvgOpts->{},Method->"Integrat
 
 Cov[f1_,f2_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{integrateopts,nintegrateopts,avgopts,method,avg1,avg2},
 	method=Evaluate[Method/.Flatten[{opts,Options[Cov]}]];
-	If[(IFFQ[f1]==True)||(IFFQ[f2]==True),method="NIntegrate"];
+	If[(IntepolatingFunctionFunctionQ[f1]==True)||(IntepolatingFunctionFunctionQ[f2]==True),method="NIntegrate"];
 	integrateopts=Evaluate[IntegrateOpts/.Flatten[{opts,Options[Cov]}]];
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Cov]}]];
 	avgopts=Evaluate[AvgOpts/.Flatten[{opts,Options[Cov]}]];
@@ -2173,7 +2214,7 @@ Cov[f1_,f2_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{integrateopts,ninte
 ];
 
 
-Cov[if1_,if2_?IFFQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,avgopts,ifdomains,numifdomains,varmin,varmax},
+Cov[if1_,if2_?IntepolatingFunctionFunctionQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,avgopts,ifdomains,numifdomains,varmin,varmax},
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Cov]}]];
 	avgopts=Evaluate[AvgOpts/.Flatten[{opts,Options[Cov]}]];
 
@@ -2192,7 +2233,7 @@ Cov[if1_,if2_?IFFQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,avgopts,ifdom
 ];
 
 
-Cov[if1_?IFFQ,if2_,var_:t,opts___?OptionQ]:=Cov[if2,if1,var,opts];
+Cov[if1_?IntepolatingFunctionFunctionQ,if2_,var_:t,opts___?OptionQ]:=Cov[if2,if1,var,opts];
 
 
 Options[Cov]={IntegrateOpts->{},NIntegrateOpts->{},AvgOpts->{},Method->"Integrate"};
@@ -3655,7 +3696,7 @@ assumptions=Evaluate[Assumptions/.Flatten[{opts,Options[EcoStableQ]}]];
 tolerance=Evaluate[Tolerance/.Flatten[{opts,Options[EcoStableQ]}]];
 
 If[method===Automatic,
-	If[modeltype=="ContinuousTime"&&modelperiod==0&&IFFQ[variables]==False&&Length[variables]<4,
+	If[modeltype=="ContinuousTime"&&modelperiod==0&&IntepolatingFunctionFunctionQ[variables]==False&&Length[variables]<4,
 		method="RouthHurwitz",
 		method="Eigenvalues"
 	];
@@ -3671,14 +3712,14 @@ Which[
 	evs=EcoEigenvalues[traits,variables,Time->time,Multipliers->True,Evaluate[Sequence@@ecoeigenvaluesopts]];
 	If[verbose,Print[func,": evs=",evs]];
 	Which[
-		modeltype=="DiscreteTime"||(modeltype=="ContinuousTime"&&IFFQ[variables]==True),
+		modeltype=="DiscreteTime"||(modeltype=="ContinuousTime"&&IntepolatingFunctionFunctionQ[variables]==True),
 		res=Which[
 			Evaluate[Max[Re[evs]]===Indeterminate],Indeterminate,
 			Evaluate[Max[Abs[evs]]<1+tolerance],True,
 			Evaluate[Max[Abs[evs]]>1+tolerance],False,
 			Else,Indeterminate
 		],
-		modeltype=="ContinuousTime"&&IFFQ[variables]==False,
+		modeltype=="ContinuousTime"&&IntepolatingFunctionFunctionQ[variables]==False,
 		res=Which[
 			Evaluate[Max[Re[evs]]===Indeterminate],Indeterminate,
 			Evaluate[Max[Re[evs]]>tolerance],False,
@@ -3686,7 +3727,7 @@ Which[
 			Else,Indeterminate		
 		]
 		(*,
-		modeltype=="ContinuousTime"&&IFFQ[variables]\[Equal]True,
+		modeltype=="ContinuousTime"&&IntepolatingFunctionFunctionQ[variables]\[Equal]True,
 		res=Which[
 			Evaluate[Max[Re[evs]]===Indeterminate],Indeterminate,
 			Evaluate[Abs[evs\[LeftDoubleBracket]2\[RightDoubleBracket]]<1+tolerance],True,
@@ -4502,7 +4543,7 @@ PlotTAD[traits_?TraitsQ,sol_?VariablesQ,opts___?OptionQ]:=
 Module[{
 func=FuncStyle["PlotTAD"],
 (* options *)
-logged,gu,gcomp,gtrait,minpop,plotstyle,markerstyle,plotopts,
+logged,gu,gcomp,gtrait,minpop,plotstyle,markerstyle,plotopts,time,
 (* other variables *)
 abunds,pos,plotmin
 },
@@ -4524,11 +4565,14 @@ minpop=Evaluate[MinPop/.Flatten[{opts,Options[PlotTAD]}]];
 plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotTAD]}]];
 markerstyle=Evaluate[MarkerStyle/.Flatten[{opts,Options[PlotTAD]}]];
 plotopts=FilterRules[Flatten[{opts,Options[PlotTAD]}],Options[ListPlot]];
+time=Evaluate[Time/.Flatten[{opts,Options[PlotTAD]}]];
 
 (* figure out number of species in guilds *)
 SetNsp[traits,sol];
 
-abunds=Quiet[Select[sol,#[[1,1]]===gcomp&&#[[2]]>minpop&],{Part::partd}];
+abunds=Quiet[Select[sol,#[[1,1]]===gcomp&],{Part::partd}];
+If[time===t,abunds=Avg[abunds],abunds=Slice[abunds,time]];
+abunds=Select[abunds,#[[2]]>minpop&];
 pos=abunds[[All,1,2]];
 
 If[markerstyle===Automatic,
@@ -4536,7 +4580,7 @@ If[markerstyle===Automatic,
 	
 If[logged==False,
 	Return[ListPlot[
-		Table[{{Subscript[gtrait,i],0},{Subscript[gtrait,i],Subscript[gcomp,i]}},{i,pos}]/.sol/.traits,
+		Table[{{Subscript[gtrait,i],0},{Subscript[gtrait,i],Subscript[gcomp,i]}},{i,pos}]/.abunds/.traits,
 		PlotStyle->Join[plotstyle,markerstyle],
 		Evaluate[Sequence@@plotopts],
 		PlotRange->All,Joined->True
@@ -4545,7 +4589,7 @@ If[logged==False,
 	plotmin=Min[Table[Subscript[gcomp,i],{i,pos}]/.sol];
 	Return[ListLogPlot[
 		Table[{{Subscript[gtrait,i],plotmin},
-		{Subscript[gtrait,i],Subscript[gcomp,i]}},{i,pos}]/.sol/.traits,
+		{Subscript[gtrait,i],Subscript[gcomp,i]}},{i,pos}]/.abunds/.traits,
 		PlotStyle->Join[plotstyle,markerstyle],
 		Evaluate[Sequence@@plotopts],
 		PlotRange->{plotmin,All},Joined->True
@@ -4554,7 +4598,7 @@ If[logged==False,
 
 ]];
 
-Options[PlotTAD]={Logged->False,Guild->Automatic,Trait->Automatic,Component->Automatic,MinPop->0,MarkerStyle->Automatic,PlotStyle->{}};
+Options[PlotTAD]={Logged->False,Guild->Automatic,Trait->Automatic,Component->Automatic,MinPop->0,MarkerStyle->Automatic,PlotStyle->{},Time->t};
 
 
 PlotTAD[sol_?TraitsAndVariablesQ,opts___?OptionQ]:=PlotTAD[ExtractTraits[sol],ExtractVariables[sol],opts];
@@ -5097,7 +5141,7 @@ Which[
 			h=(\[Epsilon]r*var/.point)+\[Epsilon]a;
 			If[verbose,
 				With[{tr=traits,so=sol,pt=RuleListTweak[point,vars,-h],op=Sequence@@invopts},
-				If[IFFQ[so],
+				If[IntepolatingFunctionFunctionQ[so],
 					PrintCall[Global`invl=Inv[tr,Global`sol,pt,op]],
 					PrintCall[Global`invl=Inv[tr,so,pt,op]]
 				]
@@ -5106,7 +5150,7 @@ Which[
 			If[verbose,Print[func," invl=",invl]];
 			If[verbose,
 				With[{tr=traits,so=sol,pt=RuleListTweak[point,vars,h],op=Sequence@@invopts},
-				If[IFFQ[so],
+				If[IntepolatingFunctionFunctionQ[so],
 					PrintCall[Global`invr=Inv[tr,Global`sol,pt,op]],
 					PrintCall[Global`invr=Inv[tr,so,pt,op]]
 				]
@@ -5147,7 +5191,7 @@ Which[
 			h=(\[Epsilon]r*var/.point)+\[Epsilon]a;
 			If[verbose,
 				With[{tr=traits,so=sol,pt=RuleListTweak[point,vars,-h],op=Sequence@@invopts},
-				If[IFFQ[so],
+				If[IntepolatingFunctionFunctionQ[so],
 					PrintCall[Global`invl=Inv[trait,Global`sol,pt,op]],
 					PrintCall[Global`invl=Inv[trait,so,pt,op]]
 				]
@@ -5156,7 +5200,7 @@ Which[
 			If[verbose,Print[func," invl=",invl]];
 			If[verbose,
 				With[{tr=traits,so=sol,pt=RuleListTweak[point,vars,h],op=Sequence@@invopts},
-				If[IFFQ[so],
+				If[IntepolatingFunctionFunctionQ[so],
 					PrintCall[Global`invr=Inv[trait,Global`sol,pt,op]],
 					PrintCall[Global`invr=Inv[trait,so,pt,op]]
 				]
@@ -5165,7 +5209,7 @@ Which[
 			If[verbose,Print[func," invr=",invr]];
 			If[verbose,
 				With[{tr=traits,so=sol,pt=point,op=Sequence@@invopts},
-				If[IFFQ[so],
+				If[IntepolatingFunctionFunctionQ[so],
 					PrintCall[Global`invc=Inv[trait,Global`sol,pt,op]],
 					PrintCall[Global`invc=Inv[trait,so,pt,op]]
 				]
@@ -5273,128 +5317,6 @@ DInv[var:(_Subscript|_List|_Symbol):All,pointin:notDInvOpts:{},opts___?OptionQ]:
 NDInv[args___]:=DInv[args,Method->"NDInv"];
 
 
-(*PlotInv[traits:(_?TraitsQ):{},sol:(_?VariablesQ):{},{trait1_,trait1min_?NumericQ,trait1max_?NumericQ},opts___?OptionQ]:=
-
-Module[{
-func=FuncStyle["PlotInv"],
-(* options *)
-verbose,verboseall,monitor,
-delayinv,invopts,time,plotopts,plotspecies,markerstyle,plottadopts,tf,axeslabel,plotrange,tadplotrange,
-(* other variables *)
-nb,x,iplot,
-iopts,imin,imax,tmin,tmax,s,iaspectratio,iticks,iaxesorigin,iplotrangepadding,resplotrange,lmin,
-gu1,tr1,per,res,inv,epilog,tad},
-
-Block[{Nsp},
-
-(*Print["traits=",traits];
-Print["sol=",sol];
-Print["{trait1,trait1min,trait1max}=",{trait1,trait1min,trait1max}];*)
-
-If[modelloaded\[NotEqual]True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
-If[Global`debug,Print["In ",func]];
-
-(* handle options *)
-
-verbose=Evaluate[Verbose/.Flatten[{opts,Options[PlotInv]}]];
-If[Global`debug,verbose=True];
-verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[PlotInv]}]];
-If[verboseall,verbose=True];
-
-monitor=Evaluate[Monitor/.Flatten[{opts,Options[PlotInv]}]];
-delayinv=Evaluate[DelayInv/.Flatten[{opts,Options[PlotInv]}]];
-If[delayinv===Automatic,If[modelperiod=!=0,delayinv=True,delayinv=False]];
-invopts=Evaluate[InvOpts/.Flatten[{opts,Options[PlotInv]}]];
-time=Evaluate[Time/.Flatten[{opts,Options[PlotInv]}]];
-plotspecies=Evaluate[PlotSpecies/.Flatten[{opts,Options[PlotInv]}]];
-markerstyle=Evaluate[MarkerStyle/.Flatten[{opts,Options[PlotInv]}]];
-plotrange=Evaluate[PlotRange/.Flatten[{opts,Options[PlotInv]}]];
-plottadopts=Evaluate[PlotTADOpts/.Flatten[{opts,Options[PlotInv]}]];
-tadplotrange=PlotRange/.plottadopts;
-tf=Evaluate[TADVerticalScale/.Flatten[{opts,Options[PlotInv]}]];
-plotopts=FilterRules[Flatten[{opts,Options[PlotInv]}],Options[Plot]];
-axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[PlotInv]}]];
-If[axeslabel===Automatic,axeslabel={trait1}];
-
-(* figure out what trait is on the x-axis *)
-{gu1,tr1}=LookUp[trait1]\[LeftDoubleBracket]2;;3\[RightDoubleBracket];
-
-(* figure out number of species in guilds *)
-SetNsp[traits,sol];
-
-If[monitor,
-	nb=CreateDialog[DialogNotebook[Grid[{{"\[FormalX]=",Dynamic[x]}}],WindowTitle\[Rule]"PlotInv Progress..."]];
-];
-
-If[delayinv,
-	(* delay inv *)
-	inv[\[FormalX]_?NumberQ]:=Inv[traits,sol,{Subscript[tr1,0]\[Rule]\[FormalX]},Guild\[Rule]gu1,Evaluate[Sequence@@invopts],Time\[Rule]time,VerboseAll\[Rule]verboseall];
-	iplot=Plot[(x=\[FormalX];Evaluate[inv[\[FormalX]]]),{\[FormalX],trait1min,trait1max},
-		AxesLabel\[Rule]axeslabel,PlotRange\[Rule]{{trait1min,trait1max},plotrange},
-		Evaluate[Sequence@@plotopts],AxesOrigin\[Rule]{trait1min,0}];
-,
-	(* nondelay inv *)
-	Off[NIntegrate::inumr];
-	inv=Inv[traits,sol,Guild\[Rule]gu1,Evaluate[Sequence@@invopts],Time\[Rule]time,VerboseAll\[Rule]verboseall];
-	iplot=Plot[inv,{trait1,trait1min,trait1max},
-		AxesLabel\[Rule]axeslabel,PlotRange\[Rule]{{trait1min,trait1max},plotrange},
-		Evaluate[Sequence@@plotopts],AxesOrigin\[Rule]{trait1min,0}];
-	On[NIntegrate::inumr]
-];
-
-Which[plotspecies==="Axis",
-	If[markerstyle===Automatic,
-		epilog=Table[{PointSize[0.015],color[Subscript[tr1,sp]][SpFrac[sp,Nsp[gu1]]],Point[{Subscript[tr1,sp]/.traits,0}]},{sp,Nsp[gu1]}],
-		epilog=MapThread[Append,{PadRight[{},Nsp[gu1],
-			Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr1,sp]/.traits,0}],{sp,Nsp[gu1]}]}]
-	];
-	res=Show[iplot,Epilog\[Rule]epilog]
-	,
-	plotspecies==="TAD",
-	epilog={};
-	tad=PlotTAD[traits,sol,PlotRange\[Rule]{{trait1min,trait1max},tadplotrange},Evaluate[Sequence@@plottadopts],ImagePadding\[Rule]0,
-		Axes\[Rule]False,Guild\[Rule]gu1];
-	(*Print[tad];*)
-	{tmin,tmax}=(PlotRange/.AbsoluteOptions[tad,PlotRange])\[LeftDoubleBracket]2\[RightDoubleBracket];
-	iopts=AbsoluteOptions[iplot];
-	{imin,imax}=(PlotRange/.iopts)\[LeftDoubleBracket]2\[RightDoubleBracket];
-	(*Print["{imin,imax}=",{imin,imax}];
-	Print["{tmin,tmax}=",{tmin,tmax}];*)
-	iaspectratio=AspectRatio/.iopts;
-	iticks=Ticks/.iopts;
-	iaxesorigin=AxesOrigin/.iopts;
-	iplotrangepadding=PlotRangePadding/.iopts;
-	(*Print["iaxesorigin=",iaxesorigin];
-	Print["iplotrangepadding=",iplotrangepadding];*)
-	s=Max[tf*imin/(tmax(tf-1)),tf*(imax-Min[0,imin])/tmax]; (* scale TAD *)
-	(*Print["s=",s];*)
-	resplotrange={Min[imin,tmin],Max[imax,s*tmax]};
-	If[Head[iplotrangepadding\[LeftDoubleBracket]2,2\[RightDoubleBracket]]===Scaled,
-		lmin=imax+1.01*Differences[resplotrange]\[LeftDoubleBracket]1\[RightDoubleBracket]*iplotrangepadding\[LeftDoubleBracket]2,2,1\[RightDoubleBracket],
-		lmin=imax+iplotrangepadding\[LeftDoubleBracket]2,2\[RightDoubleBracket]+0.01*Differences[resplotrange]\[LeftDoubleBracket]1\[RightDoubleBracket]
-	];
-	(*Print["lmin=",lmin];*)
-	res=Show[iplot,
-		PlotRange\[Rule]{{trait1min,trait1max},resplotrange},Ticks\[Rule]iticks,
-		Epilog\[Rule]{{White,Line[{{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],lmin},{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],10^10}}]},
-		Inset[Show[tad,AspectRatio\[Rule]iaspectratio*tf],{0,0},{0,0},Scaled[1]]}];
-	(*res=Show[
-		iplot,
-		PlotRange\[Rule]{{trait1min,trait1max},plotrange},Ticks\[Rule]iticks,
-		Epilog\[Rule]{{White,Line[{{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],lmin},{iaxesorigin\[LeftDoubleBracket]1\[RightDoubleBracket],10^10}}]},
-		Inset[Show[tad,AspectRatio\[Rule]iaspectratio*tf],{0,0},{0,0},Scaled[1]],
-		Inset[Show[iplot,Axes\[Rule]False,PlotRange\[Rule]{{trait1min,trait1max},resplotrange}],{0,0},{0,0},Scaled[1]]}]*)
-	,
-	Else,
-	res=iplot
-];
-
-If[monitor,NotebookClose[nb]];
-
-Return[res]
-]];*)
-
-
 PlotInv[traits:(_?TraitsQ):{},sol:(_?VariablesQ):{},{trait1_,trait1min_?NumericQ,trait1max_?NumericQ},opts___?OptionQ]:=
 
 Module[{
@@ -5475,7 +5397,7 @@ Which[plotspecies==="Axis",
 	plotspecies==="TAD",
 	epilog={};
 	tad=PlotTAD[traits,sol,PlotRange->{{trait1min,trait1max},tadplotrange},Evaluate[Sequence@@plottadopts],
-		ImagePadding->{{0,0},{0,Scaled[0.05]}},Axes->False,Guild->gu1];
+		ImagePadding->{{0,0},{0,Scaled[0.05]}},Axes->False,Guild->gu1,Time->time];
 	(*Print[tad];*)
 	{tmin,tmax}=(PlotRange/.AbsoluteOptions[tad,PlotRange])[[2]];
 	iopts=AbsoluteOptions[iplot];
