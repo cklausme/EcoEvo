@@ -198,8 +198,8 @@ StyleBox[\"rulelist\", \"TI\"]\).";
 Var::usage=
 "Var[\!\(\*
 StyleBox[\"f\", \"TI\"]\), \!\(\*
-StyleBox[\"var\", \"TI\"]\)] gives the variance of the function \!\(\*
-StyleBox[\"f\", \"TI\"]\), which contains an InterpolatingFunction, with respect to \!\(\*
+StyleBox[\"var\", \"TI\"]\)] gives the variance of \!\(\*
+StyleBox[\"f\", \"TI\"]\) with respect to \!\(\*
 StyleBox[\"var\", \"TI\"]\)\!\(\*
 StyleBox[\" \", \"TI\"]\)(default \!\(\*
 StyleBox[\"var\", \"TI\"]\)=t).
@@ -207,11 +207,14 @@ Var[\!\(\*
 StyleBox[\"f\", \"TI\"]\), {\!\(\*
 StyleBox[\"var\", \"TI\"]\), \!\(\*
 StyleBox[\"varmin\", \"TI\"]\), \!\(\*
-StyleBox[\"varmax\", \"TI\"]\)}] gives the variance of the function \!\(\*
+StyleBox[\"varmax\", \"TI\"]\)}] gives the variance of \!\(\*
 StyleBox[\"f\", \"TI\"]\) with respect to \!\(\*
 StyleBox[\"var\", \"TI\"]\), ranging from \!\(\*
 StyleBox[\"varmin\", \"TI\"]\) to \!\(\*
-StyleBox[\"varmax\", \"TI\"]\).";
+StyleBox[\"varmax\", \"TI\"]\).
+Var[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
 
 Cov::usage=
 "Cov[\!\(\*
@@ -2089,7 +2092,7 @@ TemporalDataFunctionQ[x_]:=If[Length[Cases[x,_TemporalData,\[Infinity],Heads->Tr
 
 
 (* main *)
-Avg[f_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{integrateopts,nintegrateopts,method},
+Avg[f_,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=Module[{integrateopts,nintegrateopts,method},
 (*Print["main"];*)
 	method=Evaluate[Method/.Flatten[{opts,Options[Avg]}]];
 	If[IntepolatingFunctionFunctionQ[f]==True,method="NIntegrate"];
@@ -2116,7 +2119,7 @@ f/.(x_->val_):>(x->Avg[val,{var,varmin,varmax},opts]));
 
 
 (* InterpolatingFunctionFunctions *)
-Avg[f_?IntepolatingFunctionFunctionQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,ifdomains,numifdomains,varmin,varmax},
+Avg[f_?IntepolatingFunctionFunctionQ,var_Symbol:t,opts___?OptionQ]:=Module[{nintegrateopts,ifdomains,numifdomains,varmin,varmax},
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Avg]}]];
 	
 	ifdomains=Map[#["Domain"][[1]]&,Cases[f,_InterpolatingFunction,\[Infinity],Heads->True]];
@@ -2135,7 +2138,9 @@ Avg[f_?IntepolatingFunctionFunctionQ,var_:t,opts___?OptionQ]:=Module[{nintegrate
 
 
 (* InterpolatingFunctions *)
-Avg[f_InterpolatingFunction,opts___?OptionQ]:=((*Print["raw IF"];*)Avg[f[t],opts]);
+Avg[f_InterpolatingFunction,opts___?OptionQ]:=((*Print["IF"];*)Avg[f[t],opts]);
+Avg[f_InterpolatingFunction,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=
+	((*Print["IF2"];*)Avg[f[t],{var,varmin,varmax}opts]);
 
 
 (* TemporalData *)
@@ -2151,26 +2156,35 @@ Avg[f_?((!RuleListQ[#]&&!IntepolatingFunctionFunctionQ[#])&),opts___?OptionQ]:=(
 Options[Avg]={Method->"Integrate",IntegrateOpts->{},NIntegrateOpts->{}};
 
 
+(* main *)
 Var[f_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{integrateopts,nintegrateopts,avgopts,method,avg},
 	method=Evaluate[Method/.Flatten[{opts,Options[Var]}]];
 	If[IntepolatingFunctionFunctionQ[f]==True,method="NIntegrate"];
+	If[TemporalDataFunctionQ[f]==True,method="Sum"];
 	integrateopts=Evaluate[IntegrateOpts/.Flatten[{opts,Options[Var]}]];
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Var]}]];
 	avgopts=Evaluate[AvgOpts/.Flatten[{opts,Options[Var]}]];
-
 	avg=Avg[f,{var,varmin,varmax},Method->method];
-	
 	Which[
 		method=="Integrate",
 		Return[Integrate[(f-avg)^2,{var,varmin,varmax},Evaluate[Sequence@@integrateopts]]/(varmax-varmin)^2],
 		method=="NIntegrate",
 		Return[NIntegrate[(f-avg)^2,{var,varmin,varmax},Evaluate[Sequence@@nintegrateopts]]/(varmax-varmin)^2],
+		method=="Sum",
+		Return[Sum[(f-avg)^2,{var,varmin,varmax}]/(varmax-varmin+1)^2],
 		Else,
 		Msg[General::badmtd];Return[$Failed];
 	];
 ];
 
 
+(* thread over RuleLists *)
+Var[f_?RuleListQ,opts___?OptionQ]:=((*Print["rulelist1"];*)f/.(x_->val_):>(x->Var[val,opts]));
+Var[f_?RuleListQ,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=((*Print["rulelist2"];*)
+f/.(x_->val_):>(x->Var[val,{var,varmin,varmax},opts]));
+
+
+(* InterpolatingFunctionFunctions *)
 Var[if_?IntepolatingFunctionFunctionQ,var_:t,opts___?OptionQ]:=Module[{nintegrateopts,avgopts,ifdomains,numifdomains,varmin,varmax},
 	nintegrateopts=Evaluate[NIntegrateOpts/.Flatten[{opts,Options[Var]}]];
 	avgopts=Evaluate[AvgOpts/.Flatten[{opts,Options[Var]}]];
@@ -2188,6 +2202,22 @@ Var[if_?IntepolatingFunctionFunctionQ,var_:t,opts___?OptionQ]:=Module[{nintegrat
 		Return[Var[if,{var,varmin,varmax},Method->"NIntegrate",NIntegrateOpts->nintegrateopts]]
 	];
 ];
+
+
+(* InterpolatingFunctions *)
+Var[f_InterpolatingFunction,opts___?OptionQ]:=((*Print["raw IF"];*)Var[f[t],opts]);
+Var[f_InterpolatingFunction,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=
+	((*Print["IF2"];*)Var[f[t],{var,varmin,varmax}opts]);
+
+
+(* TemporalData *)
+Var[f_TemporalData,opts___?OptionQ]:=((*Print["td"];*)Variance[f]);
+Var[f_TemporalData,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=((*Print["td2"];*)
+Variance[TimeSeriesWindow[f,{varmin,varmax}]]);
+
+
+(* fallthrough *)
+Var[f_?((!RuleListQ[#]&&!IntepolatingFunctionFunctionQ[#])&),opts___?OptionQ]:=((*Print["otherwise"];*)0);
 
 
 Options[Var]={IntegrateOpts->{},NIntegrateOpts->{},AvgOpts->{},Method->"Integrate"};
