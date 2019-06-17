@@ -135,9 +135,9 @@ PrestonPlot;WhittakerPlot;PlotTAD;
 
 InvSPS;Inv;StablePopulationStructure;ReproductiveValues;
 DInv;NDInv;NumDInv;
+PlotInv;PlotZIP;PlotZNGI;PlotPIP;PlotMIP;
 
 
-PlotInv;PlotZIP;PlotPIP;PlotMIP;
 EvoEqns;
 PlotEvoIsoclines;PlotEvoStreams;PlotEvoPhasePlane;
 EcoEvoSim;
@@ -278,18 +278,14 @@ $EcoEvoVersion::usage=
 "$EcoEvoVersion gives the version of the loaded EcoEvo package.";
 
 
-$EcoEvoVersion="0.9.8X (June 14, 2019)";
+$EcoEvoVersion="0.9.8X (June 17, 2019)";
 
 
 Print["EcoEvo Package Version ",$EcoEvoVersion,"
 Christopher A. Klausmeier <christopher.klausmeier@gmail.com>"];
 
 
-modelloaded=False;
-
-
-SetOptions[NDSolve,MaxSteps->Infinity];
-(*SetOptions[NIntegrate,MaxRecursion\[Rule]30];*)
+$ModelLoaded=False;
 
 
 SimplifyLogE::usage=
@@ -530,9 +526,6 @@ Msg[msgs__]:=Block[{$Messages=Streams["stdout"]},
 	Message[msgs];
 ];
 SetAttributes[Msg,HoldAll];
-
-
-(* add three nice color schemes *)
 
 
 ColorData[1]; (* load ColorData *)
@@ -1995,7 +1988,7 @@ lookup,vars,plotvars,yaxislabel,xinit,xfinal,ifvars,tdvars,cvars,tdsol,ifplot,td
 	
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 (* handle options *)
 
@@ -2141,7 +2134,7 @@ StyleBox[\"sol\", \"TI\"]\).";
 
 SelectValid[sol:(_?RuleListListQ):{}]:=Module[{res},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 res={};
 Do[
@@ -2181,7 +2174,7 @@ assumptions=Evaluate[Assumptions/.Flatten[{model,Options[SetModel]}]];
 
 UnsetModel;
 
-modelloaded=True;
+$ModelLoaded=True;
 
 (* model name - default="UnnamedModel"*)
 modelname=ModelName/.Append[model,ModelName->"UnnamedModel"];
@@ -2354,7 +2347,7 @@ UnsetModel::usage=
 
 
 UnsetModel:=(
-	modelloaded=False;
+	$ModelLoaded=False;
 	Clear[LookUp,type,range,comptype,color,linestyle,plotmarker,DT,modelinvthreshold,
 	modeltype,modelwhenevents,modelperiod,
 	pops,npops,npcomps,pcomps,pcompeqn,
@@ -2371,7 +2364,7 @@ ModelInfo::usage=
 
 ModelInfo:=(
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[]];
 
 (* model name *)
 Print["modelname=",modelname];
@@ -2484,7 +2477,7 @@ traits,nonfixedvars,fixed2,eqns},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -2577,7 +2570,7 @@ nonfixedvars,luv,sp,eqns,unks,ics,tic,exprule,sol,res,fixedres},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -2749,7 +2742,7 @@ nonvars,nonfixedvars,traits,fixedvars,removets,eqns,unks,newunk,sol,res},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -2886,7 +2879,7 @@ ic,nb,thing,eqns,unks,logd,vars,unksics,ics,res,sol,per},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 $FindEcoCycleSteps=0;
@@ -3111,7 +3104,7 @@ traits,fixedvars,nonfixedvars,eqns,unks,jmat},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -3190,7 +3183,7 @@ verbose,chop,time,ndsolveopts,multipliers,j,
 (* other variables *)
 dim,per,xsol,res},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 verbose=Evaluate[Verbose/.Flatten[{opts,Options[EcoEigenvalues]}]];
@@ -3256,7 +3249,7 @@ Module[{func=FuncStyle["EcoStableQ"],
 method,verbose,verboseall,simplify,time,ecoeigenvaluesopts,assumptions,tolerance,
 j,evs,res},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 verbose=Evaluate[Verbose/.Flatten[{opts,Options[EcoStableQ]}]];
@@ -3346,7 +3339,7 @@ StyleBox[\"traits\", \"TI\"]\).";
 
 SelectEcoStable[traits:(_?TraitsQ):{},sol_?ListOfVariablesQ,opts___?OptionQ]:=Module[{stableqopts,stable},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 stableqopts=FilterRules[Flatten[{opts,Options[SelectEcoStable]}],Options[EcoStableQ]];
 
@@ -3383,7 +3376,7 @@ testvalidity,teststability,
 eq,valideq,tmp,evs,ics,stableeq,res,essol,ddt,eqflag,per,ecosimflag},
 
 Block[{Nsp},
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (*handle options*)
@@ -3724,7 +3717,7 @@ fixedvars,nonfixedvars,lookup1,lookup2,style1,style2,label1,label2,g,res},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -3845,7 +3838,7 @@ fixedvars,nonfixedvars,g,res},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -3957,7 +3950,7 @@ abunds,pos,data,\[ScriptCapitalD],hist,stix
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -4013,7 +4006,7 @@ abunds,data
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -4058,7 +4051,7 @@ abunds,pos,plotmin
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -4219,7 +4212,7 @@ tstart,tend,removets,qsssol,eval,evec,invsol,j,tempIF},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 $InvCount++; (* increment $InvCount *)
@@ -4724,7 +4717,7 @@ Print["pointin=",pointin];*)
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -5033,7 +5026,7 @@ Block[{Nsp},
 Print["sol=",sol];
 Print["{trait1,trait1min,trait1max}=",{trait1,trait1min,trait1max}];*)
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -5174,6 +5167,26 @@ StyleBox[\"var2max\", \"TI\"]\)}, \!\(\*
 StyleBox[\"inv\", \"TI\"]\)] uses equilibrium \!\(\*
 StyleBox[\"eq0\", \"TI\"]\).";
 
+PlotZNGI::usage =
+"PlotZNGI[{\!\(\*
+StyleBox[\"var1\", \"TI\"]\), \!\(\*
+StyleBox[\"var1min\", \"TI\"]\), \!\(\*
+StyleBox[\"var1max\", \"TI\"]\)}, {\!\(\*
+StyleBox[\"var2\", \"TI\"]\), \!\(\*
+StyleBox[\"var2min\", \"TI\"]\), \!\(\*
+StyleBox[\"var2max\", \"TI\"]\)}, \!\(\*
+StyleBox[\"sp\", \"TI\"]\)] plots a zero net growth isocline of \!\(\*
+StyleBox[\"sp\", \"TI\"]\).
+PlotZNGI[{\!\(\*
+StyleBox[\"var1\", \"TI\"]\), \!\(\*
+StyleBox[\"var1min\", \"TI\"]\), \!\(\*
+StyleBox[\"var1max\", \"TI\"]\)}, {\!\(\*
+StyleBox[\"var2\", \"TI\"]\), \!\(\*
+StyleBox[\"var2min\", \"TI\"]\), \!\(\*
+StyleBox[\"var2max\", \"TI\"]\)}, {\!\(\*
+StyleBox[\"sp1\", \"TI\"]\), \!\(\*
+StyleBox[\"sp2\", \"TI\"]\), \[Ellipsis]}] plots multiple ZNGIs.";
+
 
 PlotZIP[solin_:"FindEcoAttractor",{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},
 invaderin_Symbol:Automatic,opts___?OptionQ]:=
@@ -5190,7 +5203,7 @@ fixedvars,traitinv,subrule,luv1,luv2,gu,tr1,tr2,invader,sol,inv,res},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -5252,6 +5265,12 @@ If[invaderin===Automatic,
 ];
 (*Print["invader=",invader];*)
 
+If[boundarystyle===Automatic,
+	If[LookUp[invader][[1]]=="pcomp",
+		boundarystyle={Thick,color[invader]},
+		boundarystyle={Thick,Black}]
+];
+
 If[framelabel===Automatic,
 	If[plottype=="Plot3D",
 		framelabel={var1,var2,"inv"},
@@ -5260,7 +5279,6 @@ If[framelabel===Automatic,
 ];
 
 (* define resident sol *)
-
 If[solin==="FindEcoAttractor",
 	If[fixed=={},
 		sol[\[FormalX]_,\[FormalY]_]={}
@@ -5321,7 +5339,7 @@ Which[
 		Evaluate[Sequence@@plotopts],AxesLabel->Append[framelabel,"inv"]],
 	plottype=="ContourPlot",
 	res=ContourPlot[({x,y}={\[FormalX],\[FormalY]};Evaluate[inv[\[FormalX],\[FormalY]]]),{\[FormalX],var1min,var1max},{\[FormalY],var2min,var2max},
-		Evaluate[Sequence@@plotopts],FrameLabel->framelabel],
+		Evaluate[Sequence@@plotopts],FrameLabel->framelabel,PlotRange->{{var1min,var1max},{var2min,var2max}}],
 	plottype=="RegionZIP", 
 	res=RegionPlot[({x,y}={\[FormalX],\[FormalY]};Evaluate[inv[\[FormalX],\[FormalY]]>invthreshold]),{\[FormalX],var1min,var1max},{\[FormalY],var2min,var2max},
 		Evaluate[Sequence@@plotopts],PlotStyle->invstyle,BoundaryStyle->boundarystyle,FrameLabel->framelabel],
@@ -5329,7 +5347,8 @@ Which[
 	res=ContourPlot[({x,y}={\[FormalX],\[FormalY]};Evaluate[inv[\[FormalX],\[FormalY]]]),{\[FormalX],var1min,var1max},{\[FormalY],var2min,var2max},Evaluate[Sequence@@plotopts],
 		PlotRange->All,Contours->{invthreshold},ContourStyle->{boundarystyle},ContourShading->True,
 		ColorFunction->(If[#>invthreshold,invstyle,noninvstyle]&),
-		AspectRatio->1,Method->{"TransparentPolygonMesh"->True},ColorFunctionScaling->False,FrameLabel->framelabel],
+		AspectRatio->1,Method->{"TransparentPolygonMesh"->True},ColorFunctionScaling->False,FrameLabel->framelabel,
+		PlotRange->{{var1min,var1max},{var2min,var2max}}],
 	Else,
 	Message[PlotZIP::badmtd];Return[$Failed]
 ];
@@ -5345,10 +5364,18 @@ Options[PlotZIP]={
 	FindEcoAttractorOpts->{},InvOpts->{},
 	DelayInv->False,PlotType->"ZIP",ICs->{},Fixed->{},InvThreshold->Automatic,
 	PlotOpts->{MaxRecursion->3},
-	BoundaryStyle->Black,InvStyle->Gray,NonInvStyle->White,
+	BoundaryStyle->Automatic,InvStyle->Gray,NonInvStyle->Opacity[0],
 	Monitor->False,
 	Verbose->False,VerboseAll->False
 };
+
+
+PlotZNGI[{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},
+invader_,opts___?OptionQ]:=PlotZIP[{},{var1,var1min,var1max},{var2,var2min,var2max},invader,opts,InvStyle->Opacity[0]];
+
+
+PlotZNGI[{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},
+invaders_List,opts___?OptionQ]:=Show[PlotZIP[{},{var1,var1min,var1max},{var2,var2min,var2max},#,opts,InvStyle->Opacity[0]]&/@invaders];
 
 
 PlotZIP::unkinv=
@@ -5390,7 +5417,7 @@ invfixed,gu1,tr1,sp1,res,sol,resinv,inv},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -5594,7 +5621,7 @@ invfixed,gu1,tr1,sp1,gu2,tr2,sp2,ics,sol1,sol2,inv12,inv21,pip1,pip2,res},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -5846,7 +5873,7 @@ g,dtrait,pre,wt,sol,eqns},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -5999,7 +6026,7 @@ gu1,tr1,sp1,gu2,tr2,sp2,res},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -6149,7 +6176,7 @@ sol,dt,dinv21,dinv22,gu1,tr1,sp1,gu2,tr2,sp2,pre1,pre2,iso1,iso2},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -6419,7 +6446,7 @@ plotmipopts,plotevoisoclinesopts,plotevostreamsopts,verbose,verboseall,
 (* other variables *)
 pes,pei,mip},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 (* handle options *)
 
@@ -6455,7 +6482,7 @@ plotmipopts,plotevoisoclinesopts,plotevostreamsopts,verbose,verboseall,
 (* other variables *)
 pes,pei,mip},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 (* handle options *)
 
@@ -6491,7 +6518,7 @@ plotzipopts,plotevoisoclinesopts,plotevostreamsopts,verbose,verboseall,
 (* other variables *)
 invader,pes,pei,zip},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 (* handle options *)
 
@@ -6556,7 +6583,7 @@ fixedvars,fixedtraits,fixedvariables,tic,ecoeqns,evoeqns,eqns,ics,unks,discretev
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -6712,7 +6739,7 @@ fixedvars,fixedtraits,fixedvariables,ecoeqns,evoeqns,eqns,unks,newunk,unksics,so
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -6824,7 +6851,7 @@ thing,fw,sol,unks,unksics,res,dtrait,v,nb},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -6984,7 +7011,7 @@ fixedvars,fixedtraits,fixedvariables,tounks,fromunks,evoeqns,eqns,unks,unksics,n
    
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -7117,7 +7144,7 @@ traits,variables,eqns,unks,jmat},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -7235,7 +7262,7 @@ traits,variables,eqns,unks,jmat},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
@@ -7308,7 +7335,7 @@ StyleBox[\"varcovars\", \"TI\"]\).";
 
 EvoEigenvalues[traits:(_?TraitsQ):{},variables:(_?VariablesQ):{},Gs:(_?GsQ):{},opts___?OptionQ]:=Module[{chop,ejopts,res},
 
-	If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+	If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 	chop=Evaluate[Chop/.Flatten[{opts,Options[EvoEigenvalues]}]];
 	ejopts=FilterRules[Flatten[{opts,Options[EvoEigenvalues]}],Options[EvoJacobian]];
@@ -7351,7 +7378,7 @@ vars,unks,inv,res},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* reset $InvCount *)
@@ -7443,7 +7470,7 @@ inv,tmp},
 
 Block[{Nsp},
 
-If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[$ModelLoaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
 (* handle options *)
