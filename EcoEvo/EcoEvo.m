@@ -31,10 +31,11 @@ Unprotect@@Names["EcoEvo`*"];
 ClearAll@@Names["EcoEvo`*"];
 
 
-$EcoEvoVersion;
+EcoEvoGeneral::nomodel=
+"No model loaded. Use SetModel first.";
 
-
-EcoEvoGeneral::nomodel="No model loaded. Use SetModel first.";
+$EcoEvoVersion::usage=
+"$EcoEvoVersion gives the version of the loaded EcoEvo package.";
 
 
 $InvCount;$FindEcoCycleSteps;
@@ -274,18 +275,13 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion::usage=
-"$EcoEvoVersion gives the version of the loaded EcoEvo package.";
-
-
-$EcoEvoVersion="0.9.8X (June 17, 2019)";
-
-
-Print["EcoEvo Package Version ",$EcoEvoVersion,"
-Christopher A. Klausmeier <christopher.klausmeier@gmail.com>"];
+$EcoEvoVersion="0.9.9X (June 18, 2019)";
 
 
 $ModelLoaded=False;
+
+
+SetOptions[NDSolve,MaxSteps->Infinity];
 
 
 SimplifyLogE::usage=
@@ -5267,8 +5263,8 @@ If[invaderin===Automatic,
 
 If[boundarystyle===Automatic,
 	If[LookUp[invader][[1]]=="pcomp",
-		boundarystyle={Thick,color[invader]},
-		boundarystyle={Thick,Black}]
+		boundarystyle={color[invader],Opacity[1]},
+		boundarystyle={Black,Opacity[1]}]
 ];
 
 If[framelabel===Automatic,
@@ -7512,3 +7508,7 @@ Unprotect[Unk,t,LookUp,$FindEcoCycleSteps,$InvCount,$findecocycleevoeqthingcount
 
 End[];
 EndPackage[];
+
+
+"EcoEvo Package Version "<>$EcoEvoVersion<>"
+Christopher A. Klausmeier <christopher.klausmeier@gmail.com>"
