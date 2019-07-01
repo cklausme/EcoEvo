@@ -66,7 +66,7 @@ SortedEigensystem;ListMultiplier;RunFile;RouthHurwitzCriteria;
 Set\[ScriptCapitalN];
 
 
-ExtractTraits;ExtractPops;ExtractAuxs;ExtractGuilds;ExtractVariables;
+EcoEvoDocs;ExtractTraits;ExtractPops;ExtractAuxs;ExtractGuilds;ExtractVariables;
 TraitsQ;VariablesQ;ListOfVariablesQ;TraitsAndVariablesQ;InvaderQ;NotInvaderTraitsQ;GsQ;
 DeleteInvaders;
 PlotDynamics;SelectValid;
@@ -256,7 +256,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.10 (June 29, 2019)";
+$EcoEvoVersion="0.9.11X (July 1, 2019)";
 
 
 modelloaded=False;
@@ -1807,6 +1807,12 @@ DefaultICs:=Flatten[{
 	Table[Table[pcomp->Min[(Min[range[pcomp]]+Max[range[pcomp]])/2,Min[range[pcomp]]+1],{pcomp,pcomps[pop]}],{pop,pops}],
 	Table[aux->Min[(Min[range[aux]]+Max[range[aux]])/2,Min[range[aux]]+1],{aux,auxs}]
 }];
+
+
+EcoEvoDocs::usage="EcoEvoDocs opens the main EcoEvo guide.";
+
+
+EcoEvoDocs:=(NotebookOpen["paclet:EcoEvo/guide/EcoEvo"];Null);
 
 
 ExtractTraits::usage=
