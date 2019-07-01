@@ -1,17 +1,17 @@
 # EcoEvo
-Analyze ecological and eco-evolutionary models, including Adaptive Dynamics, in Mathematica.
+Analyze species- and trait-based ecological and eco-evolutionary models, including Adaptive Dynamics, in Mathematica.
 
 ## Installation
 - Requires Mathematica 10.0 or higher.
 
-- [Download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-0.9.3.paclet` was downloaded into the directory `~/Downloads`, evaluate
+- Install directly with
+
+      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v0.9.10/EcoEvo-0.9.10.paclet"]
+
+- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-0.9.10.paclet` was downloaded into the directory `~/Downloads`, evaluate
 
       Needs["PacletManager`"]
-      PacletInstall["~/Downloads/EcoEvo-0.9.3.paclet"]
-
-- Alternatively directly install with
-
-      PacletInstall["http://preston.kbs.msu.edu/EcoEvo-0.9.3.paclet"]
+      PacletInstall["~/Downloads/EcoEvo-0.9.10.paclet"]
 
 ## Usage
 
@@ -35,3 +35,9 @@ Analyze ecological and eco-evolutionary models, including Adaptive Dynamics, in 
 
 - Initial public beta release.
 - Behind-the-scenes changes will be made, but functionality should remain constant.
+
+### v0.9.10 (June 30, 2019)
+
+- Lots of behind-the-scenes cleaning.
+- Changed notation from Nsp to ScriptCapitalN for number of species.
+- Made variable names the identifiers for model parts.

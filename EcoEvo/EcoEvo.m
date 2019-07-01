@@ -63,7 +63,7 @@ InterpolatingFunctionTake;Slice;InitialSlice;FinalSlice;FinalDerivatives;Initial
 SortedEigensystem;ListMultiplier;RunFile;RouthHurwitzCriteria;
 
 
-SetNsp;
+Set\[ScriptCapitalN];
 
 
 ExtractTraits;ExtractPops;ExtractAuxs;ExtractGuilds;ExtractVariables;
@@ -95,9 +95,8 @@ Guild::usage="Defines a Guild in SetModel. Also an option for various EcoEvo fun
 Trait::usage="Defines a trait in SetModel.";
 Type::usage="Defines a Component type in SetModel.";
 
-Nsp::usage =
-"Nsp[\!\(\*
-StyleBox[\"gu\", \"TI\"]\)] is a reserved symbol that denotes the number of species in guild \!\(\*
+\[ScriptCapitalN]::usage = "\!\(\*SubscriptBox[\(\[ScriptCapitalN]\), 
+StyleBox[\"gu\", \"TI\"]]\) is a reserved symbol that denotes the number of species in guild \!\(\*
 StyleBox[\"gu\", \"TI\"]\).  Do not set directly.";
 
 Color::usage="Color gives the color for a model part.";
@@ -200,7 +199,7 @@ NonFixedVars::usage = "NonFixedVars is an option for EcoEqns that lists variable
 NonInvStyle::usage = "NonInvStyle is an option for PlotMIP (PlotType->MIP) that defines the style for unsuccessful invasion.";
 NSolveEcoEqOpts::usage = "NSolveEcoEqOpts is an option for various EcoEvo functions that passes options to NSolveEcoEq.";
 NSolveOpts::usage = "NSolveOpts is an option for various EcoEvo functions that passes options to NSolve.";
-Nsps::usage = "Nsps is an option for EvoEqns that sets the number of species in each Guild.";
+\[ScriptCapitalN]s::usage = "\[ScriptCapitalN]s is an option for EvoEqns that sets the number of species in each Guild.";
 NumTries::usage = "NumTries is an option for FindEcoAttractor's method \"FindRoot\" that says how many initial guesses to try.";
 Output::usage = "Output is an option for various EcoEvo functions that determines the type of output.";
 OutputTMin::usage = "OutputTMin is an option for EcoSim and EcoEvoSim that that sets the length of the results (default=0).";
@@ -257,7 +256,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.9X (June 26, 2019)";
+$EcoEvoVersion="0.9.10 (June 29, 2019)";
 
 
 modelloaded=False;
@@ -1600,14 +1599,14 @@ RouthHurwitzCriteria[a_?MatrixQ]:=Module[{c3},
 ];
 
 
-SetNsp[traits:(_?TraitsQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,tnsp,pnsp},
-(*Print["In SetNsp, traits=",traits," variables=",variables];*)
+Set\[ScriptCapitalN][traits:(_?TraitsQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,tnsp,pnsp},
+(*Print["In Set\[ScriptCapitalN], traits=",traits," variables=",variables];*)
 
 	Do[
 		tmp=Table[Max[Select[Select[variables,#[[1,0]]==Subscript&],#[[1,1]]==gcomp&][[All,1,2]]],{gcomp,gcomps[gu]}];
 		If[Length[Union[tmp]]==1,
 			pnsp[gu]=tmp[[1]],
-			Msg[SetNsp::badcomm,gu,tmp];
+			Msg[Set\[ScriptCapitalN]::badcomm,gu,tmp];
 			Abort[]
 		];
 		If[pnsp[gu]==-\[Infinity],pnsp[gu]=0];
@@ -1618,7 +1617,7 @@ SetNsp[traits:(_?TraitsQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,tnsp,pnsp
 			tmp=Table[Max[Select[Select[traits,#[[1,0]]==Subscript&],#[[1,1]]==gtrait&][[All,1,2]]],{gtrait,gtraits[gu]}];
 			If[Length[Union[tmp]]==1,
 				tnsp[gu]=tmp[[1]],
-				Msg[SetNsp::badtrait,gu,tmp];
+				Msg[Set\[ScriptCapitalN]::badtrait,gu,tmp];
 				Abort[]
 			];
 			If[tnsp[gu]==-\[Infinity],tnsp[gu]=0];
@@ -1627,26 +1626,26 @@ SetNsp[traits:(_?TraitsQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,tnsp,pnsp
 		]
 	,{gu,guilds}];
 	
-(*Print["SetNsp: tnsp=",Table[tnsp[gu],{gu,guilds}]," pnsp=",Table[pnsp[gu],{gu,guilds}]];*)
+(*Print["Set\[ScriptCapitalN]: tnsp=",Table[tnsp[gu],{gu,guilds}]," pnsp=",Table[pnsp[gu],{gu,guilds}]];*)
 
 	If[Table[tnsp[gu],{gu,guilds}]==Table[pnsp[gu],{gu,guilds}]||variables=={}||traits=={},
 		Do[
-			Nsp[gu]=If[traits!={},tnsp[gu],pnsp[gu]]
+			\[ScriptCapitalN][gu]=If[traits!={},tnsp[gu],pnsp[gu]]
 		,{gu,guilds}]
 	,
-		Msg[SetNsp::badnsp,Table[tnsp[gu],{gu,guilds}],Table[pnsp[gu],{gu,guilds}]];
+		Msg[Set\[ScriptCapitalN]::badnsp,Table[tnsp[gu],{gu,guilds}],Table[pnsp[gu],{gu,guilds}]];
 		Abort[]
 	];
 ]/;(nguilds!=0);
 
 
-SetNsp::badnsp=
+Set\[ScriptCapitalN]::badnsp=
 "Number of species inconsistent between traits `1` and densities `2`.";
 
-SetNsp::badtrait=
+Set\[ScriptCapitalN]::badtrait=
 "Number of traits in guild `1` inconsistent: `2`.";
 
-SetNsp::badcomm=
+Set\[ScriptCapitalN]::badcomm=
 "Number of components in guild `1` inconsistent: `2`.";
 
 
@@ -1698,11 +1697,11 @@ AllVariables::usage="Internal usage only ;)";
 AllPopsAndAuxs::usage="Internal usage only ;)";
 
 
-AllTraits:=Flatten[Table[Table[Table[Subscript[gtrait,sp],{gtrait,gtraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}]];
+AllTraits:=Flatten[Table[Table[Table[Subscript[gtrait,sp],{gtrait,gtraits[gu]}],{sp,If[\[ScriptCapitalN][gu]==0,0,1],\[ScriptCapitalN][gu]}],{gu,guilds}]];
 
 
 AllVariables:=Flatten[Join[
-	Table[Table[Table[Subscript[gcomp,sp],{gcomp,gcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}],
+	Table[Table[Table[Subscript[gcomp,sp],{gcomp,gcomps[gu]}],{sp,\[ScriptCapitalN][gu]}],{gu,guilds}],
 	Table[Table[pcomp,{pcomp,pcomps[pop]}],{pop,pops}],
 	Table[aux,{aux,auxs}]
 ]];
@@ -1721,36 +1720,36 @@ BlankUnkVariables::usage="Internal usage only ;)";
 
 
 BlankTraits:=Flatten[
-	Table[Table[Table[Subscript[gtrait,sp]->Subscript[gtrait,sp],{gtrait,gtraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}]];
+	Table[Table[Table[Subscript[gtrait,sp]->Subscript[gtrait,sp],{gtrait,gtraits[gu]}],{sp,If[\[ScriptCapitalN][gu]==0,0,1],\[ScriptCapitalN][gu]}],{gu,guilds}]];
 
 
 BlankUnkTraits:=Flatten[
-	Table[Table[Table[Subscript[gtrait,sp]->Unk[Subscript[gtrait,sp]],{gtrait,gtraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}]];
+	Table[Table[Table[Subscript[gtrait,sp]->Unk[Subscript[gtrait,sp]],{gtrait,gtraits[gu]}],{sp,If[\[ScriptCapitalN][gu]==0,0,1],\[ScriptCapitalN][gu]}],{gu,guilds}]];
 
 
 BlankVariables:=Flatten[Join[				
-	Table[Table[Table[Subscript[gcomp,sp]->Subscript[gcomp,sp],{gcomp,gcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}],
+	Table[Table[Table[Subscript[gcomp,sp]->Subscript[gcomp,sp],{gcomp,gcomps[gu]}],{sp,\[ScriptCapitalN][gu]}],{gu,guilds}],
 	Table[Table[pcomp->pcomp,{pcomp,pcomps}],{pop,pops}],
 	Table[aux->aux,{aux,auxs}]
 ]];
 
 
 BlankUnkVariables:=Flatten[Join[				
-	Table[Table[Table[Subscript[gcomp,sp]->Unk[Subscript[gcomp,sp]],{gcomp,gcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}],
+	Table[Table[Table[Subscript[gcomp,sp]->Unk[Subscript[gcomp,sp]],{gcomp,gcomps[gu]}],{sp,\[ScriptCapitalN][gu]}],{gu,guilds}],
 	Table[Table[pcomp->Unk[pcomp],{pcomp,pcomps[pop]}],{pop,pops}],
 	Table[aux->Unk[aux],{aux,auxs}]
 ]];
 
 
-ExpandNspInTraits::usage="Internal usage only ;)";
-ExpandNspInPops::usage="Internal usage only ;)";
+Expand\[ScriptCapitalN]InTraits::usage="Internal usage only ;)";
+Expand\[ScriptCapitalN]InPops::usage="Internal usage only ;)";
 
 
-ExpandNspInTraits[traits_]:=traits/.(Nsp[gu_]->nsp_):>
+Expand\[ScriptCapitalN]InTraits[traits_]:=traits/.(\[ScriptCapitalN][gu_]->nsp_):>
 Sequence@@Flatten[Table[Table[Subscript[gtrait,sp]->Subscript[gtrait,sp],{gtrait,gtraits[gu]}],{sp,nsp}]];
 
 
-ExpandNspInPops[pops_]:=pops/.(Nsp[gu_]->nsp_):>
+Expand\[ScriptCapitalN]InPops[pops_]:=pops/.(\[ScriptCapitalN][gu_]->nsp_):>
 Sequence@@Flatten[Table[Table[Subscript[gcomp,sp]->Subscript[gcomp,sp],{gcomp,gcomps[gu]}],{sp,nsp}]];
 
 
@@ -1804,7 +1803,7 @@ DefaultICs::usage="Internal usage only ;)";
 
 
 DefaultICs:=Flatten[{
-	Table[Table[Table[Subscript[gcomp,sp]->Min[(Min[range[gcomp]]+Max[range[gcomp]])/2,Min[range[gcomp]]+1],{gcomp,gcomps[gu]}],{sp,Nsp[gu]}],{gu,guilds}],
+	Table[Table[Table[Subscript[gcomp,sp]->Min[(Min[range[gcomp]]+Max[range[gcomp]])/2,Min[range[gcomp]]+1],{gcomp,gcomps[gu]}],{sp,\[ScriptCapitalN][gu]}],{gu,guilds}],
 	Table[Table[pcomp->Min[(Min[range[pcomp]]+Max[range[pcomp]])/2,Min[range[pcomp]]+1],{pcomp,pcomps[pop]}],{pop,pops}],
 	Table[aux->Min[(Min[range[aux]]+Max[range[aux]])/2,Min[range[aux]]+1],{aux,auxs}]
 }];
@@ -1840,7 +1839,7 @@ ExtractTraits[in_?RuleListQ]:=Module[{res},
 	Off[Part::partd];
 	res=Join[
 		Select[in,MemberQ[Flatten[Table[gtraits[gu],{gu,guilds}]],#[[1,1]]]&],
-		Select[in,(#[[1,0]]==Nsp)&]
+		Select[in,(#[[1,0]]==\[ScriptCapitalN])&]
 	];
 	On[Part::partd];
 	Return[Union[res]]
@@ -1867,7 +1866,7 @@ ExtractGuilds[in_?RuleListQ]:=Module[{res},
 	Off[Part::partd];
 	res=Join[
 		Select[in,MemberQ[Flatten[Table[gcomps[gu],{gu,guilds}]],#[[1,1]]]&],
-		Select[in,(#[[1,0]]==Nsp)&]
+		Select[in,(#[[1,0]]==\[ScriptCapitalN])&]
 	];
 	On[Part::partd];
 	Return[Union[res]]
@@ -1921,14 +1920,14 @@ StyleBox[\"x\", \"TI\"]\)] returns True if \!\(\*
 StyleBox[\"x\", \"TI\"]\) is a list of G matrices or V variances.";
 
 
-TraitsQ[list_]:=VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&(First@LookUp[#[[1]]]==="gtrait"||#[[1,0]]===Nsp)&]
+TraitsQ[list_]:=VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&(First@LookUp[#[[1]]]==="gtrait"||#[[1,0]]===\[ScriptCapitalN])&]
 
 
-VariablesQ[list_]:=list==="FindEcoAttractor"||VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&(MemberQ[{"pcomp","gcomp","aux"},First@LookUp[#[[1]]]]||#[[1,0]]===Nsp)&]
+VariablesQ[list_]:=list==="FindEcoAttractor"||VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&(MemberQ[{"pcomp","gcomp","aux"},First@LookUp[#[[1]]]]||#[[1,0]]===\[ScriptCapitalN])&]
 
 
 TraitsAndVariablesQ[list_]:=
-If[RuleListQ[list]&&ExpandNspInTraits[ExtractTraits[list]]=!=list&&ExpandNspInPops[ExtractVariables[list]]=!=list,True,False,False]
+If[RuleListQ[list]&&Expand\[ScriptCapitalN]InTraits[ExtractTraits[list]]=!=list&&Expand\[ScriptCapitalN]InPops[ExtractVariables[list]]=!=list,True,False,False]
 
 
 ListOfVariablesQ[x_]:=If[x==={},False,VectorQ[x,VariablesQ[#]&]];
@@ -1940,7 +1939,7 @@ InvaderQ[x_]:=If[
 	VectorQ[x,#[[0]]===Rule&&Length[LookUp[#[[1]]]]>=4&&LookUp[#[[1]]][[{1,4}]]==={"gtrait",0}&],True,False]
 
 
-NotInvaderTraitsQ[list_]:=VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&((LookUp[#[[1]]][[1]]==="gtrait"&&LookUp[#[[1]]][[4]]=!=0)||#[[1,0]]===Nsp)&]
+NotInvaderTraitsQ[list_]:=VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&((LookUp[#[[1]]][[1]]==="gtrait"&&LookUp[#[[1]]][[4]]=!=0)||#[[1,0]]===\[ScriptCapitalN])&]
 
 
 GsQ[list_]:=VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&(MemberQ[{G,V},#[[1,0]]])&]
@@ -1974,7 +1973,7 @@ logged,plotstyle,plotmarkers,axeslabel,plotopts,plotrange,
 (* other variables *)
 lookup,vars,plotvars,yaxislabel,xinit,xfinal,ifvars,tdvars,cvars,tdsol,ifplot,tdplot,cplot},
 	
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 
@@ -1990,12 +1989,12 @@ vars=sol[[All,1]];
 
 (* figure out number of species in guilds *)
 Do[
-	Nsp[gu]=Max[
+	\[ScriptCapitalN][gu]=Max[
 		Table[Max[Select[vars,(#[[0]]===Subscript)&&(#[[1]]==gcomp)&][[All,2]]],{gcomp,gcomps[gu]}],
 		Table[Max[Select[vars,(#[[0]]===Subscript)&&(#[[1]]==gtrait)&][[All,2]]],{gtrait,gtraits[gu]}]
 	];
-	If[Nsp[gu]==-\[Infinity],Nsp[gu]=0];
-	If[Global`debug,Print["Nsp[",gu,"]=",Nsp[gu]]];
+	If[\[ScriptCapitalN][gu]==-\[Infinity],\[ScriptCapitalN][gu]=0];
+	If[Global`debug,Print["\[ScriptCapitalN][",gu,"]=",\[ScriptCapitalN][gu]]];
 ,{gu,guilds}];
 
 
@@ -2006,7 +2005,7 @@ If[plotvarsin==={All},
 	Do[
 		lookup=LookUp[var];
 		If[MemberQ[{"gcomp","gtrait"},lookup[[1]]]&&Length[lookup]==3,
-			Do[AppendTo[plotvars,Subscript[var,sp]],{sp,Nsp[lookup[[2]]]}],
+			Do[AppendTo[plotvars,Subscript[var,sp]],{sp,\[ScriptCapitalN][lookup[[2]]]}],
 			AppendTo[plotvars,var]
 		];
 	,{var,plotvarsin}]
@@ -2034,7 +2033,7 @@ If[plotstyle==={},
 		lookup=LookUp[var];
 		Which[
 			lookup[[1]]=="gcomp"||lookup[[1]]=="gtrait",
-			AppendTo[plotstyle,{color[var][SpFrac[lookup[[4]],Nsp[lookup[[2]]]]],linestyle[var]}]
+			AppendTo[plotstyle,{color[var][SpFrac[lookup[[4]],\[ScriptCapitalN][lookup[[2]]]]],linestyle[var]}]
 		,
 			lookup[[1]]=="pcomp"||lookup[[1]]=="aux",
 			AppendTo[plotstyle,{color[var],linestyle[var]}]
@@ -2146,6 +2145,9 @@ Do[
 Return[res]
 
 ];
+
+
+Subscript[\[ScriptCapitalN], gu_]:=\[ScriptCapitalN][gu];
 
 
 SetModel::usage=
@@ -2467,7 +2469,7 @@ verbose,verboseall,logged,fixed,fixedvars,fixedvariables,timescale,percapita,
 (* other variables *)
 traits,nonfixedvars,fixed2,eqns},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -2490,10 +2492,10 @@ fixedvariables=ExtractVariables[fixed];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 
 (* handle blanks & figure out number of species in guilds *)
-traits=ExpandNspInTraits[traitsin];
+traits=Expand\[ScriptCapitalN]InTraits[traitsin];
 (*Print["traits=",traits];*)
-SetNsp[traits];
-(*Print["Nsp=",Table[Nsp[gu],{gu,guilds}]];*)
+Set\[ScriptCapitalN][traits];
+(*Print["\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];*)
 
 If[nonfixedvars===Automatic,nonfixedvars=OrderedComplement[AllVariables,fixedvars]];
 If[Global`debug,Print["nonfixedvars=",nonfixedvars]];
@@ -2556,7 +2558,7 @@ output,tmin,
 (* other variables *)
 nonfixedvars,luv,sp,eqns,unks,ics,tic,exprule,sol,res,fixedres},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -2595,8 +2597,8 @@ Do[
 ,{var,AllPopsAndAuxs}];
 
 (* figure out number of species in guilds *)
-SetNsp[traits,Join[variables,fixed]];
-If[Global`debug,Print[func," Nsp=",Table[Nsp[gu],{gu,guilds}]]];
+Set\[ScriptCapitalN][traits,Join[variables,fixed]];
+If[Global`debug,Print[func," \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 (* find time for ICs *)
 tic=If[modelwhenevents=={},tmin,tmin-10^-15]; (* hack to ensure that events are triggered at t=tmin *)
@@ -2728,7 +2730,7 @@ method,solveopts,nsolveopts,findrootopts,boundarydetection,time,fixed,chop,qss,v
 (* other variables *)
 nonvars,nonfixedvars,traits,fixedvars,removets,eqns,unks,newunk,sol,res},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -2758,8 +2760,8 @@ fixed=Evaluate[Fixed/.Flatten[{opts,Options[EcoEq]}]];
 If[modelperiod=!=0&&time===t&&method=="FindRoot",Msg[EcoEq::noneq];Return[]];
 
 (* handle blanks & figure out number of species in guilds *)
-traits=ExpandNspInTraits[traitsin];
-SetNsp[traits];
+traits=Expand\[ScriptCapitalN]InTraits[traitsin];
+Set\[ScriptCapitalN][traits];
 
 If[vars===All,
 	nonvars={},
@@ -2868,7 +2870,7 @@ triggervar,warmup1,warmup2,warmup3,wheneventopts,
 nonfixedvars,fixedvars,extrema,triggerpos,triggerval,max,ics2,ics3,ics4,diff,tmax,eq,
 ic,nb,thing,eqns,unks,logd,vars,unksics,ics,res,sol,per},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -2906,7 +2908,7 @@ If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 (*Print["fixed=",fixed];*)
 
 (* figure out number of species in guilds *)
-SetNsp[traits];
+Set\[ScriptCapitalN][traits];
 
 (* set up thing & unks *)
 nonfixedvars=variables[[All,1]];
@@ -3093,7 +3095,7 @@ time,fixed,verbose,
 (* other variables *)
 traits,fixedvars,nonfixedvars,eqns,unks,jmat},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -3105,8 +3107,8 @@ time=Evaluate[Time/.Flatten[{opts,Options[EcoJacobian]}]];
 verbose=Evaluate[Verbose/.Flatten[{opts,Options[EcoJacobian]}]];
 
 (* figure out number of species in guilds *)
-traits=ExpandNspInTraits[traitsin];
-SetNsp[traits];
+traits=Expand\[ScriptCapitalN]InTraits[traitsin];
+Set\[ScriptCapitalN][traits];
 
 fixedvars=fixed[[All,1]];
 nonfixedvars=OrderedComplement[AllVariables,fixedvars];
@@ -3274,9 +3276,27 @@ Which[
 	method=="RouthHurwitz",
 	j=EcoJacobian[traits,variables,Time->time];
 	res=RouthHurwitzCriteria[j];
+	Which[
+		simplifyresult===True,
+		Return[Simplify[res]],
+		simplifyresult===Full,
+		Return[FullSimplify[res]],
+		simplifyresult===Real,
+		Return[RealSimplify[res]],
+		Else,
+		Return[res]
+	]
 ,
 	method=="Eigenvalues",
 	evs=EcoEigenvalues[traits,variables,Time->time,Evaluate[Sequence@@ecoeigenvaluesopts]];
+	Which[
+		simplifyresult===True,
+		evs=Simplify[evs]],
+		simplifyresult===Full,
+		evs=FullSimplify[evs],
+		simplifyresult===Real,
+		evs=RealSimplify[res]
+	];
 	If[verbose,Print[func,": evs=",evs]];
 	Which[
 		modeltype=="DiscreteTime",
@@ -3294,18 +3314,8 @@ Which[
 			Else,Indeterminate		
 		]
 	];
-];
-	
-	Which[
-		simplifyresult===True,
-		Return[Simplify[res]],
-		simplifyresult===Full,
-		Return[FullSimplify[res]],
-		simplifyresult===Real,
-		Return[RealSimplify[res]],
-		Else,
-		Return[res]
-	];
+
+Return[res];
 
 ];
 
@@ -3375,7 +3385,7 @@ testvalidity,teststability,
 (*other variables*)
 eq,valideq,tmp,evs,ics,stableeq,res,essol,ddt,eqflag,per,ecosimflag},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
@@ -3415,7 +3425,7 @@ ecosimflag=False;
 
 (* figure out number of species in guilds *)
 
-SetNsp[traits];
+Set\[ScriptCapitalN][traits];
 
 If[method===Automatic,
 	Which[
@@ -3424,7 +3434,7 @@ If[method===Automatic,
 		variables=={},
 		method="NSolveEcoEq",
 		Else,
-		If[naux+npops+Sum[Nsp[gu]*ngcomps[gu],{gu,guilds}]<=4,
+		If[naux+npops+Sum[\[ScriptCapitalN][gu]*ngcomps[gu],{gu,guilds}]<=4,
 			method="NSolveEcoEq",
 			method="FindEcoEq"
 		];
@@ -3715,7 +3725,7 @@ verbose,verboseall,fixed,time,monitor,percapita,isoclinestyle,framelabel,contour
 (* other variables *)
 fixedvars,nonfixedvars,lookup1,lookup2,style1,style2,label1,label2,g,res},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -3823,7 +3833,7 @@ verbose,verboseall,fixed,time,monitor,framelabel,streamplotopts,
 (* other variables *)
 fixedvars,nonfixedvars,g,res},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -3935,7 +3945,7 @@ gu,gcomp,base,minpop,bandwidth,showspecies,markerstyle,plotopts,listplotopts,plo
 abunds,pos,data,\[ScriptCapitalD],hist,stix
 },
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -3955,7 +3965,7 @@ listplotopts=FilterRules[Flatten[{opts,Options[PrestonPlot]}],Options[ListPlot]]
 plotrange=Evaluate[PlotRange/.Flatten[{opts,Options[PrestonPlot]}]];
 
 (* figure out number of species in guilds *)
-SetNsp[sol];
+Set\[ScriptCapitalN][sol];
 
 abunds=Select[sol,#[[1,1]]===gcomp&&#[[2]]>minpop&];
 pos=abunds[[All,1,2]];
@@ -3964,7 +3974,7 @@ data=Log[base,abunds[[All,2]]];
 hist=Plot[PDF[\[ScriptCapitalD],x],{x,Min[data],Max[data]},Evaluate[Sequence@@plotopts]];
 If[showspecies,
 	If[markerstyle===Automatic,
-		markerstyle=Table[color[Subscript[gcomp,i]][SpFrac[i,Nsp[gu]]],{i,pos}]];
+		markerstyle=Table[color[Subscript[gcomp,i]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,pos}]];
 	stix=ListPlot[
 		Map[List,Transpose[{data,Table[0,Length[pos]]}]],PlotStyle->markerstyle,
 		Evaluate[Sequence@@listplotopts],PlotMarkers->{"|",8}],
@@ -3994,7 +4004,7 @@ gu,gcomp,base,minpop,listplotopts,
 abunds,data
 },
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -4009,7 +4019,7 @@ minpop=Evaluate[MinPop/.Flatten[{opts,Options[WhittakerPlot]}]];
 listplotopts=FilterRules[Flatten[{opts,Options[WhittakerPlot]}],Options[ListPlot]];
 
 (* figure out number of species in guilds *)
-SetNsp[sol];
+Set\[ScriptCapitalN][sol];
 abunds=Select[sol,#[[1,1]]===gcomp&&#[[2]]>minpop&];
 data=Log[base,abunds[[All,2]]];
 Return[ListPlot[Sort[data,Greater],Evaluate[Sequence@@listplotopts]]];
@@ -4036,7 +4046,7 @@ logged,gu,gcomp,gtrait,minpop,plotstyle,markerstyle,plotopts,time,
 traits,abunds,pos,plotmin
 },
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -4056,8 +4066,8 @@ plotopts=FilterRules[Flatten[{opts,Options[PlotTAD]}],Options[ListPlot]];
 time=Evaluate[Time/.Flatten[{opts,Options[PlotTAD]}]];
 
 (* figure out number of species in guilds *)
-SetNsp[traitsin,sol];
-If[Global`debug,Print[func," Nsp=",Table[Nsp[gu],{gu,guilds}]]];
+Set\[ScriptCapitalN][traitsin,sol];
+If[Global`debug,Print[func," \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 abunds=Quiet[Select[sol,#[[1,1]]===gcomp&],{Part::partd}];
 If[time===t,
@@ -4071,7 +4081,7 @@ abunds=Select[abunds,#[[2]]>minpop&];
 pos=abunds[[All,1,2]];
 
 If[markerstyle===Automatic,
-	markerstyle=Table[color[Subscript[gtrait,i]][SpFrac[i,Nsp[gu]]],{i,pos}]];
+	markerstyle=Table[color[Subscript[gtrait,i]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,pos}]];
 
 If[logged==False,
 	Return[ListPlot[
@@ -4193,7 +4203,7 @@ invtype,invid,invunk,zeropcomps,sol,
 inveqns,invunks,qsseqns,qssunks,qsssubs,mode,
 tstart,tend,removets,qsssol,eval,evec,invsol,j,tempIF},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -4228,12 +4238,12 @@ rv=OptionValue[RV];
 qssics=OptionValue[QSSICs];
 
 (* figure out number of species in guilds *)
-traits=ExpandNspInTraits[traitsin];
+traits=Expand\[ScriptCapitalN]InTraits[traitsin];
 (*Print["traits=",traits];*)
-variables=ExpandNspInPops[solin];
+variables=Expand\[ScriptCapitalN]InPops[solin];
 (*Print["variables=",variables];*)
-SetNsp[traits,variables];
-(*Print["Nsp=",Table[Nsp[gu],{gu,guilds}]];*)
+Set\[ScriptCapitalN][traits,variables];
+(*Print["\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];*)
 
 (* assemble sol [resident state] *)
 
@@ -4701,7 +4711,7 @@ Print["solin=",solin];
 Print["{var,ord}=",{var,ord}];
 Print["pointin=",pointin];*)
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -4727,9 +4737,9 @@ chop=OptionValue[Chop];
 findecoattractoropts=OptionValue[FindEcoAttractorOpts];
 
 (* handle blanks & figure out number of species in guilds *)
-traits=DeleteInvaders[ExpandNspInTraits[traitsin]];
-sol=ExpandNspInPops[solin];
-SetNsp[traits];
+traits=DeleteInvaders[Expand\[ScriptCapitalN]InTraits[traitsin]];
+sol=Expand\[ScriptCapitalN]InPops[solin];
+Set\[ScriptCapitalN][traits];
 
 If[solin==="FindEcoAttractor",
 	If[verbose,
@@ -4753,7 +4763,7 @@ If[pointin=={},
 		targetgu=guild,
 		If[ListQ[var],targetgu=LookUp[var[[1]]][[2]],targetgu=LookUp[var][[2]]]
 	];
-	If[species===All,If[Nsp[targetgu]==0,species=0,species=Table[sp,{sp,Nsp[targetgu]}]]];
+	If[species===All,If[\[ScriptCapitalN][targetgu]==0,species=0,species=Table[sp,{sp,\[ScriptCapitalN][targetgu]}]]];
 	If[ListQ[species],
 		If[method=="NDInv",Return[Table[DInv[traits,sol,{var,ord},{},Species->sp,opts],{sp,species}]]];
 		point=Table[Table[Subscript[gtrait,0]->Subscript[gtrait,sp],{gtrait,gtraits[targetgu]}],{sp,species}]/.traits
@@ -5002,7 +5012,7 @@ nb,x,iplot,
 iopts,imin,imax,tmin,tmax,s,iaspectratio,iticks,iaxesorigin,iplotrangepadding,resplotrange,lmin,
 gu1,tr1,per,res,inv,epilog,tad},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 (*Print["traits=",traits];
 Print["sol=",sol];
@@ -5037,7 +5047,7 @@ If[axeslabel===Automatic,axeslabel={trait1}];
 {gu1,tr1}=LookUp[trait1][[2;;3]];
 
 (* figure out number of species in guilds *)
-SetNsp[traits,sol];
+Set\[ScriptCapitalN][traits,sol];
 
 If[monitor,
 	nb=CreateDialog[DialogNotebook[Grid[{{"\[FormalX]=",Dynamic[x]}}],WindowTitle->"PlotInv Progress..."]];
@@ -5063,9 +5073,9 @@ If[delayinv,
 (* plot species markers *)
 Which[plotspecies==="Axis",
 	If[markerstyle===Automatic,
-		epilog=Table[{PointSize[0.015],color[Subscript[tr1,sp]][SpFrac[sp,Nsp[gu1]]],Point[{Subscript[tr1,sp]/.traits,0}]},{sp,Nsp[gu1]}],
-		epilog=MapThread[Append,{PadRight[{},Nsp[gu1],
-			Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr1,sp]/.traits,0}],{sp,Nsp[gu1]}]}]
+		epilog=Table[{PointSize[0.015],color[Subscript[tr1,sp]][SpFrac[sp,\[ScriptCapitalN][gu1]]],Point[{Subscript[tr1,sp]/.traits,0}]},{sp,\[ScriptCapitalN][gu1]}],
+		epilog=MapThread[Append,{PadRight[{},\[ScriptCapitalN][gu1],
+			Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr1,sp]/.traits,0}],{sp,\[ScriptCapitalN][gu1]}]}]
 	];
 	res=Show[iplot,Epilog->epilog]
 	,
@@ -5186,7 +5196,7 @@ boundarystyle,invstyle,noninvstyle,framelabel,
 nb,x,y,
 fixedvars,traitinv,subrule,luv1,luv2,gu,tr1,tr2,invader,sol,inv,res},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -5270,8 +5280,8 @@ If[solin==="FindEcoAttractor",
 	,
 		If[ics=={},
 			(* figure out number of species in guilds *)
-			SetNsp[fixed];
-			If[Global`debug,Print[func,": Nsp=",Table[Nsp[gu],{gu,guilds}]]];
+			Set\[ScriptCapitalN][fixed];
+			If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 			ics=DefaultICs;
 			If[verbose,Print[func,": ics=",ics]];
 		];
@@ -5400,7 +5410,7 @@ boundarystyle,invstyle,noninvstyle,framelabel,
 nb,x,y,
 invfixed,gu1,tr1,sp1,res,sol,resinv,inv},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -5450,8 +5460,8 @@ invfixed=Table[Subscript[trt,0]->(Subscript[trt,sp1]/.fixed),{trt,Complement[gtr
 If[solin==="FindEcoAttractor",
 	If[ics=={},
 		(* figure out number of species in guilds *)
-		SetNsp[Append[fixed,trait1->trait1]];
-		If[Global`debug,Print[func,": Nsp=",Table[Nsp[gu],{gu,guilds}]]];
+		Set\[ScriptCapitalN][Append[fixed,trait1->trait1]];
+		If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 		ics=DefaultICs;
 		If[verbose,Print[func,": ics=",ics]];
 	];
@@ -5604,7 +5614,7 @@ boundarystyle,spcolors,invstyle,noninvstyle,framelabel,
 nb,x,y,
 invfixed,gu1,tr1,sp1,gu2,tr2,sp2,ics,sol1,sol2,inv12,inv21,pip1,pip2,res},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -5659,8 +5669,8 @@ invfixed=Flatten[Join[
 If[solin1==="FindEcoAttractor",
 	If[icsin=={},
 		(* figure out number of species in guilds *)
-		SetNsp[Append[fixed,trait1->trait1]];
-		If[Global`debug,Print[func,": Nsp=",Table[Nsp[gu],{gu,guilds}]]];
+		Set\[ScriptCapitalN][Append[fixed,trait1->trait1]];
+		If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 		ics=DefaultICs;
 		If[verbose,Print[func,": ics=",ics]];
 	,
@@ -5688,8 +5698,8 @@ If[trait1=!=trait2,
 		delayinv=True;
 		If[icsin=={},
 			(* figure out number of species in guilds *)
-			SetNsp[Append[fixed,trait2->trait2]];
-			If[Global`debug,Print[func,": Nsp2=",Table[Nsp[gu],{gu,guilds}]]];
+			Set\[ScriptCapitalN][Append[fixed,trait2->trait2]];
+			If[Global`debug,Print[func,": \[ScriptCapitalN]2=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 			ics=DefaultICs;
 			If[verbose,Print[func,": ics=",ics]];
 		,
@@ -5860,7 +5870,7 @@ verbose,verboseall,fixed,delaydinv,dinvopts,evoeqn,traitshiftrate,nsps,ics,time,
 fixedvars,fixedtraits,fixedvariables,nonfixedtraits,
 g,dtrait,pre,wt,sol,eqns},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -5887,18 +5897,18 @@ dinvopts=Evaluate[DInvOpts/.Flatten[{opts,Options[EvoEqns]}]];
 If[modelperiod=!=0,AppendTo[dinvopts,InvOpts->{Method->"Instantaneous"}]];
 evoeqn=Evaluate[EvoEquation/.Flatten[{opts,Options[EvoEqns]}]];
 traitshiftrate=Evaluate[TraitShiftRate/.Flatten[{opts,Options[EvoEqns]}]];
-nsps=Evaluate[Nsps/.Flatten[{opts,Options[EvoEqns]}]];
+nsps=Evaluate[\[ScriptCapitalN]s/.Flatten[{opts,Options[EvoEqns]}]];
 time=Evaluate[Time/.Flatten[{opts,Options[EvoEqns]}]];
 
-sol=ExpandNspInPops[solin];
+sol=Expand\[ScriptCapitalN]InPops[solin];
 (*Print["sol=",sol];*)
 
 (* figure out number of species in guilds *)
 If[solin==="FindEcoAttractor"&&nsps=!={},
-	Evaluate[Table[Nsp[gu],{gu,guilds}]]=nsps,
-	SetNsp[Join[sol,fixedvariables]]
+	Evaluate[Table[\[ScriptCapitalN][gu],{gu,guilds}]]=nsps,
+	Set\[ScriptCapitalN][Join[sol,fixedvariables]]
 ];
-If[Global`debug,Print[func,": Nsp=",Table[Nsp[gu],{gu,guilds}]]];
+If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 (* shifting traits *)
 Do[
@@ -5917,7 +5927,7 @@ Do[
 (* traiteqns *)
 Which[
 	evoeqn=="QG",
-	Do[Do[pre[gu,sp]=1,{sp,0,Nsp[gu]}],{gu,guilds}],
+	Do[Do[pre[gu,sp]=1,{sp,0,\[ScriptCapitalN][gu]}],{gu,guilds}],
 	evoeqn=="CE",
 	Do[
 		Do[
@@ -5925,7 +5935,7 @@ Which[
 		,{gcomp,gcomps[gu]}];
 		Do[
 			pre[gu,sp]:=Sum[wt[gu,gcomp]*Subscript[gcomp,sp],{gcomp,gcomps[gu]}]
-		,{sp,0,Nsp[gu]}]
+		,{sp,0,\[ScriptCapitalN][gu]}]
 	,{gu,guilds}],
 	Else,
 	Msg[EvoEqns::badte];
@@ -5938,7 +5948,7 @@ If[delaydinv==True,
 		DT[Subscript[gtrait,sp]]==pre[gu,sp]*
 		Sum[g[gu][[index[gtrait],index[gtrait\[Prime]]]]NumDInv[BlankUnkTraits,sol,Subscript[gtrait\[Prime],0],Species->sp,Method->"NDInv",Evaluate[Sequence@@dinvopts],VerboseAll->verboseall],{gtrait\[Prime],gtraits[gu]}]
 		-dtrait[gu,gtrait]+If[modeltype=="DiscreteTime",Unk[Subscript[gtrait,sp]],0]
-	,{gtrait,gtraits[gu]}],{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}]]/.fixed
+	,{gtrait,gtraits[gu]}],{sp,If[\[ScriptCapitalN][gu]==0,0,1],\[ScriptCapitalN][gu]}],{gu,guilds}]]/.fixed
 ,
 	If[sol==="FindEcoAttractor",sol=BlankVariables];
 	eqns=Flatten[Table[Table[
@@ -5947,7 +5957,7 @@ If[delaydinv==True,
 		-Table[dtrait[gu,gtrait],{gtrait,gtraits[gu]}]
 		+If[modeltype=="DiscreteTime",Table[Subscript[gtrait,sp],{gtrait,gtraits[gu]}],0]
 		/.fixed/.AddVariablets/.AddTraitts)]
-	,{sp,If[Nsp[gu]==0,0,1],Nsp[gu]}],{gu,guilds}]]
+	,{sp,If[\[ScriptCapitalN][gu]==0,0,1],\[ScriptCapitalN][gu]}],{gu,guilds}]]
 ];
 
 eqns=DeleteCases[eqns,DT[var_]==_/;MemberQ[fixedvars,var]];
@@ -5957,7 +5967,7 @@ Return[eqns];
 ]];
 
 
-Options[EvoEqns]={Time->t,DelayDInv->False,DInvOpts->{},EvoEquation->"QG",TraitShiftRate->{},Fixed->{},Nsps->{},
+Options[EvoEqns]={Time->t,DelayDInv->False,DInvOpts->{},EvoEquation->"QG",TraitShiftRate->{},Fixed->{},\[ScriptCapitalN]s->{},
 Verbose->False,VerboseAll->False};
 
 
@@ -6012,7 +6022,7 @@ evoeqn,fitnessgradient,dinvopts,delaydinv,findecoattractoropts,streamplotopts,fr
 nb,evoeqns,dt,nsps,ics,sol,
 gu1,tr1,sp1,gu2,tr2,sp2,res},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -6056,15 +6066,15 @@ If[framelabel===Automatic,
 
 If[solin==="FindEcoAttractor",
 	(* figure out number of species in guilds *)
-	SetNsp[Join[fixed,{trait1->trait1,trait2->trait2}]];
+	Set\[ScriptCapitalN][Join[fixed,{trait1->trait1,trait2->trait2}]];
 	ics=DefaultICs;
-	nsps=Table[Nsp[gu],{gu,guilds}];
-	If[Global`debug,Print[func,": Nsp=",nsps]];
+	nsps=Table[\[ScriptCapitalN][gu],{gu,guilds}];
+	If[Global`debug,Print[func,": \[ScriptCapitalN]=",nsps]];
 ,
 	nsps={}
 ];
 
-evoeqns=EvoEqns[solin,Gs,DInvOpts->dinvopts,DelayDInv->delaydinv,opts,Nsps->nsps];
+evoeqns=EvoEqns[solin,Gs,DInvOpts->dinvopts,DelayDInv->delaydinv,opts,\[ScriptCapitalN]s->nsps];
 If[modeltype=="DiscreteTime",
 	evoeqns=(evoeqns/.RHS/.var_[t]->var/.fixed)-(evoeqns/.LHS/.var_[t+1]->var),
 	evoeqns=evoeqns/.RHS/.var_[t]->var/.fixed
@@ -6162,7 +6172,7 @@ nb,evoeqns,
 ics1,nsps,color1,color1es,color1nes,color2,color2es,color2nes,style1,style1es,style1nes,style2,style2es,style2nes,
 sol,dt,dinv21,dinv22,gu1,tr1,sp1,gu2,tr2,sp2,pre1,pre2,iso1,iso2},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -6236,11 +6246,11 @@ If[solin==="FindEcoAttractor",
 	delaydinv2=True;
 	If[ics=={},
 		(* figure out number of species in guilds *)
-		SetNsp[Join[fixed,{trait1->trait1}]];
+		Set\[ScriptCapitalN][Join[fixed,{trait1->trait1}]];
 		ics1=DefaultICs;
-		SetNsp[Join[fixed,{trait1->trait1,trait2->trait2}]];
-		nsps=Table[Nsp[gu],{gu,guilds}];
-		If[Global`debug,Print[func,": Nsp=",nsps]];
+		Set\[ScriptCapitalN][Join[fixed,{trait1->trait1,trait2->trait2}]];
+		nsps=Table[\[ScriptCapitalN][gu],{gu,guilds}];
+		If[Global`debug,Print[func,": \[ScriptCapitalN]=",nsps]];
 		ics=DefaultICs;
 	];
 	(* handle diagonal *)
@@ -6266,7 +6276,7 @@ If[solin==="FindEcoAttractor",
 	If[verbose,Print[func,": sol[\[FormalX],\[FormalY]]=",sol[\[FormalX],\[FormalY]]]]
 ];
 
-evoeqns=EvoEqns[solin,Gs,DInvOpts->dinvopts,DelayDInv->delaydinv,opts,Nsps->nsps];
+evoeqns=EvoEqns[solin,Gs,DInvOpts->dinvopts,DelayDInv->delaydinv,opts,\[ScriptCapitalN]s->nsps];
 
 If[modeltype=="DiscreteTime",
 	evoeqns=(evoeqns/.RHS/.var_[t]->var/.fixed)-(evoeqns/.LHS/.var_[t+1]->var),
@@ -6566,7 +6576,7 @@ boundarydetection,ndsolveopts,wheneventopts,delaydinv,fixed,tmin,outputtmin,outp
 (* other variables *)
 fixedvars,fixedtraits,fixedvariables,tic,ecoeqns,evoeqns,eqns,ics,unks,discretevars,bdwhens,res,sol},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -6594,8 +6604,8 @@ fixedvariables=ExtractVariables[fixed];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 
 (* figure out number of species in guilds *)
-SetNsp[Join[traits,fixedtraits],Join[variables,fixedvariables]];
-(*Print["Nsp=",Table[Nsp[gu],{gu,guilds}]];*)
+Set\[ScriptCapitalN][Join[traits,fixedtraits],Join[variables,fixedvariables]];
+(*Print["\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];*)
 
 (* find time for ICs *)
 tic=If[modelwhenevents=={},tmin,tmin-$MachineEpsilon]; (* hack to ensure that events are triggered at t=tmin *)
@@ -6719,7 +6729,7 @@ verbose,verboseall,method,boundarydetection,percapita,delaydinv,fixed,findrootop
 (* other variables *)
 fixedvars,fixedtraits,fixedvariables,ecoeqns,evoeqns,eqns,unks,newunk,unksics,sol},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -6744,7 +6754,7 @@ fixedvariables=ExtractVariables[fixed];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 
 (* figure out number of species in guilds *)
-SetNsp[Join[traits,fixedtraits],Join[variables,fixedvariables]];
+Set\[ScriptCapitalN][Join[traits,fixedtraits],Join[variables,fixedvariables]];
 
 (* set up eqns *)
 ecoeqns=EcoEqns[BlankTraits,opts,PerCapita->percapita];
@@ -6826,7 +6836,7 @@ traits,variables,
 fixedvars,fixedtraits,fixedvariables,nonfixedtraits,nonfixedvars,nonfixedvariables,
 thing,fw,sol,unks,unksics,res,dtrait,v,nb},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -6869,7 +6879,7 @@ nonfixedvariables=variables[[All,1]];
 nonfixedvars=Join[nonfixedvariables,nonfixedtraits];
 
 (* figure out number of species in guilds *)
-SetNsp[Join[traits,fixedtraits],Join[variables,fixedvariables]];
+Set\[ScriptCapitalN][Join[traits,fixedtraits],Join[variables,fixedvariables]];
 
 Which[
 	fitnessgradient=="EcoEvoSim",
@@ -6991,7 +7001,7 @@ verbose,verboseall,method,fixed,delaydinv,solveopts,nsolveopts,findrootopts,find
 (* other variables *)
 fixedvars,fixedtraits,fixedvariables,tounks,fromunks,evoeqns,eqns,unks,unksics,newunk,res},
    
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -7020,7 +7030,7 @@ findinstanceopts=Evaluate[FindInstanceOpts/.Flatten[{opts,Options[EvoEq]}]];
 boundarydetection=Evaluate[BoundaryDetection/.Flatten[{opts,Options[EvoEq]}]];
 
 (* figure out number of species in guilds *)
-SetNsp[Join[sol,fixedvariables]];
+Set\[ScriptCapitalN][Join[sol,fixedvariables]];
 
 evoeqns=EvoEqns[sol,Gs,opts];
 eqns=evoeqns/.Eq/.RemoveTraitts/.RemoveVariablets;
@@ -7124,7 +7134,7 @@ fixedvars,fixedtraits,fixedvariables,
 (* other variables *)
 traits,variables,eqns,unks,jmat},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -7145,11 +7155,11 @@ fixedvariables=ExtractVariables[fixed];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 
 (* handle blanks & figure out number of species in guilds *)
-traits=ExpandNspInTraits[traitsin];
-variables=ExpandNspInPops[variablesin];
+traits=Expand\[ScriptCapitalN]InTraits[traitsin];
+variables=Expand\[ScriptCapitalN]InPops[variablesin];
 
 (* figure out number of species in guilds *)
-SetNsp[Join[traits,fixedtraits],Join[variables,fixedvariables]];
+Set\[ScriptCapitalN][Join[traits,fixedtraits],Join[variables,fixedvariables]];
 
 (* set up eqns & unks *)
 eqns=Join[EcoEqns[BlankTraits,opts],EvoEqns[BlankVariables,Gs,opts]];
@@ -7242,7 +7252,7 @@ fixedvars,fixedtraits,fixedvariables,
 (* other variables *)
 traits,variables,eqns,unks,jmat},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -7263,11 +7273,11 @@ fixedvariables=ExtractVariables[fixed];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 
 (* handle blanks & figure out number of species in guilds *)
-traits=ExpandNspInTraits[traitsin];
-variables=ExpandNspInPops[variablesin];
+traits=Expand\[ScriptCapitalN]InTraits[traitsin];
+variables=Expand\[ScriptCapitalN]InPops[variablesin];
 
 (* figure out number of species in guilds *)
-SetNsp[Join[traits,fixedtraits],Join[variables,fixedvariables]];
+Set\[ScriptCapitalN][Join[traits,fixedtraits],Join[variables,fixedvariables]];
 
 (* set up eqns & unks *)
 eqns=EvoEqns[BlankVariables,Gs,opts];
@@ -7358,7 +7368,7 @@ verbose,verboseall,guild,delayinv,invopts,maximizeopts,method,constraints,
 (* other variables *)
 vars,unks,inv,res},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
@@ -7449,7 +7459,7 @@ maximizeinvopts,invthreshold,
 (* other variables *)
 inv,tmp},
 
-Block[{Nsp},
+Block[{\[ScriptCapitalN]},
 
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
