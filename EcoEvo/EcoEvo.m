@@ -1106,13 +1106,18 @@ tweaked by me <https://mathematica.stackexchange.com/a/157613/6358>,
 RegionFunction fixed by kglr <https://mathematica.stackexchange.com/a/193304/6358> *)
 ClearAll[MyStreamPlot]
 Options[MyStreamPlot]=Options[StreamPlot];
+
 MyStreamPlot[f_,{x_,x0_,x1_},{y_,y0_,y1_},opts:OptionsPattern[]]:=Module[
-	{u,v,a=OptionValue[AspectRatio]/.Automatic->1,rf=OptionValue[RegionFunction]},
-	Show[StreamPlot[{1/(x1-x0),a/(y1-y0)} (f/.{x->Rescale[u,{0,1},{x0,x1}],y->Rescale[v,{0,a},{y0,y1}]}),{u,0,1},{v,0,a},
+	{u,v,a=OptionValue[AspectRatio]/.Automatic->1,rf=OptionValue[RegionFunction],nb,res},
+		
+	res=Show[StreamPlot[({EcoEvo`Private`xmon,EcoEvo`Private`ymon}={Rescale[u,{0,1},{x0,x1}],Rescale[v,{0,a},{y0,y1}]};
+	{1/(x1-x0),a/(y1-y0)} (f/.{x->Rescale[u,{0,1},{x0,x1}],y->Rescale[v,{0,a},{y0,y1}]})),{u,0,1},{v,0,a},
 	RegionFunction->(rf[Rescale[#,{0,1},{x0,x1}],Rescale[#2,{0,a},{y0,y1}],##3]&),opts]
 	/.Arrow[pts_]:>Arrow[Transpose[{Rescale[#,{0,1},{x0,x1}],Rescale[#2,{0,a},{y0,y1}]}&@@Transpose[pts]]],
-	PlotRange->{{x0,x1},{y0,y1}}]
-]
+	PlotRange->{{x0,x1},{y0,y1}}];
+	
+	Return[res]
+];
 
 
 RealSimplify::usage=
@@ -2995,13 +3000,13 @@ If[(modeltype=="ContinuousTime"&&modelperiod==0),
 (*Print["unks=",unks];Print["unksics=",unksics];Print["ics=",ics];*)
 
 If[monitor,
-	nb=CreateWindow[DialogNotebook[{
-	TextCell["evaluation: "],
-	Dynamic[$FindEcoCycleSteps],
-	TextCell["vars:"],
-	Dynamic[Table[eq[var],{var,nonfixedvars}]]
+	nb=CreateDialog[{
+		TextCell["evaluation: "],
+		Dynamic[$FindEcoCycleSteps],
+		TextCell["vars:"],
+		Dynamic[FinalSlice[sol]]
 	},
-	WindowTitle->"FindEcoCycle Progress..."]];
+	WindowTitle->"FindEcoCycle Progress...",WindowSize->All];
 ];
 
 
@@ -3727,7 +3732,7 @@ PlotEcoIsoclines[traits:(_?TraitsQ):{},{var1_,var1min_?NumericQ,var1max_?Numeric
 Module[{
 func=FuncStyle["PlotEcoIsoclines"],
 (* options *)
-verbose,verboseall,fixed,time,monitor,percapita,isoclinestyle,framelabel,contourplotopts,
+verbose,verboseall,fixed,time,percapita,isoclinestyle,framelabel,contourplotopts,
 (* other variables *)
 fixedvars,nonfixedvars,lookup1,lookup2,style1,style2,label1,label2,g,res},
 
@@ -3743,7 +3748,6 @@ If[Global`debug,verbose=True];
 verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[PlotEcoIsoclines]}]];
 If[verboseall,verbose=True];
 
-monitor=Evaluate[Monitor/.Flatten[{opts,Options[PlotEcoIsoclines]}]];
 fixed=Evaluate[Fixed/.Flatten[{opts,Options[PlotEcoIsoclines]}]];
 fixedvars=fixed[[All,1]];
 If[Global`debug,Print["PlotEcoIsoclines: fixedvars=",fixedvars]];
@@ -3802,7 +3806,6 @@ Return[res]
 ]];
 
 Options[PlotEcoIsoclines]={
-	Monitor->False,
 	Time->t,PerCapita->False,Fixed->{},
 	IsoclineStyle->Automatic,FrameLabel->Automatic,
 	MaxRecursion->3,
@@ -3835,7 +3838,7 @@ PlotEcoStreams[traits:(_?TraitsQ):{},{var1_,var1min_?NumericQ,var1max_?NumericQ}
 Module[{
 func=FuncStyle["PlotEcoStreams"],
 (* options *)
-verbose,verboseall,fixed,time,monitor,framelabel,streamplotopts,
+verbose,verboseall,fixed,time,framelabel,streamplotopts,
 (* other variables *)
 fixedvars,nonfixedvars,g,res},
 
@@ -3851,7 +3854,6 @@ If[Global`debug,verbose=True];
 verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[PlotEcoStreams]}]];
 If[verboseall,verbose=True];
 
-monitor=Evaluate[Monitor/.Flatten[{opts,Options[PlotEcoStreams]}]];
 fixed=Evaluate[Fixed/.Flatten[{opts,Options[PlotEcoStreams]}]];
 fixedvars=fixed[[All,1]];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
@@ -3881,7 +3883,7 @@ Return[res]
 ]];
 
 Options[PlotEcoStreams]={
-	Monitor->False,Fixed->{},Time->t,
+	Fixed->{},Time->t,
 	FrameLabel->Automatic,PlotRangePadding->Scaled[0.02],StreamStyle->Gray,
 	Verbose->False,VerboseAll->False};
 
@@ -3930,7 +3932,6 @@ Return[Show[
 
 
 Options[PlotEcoPhasePlane]={
-	Monitor->False,
 	Fixed->{},Time->t,FrameLabel->Automatic,
 	PlotEcoIsoclinesOpts->{},PlotEcoStreamsOpts->{},
 	Verbose->False,VerboseAll->False};
@@ -5056,7 +5057,7 @@ If[axeslabel===Automatic,axeslabel={trait1}];
 Set\[ScriptCapitalN][traits,sol];
 
 If[monitor,
-	nb=CreateDialog[DialogNotebook[Grid[{{"\[FormalX]=",Dynamic[x]}}],WindowTitle->"PlotInv Progress..."]];
+	nb=CreateDialog[Grid[{{ExpressionCell[Subscript[tr1,0]],TextCell["="],Dynamic[x]}}],WindowTitle->"PlotInv Progress...",WindowSize->All];
 ];
 
 (* plot fitness function *)
@@ -5064,15 +5065,13 @@ If[delayinv,
 	(* delay inv *)
 	inv[\[FormalX]_?NumberQ]:=Inv[traits,sol,{Subscript[tr1,0]->\[FormalX]},Guild->gu1,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall];
 	iplot=Plot[(x=\[FormalX];Evaluate[inv[\[FormalX]]]),{\[FormalX],trait1min,trait1max},
-		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},
-		Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
+		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
 ,
 	(* nondelay inv *)
 	Off[NIntegrate::inumr];
 	inv=Inv[traits,sol,Guild->gu1,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall];
 	iplot=Plot[inv,{trait1,trait1min,trait1max},
-		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},
-		Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
+		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
 	On[NIntegrate::inumr]
 ];
 
@@ -5331,8 +5330,12 @@ If[delayinv,
 ];
 
 If[monitor,
-	nb=CreateDialog[DialogNotebook[Grid[{{"\[FormalX]=",Dynamic[x]},{"\[FormalY]=",Dynamic[y]}}],WindowTitle->"PlotZIP Progress..."]];
+	nb=CreateDialog[Grid[{
+		{ExpressionCell[var1],TextCell["="],Dynamic[x]},
+		{ExpressionCell[var2],TextCell["="],Dynamic[y]}
+		}],WindowTitle->"PlotZIP Progress...",WindowSize->All];
 ];
+
 
 Which[
 	plottype=="Plot3D",
@@ -5531,7 +5534,10 @@ If[delayinv,
 ];
 
 If[monitor,
-	nb=CreateDialog[DialogNotebook[Grid[{{"\[FormalX]=",Dynamic[x]},{"\[FormalY]=",Dynamic[y]}}],WindowTitle->"PlotPIP Progress..."]];
+	nb=CreateDialog[Grid[{
+		{ExpressionCell[trait1],TextCell["="],Dynamic[x]},
+		{ExpressionCell[Subscript[tr1,0]],TextCell["="],Dynamic[y]}
+		}],WindowTitle->"PlotPIP Progress...",WindowSize->All];
 ];
 
 Which[
@@ -5781,15 +5787,19 @@ If[delayinv,
 
 
 If[monitor,
-	nb=CreateDialog[DialogNotebook[Grid[{{trait1,"=",Dynamic[x]},{SubscriptAdd[trait2,1],"=",Dynamic[y]}}],WindowTitle->"PlotMIP Progress..."]];
+	nb=CreateDialog[Grid[{
+		{ExpressionCell[trait1],TextCell["="],Dynamic[x]},
+		{ExpressionCell[If[trait2===trait1,Subscript[tr1,sp1+1],trait2]],TextCell["="],Dynamic[y]}
+		}],WindowTitle->"PlotMIP Progress...",WindowSize->All];
 ];
+
 
 Which[
 	plottype=="MIP",
-	pip1=ContourPlot[({monx,mony}={\[FormalX],\[FormalY]};Evaluate[inv21[\[FormalX],\[FormalY]]]),{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Evaluate[Sequence@@plotopts],
+	pip1=ContourPlot[({x,y}={\[FormalX],\[FormalY]};Evaluate[inv21[\[FormalX],\[FormalY]]]),{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Evaluate[Sequence@@plotopts],
 		Contours->{invthreshold},PlotRange->All,ColorFunction->(If[#>invthreshold,Opacity[0],noninvstyle]&),ContourShading->True,ContourStyle->boundarystyle,ColorFunctionScaling->False];
 	If[trait1=!=trait2,
-		pip2=ContourPlot[({monx,mony}={\[FormalX],\[FormalY]};Evaluate[inv12[\[FormalY],\[FormalX]]]),{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Evaluate[Sequence@@plotopts],
+		pip2=ContourPlot[({x,y}={\[FormalX],\[FormalY]};Evaluate[inv12[\[FormalY],\[FormalX]]]),{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Evaluate[Sequence@@plotopts],
 			Contours->{invthreshold},PlotRange->All,ColorFunction->(If[#>invthreshold,Opacity[0],noninvstyle]&),ContourShading->True,ContourStyle->boundarystyle,ColorFunctionScaling->False],
 		pip2=pip1//AxisFlip
 	];
@@ -6026,6 +6036,7 @@ verbose,verboseall,monitor,printtrace,fixed,time,
 evoeqn,fitnessgradient,dinvopts,delaydinv,findecoattractoropts,streamplotopts,framelabel,ecoattnumber,usesymmetry,zerodiagonal,
 (* other variables *)
 nb,evoeqns,dt,nsps,ics,sol,
+x,y,
 gu1,tr1,sp1,gu2,tr2,sp2,res},
 
 Block[{\[ScriptCapitalN]},
@@ -6094,10 +6105,10 @@ If[solin==="FindEcoAttractor",
 	sol[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=sol[\[FormalX],\[FormalY]]=FindEcoAttractor[{trait1->\[FormalX],trait2->\[FormalY]},ics,Time->time,Evaluate[Sequence@@findecoattractoropts],VerboseAll->verboseall]/.fixed;
 
 	If[delaydinv,
-		dt[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=(evoeqns/."FindEcoAttractor"->sol[\[FormalX],\[FormalY]]/.{Unk[trait1]->\[FormalX],Unk[trait2]->\[FormalY]}/.t->time)
+		dt[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=({x,y}={\[FormalX],\[FormalY]};evoeqns/."FindEcoAttractor"->sol[\[FormalX],\[FormalY]]/.{Unk[trait1]->\[FormalX],Unk[trait2]->\[FormalY]}/.t->time)
 		/;(trait1min<=\[FormalX]<=trait1max&&trait2min<=\[FormalY]<=trait2max&&\[FormalX]!=\[FormalY])
 	,
-		dt[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=(evoeqns/.sol[\[FormalX],\[FormalY]]/.{trait1->\[FormalX],trait2->\[FormalY]}/.t->time)
+		dt[\[FormalX]_?NumericQ,\[FormalY]_?NumericQ]:=({x,y}={\[FormalX],\[FormalY]};evoeqns/.sol[\[FormalX],\[FormalY]]/.{trait1->\[FormalX],trait2->\[FormalY]}/.t->time)
 		/;(trait1min<=\[FormalX]<=trait1max&&trait2min<=\[FormalY]<=trait2max&&\[FormalX]!=\[FormalY])
 	]
 ,
@@ -6105,6 +6116,13 @@ If[solin==="FindEcoAttractor",
 ];
 (*Print[sol[12,18]];Print[dt[12,18]];*)
 (*Print[sol[0.5,0]];Print[dt[0.5,0]];*)
+
+If[monitor,
+	nb=CreateDialog[Grid[{
+		{ExpressionCell[trait1],TextCell["="],Dynamic[EcoEvo`Private`xmon]},
+		{ExpressionCell[If[tr2===tr1,SubscriptAdd[trait1,1],trait2]],TextCell["="],Dynamic[EcoEvo`Private`ymon]}
+		}],WindowTitle->"PlotEvoStreams Progress...",WindowSize->All];
+];
 
 res=MyStreamPlot[dt[\[FormalX],\[FormalY]],{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Evaluate[Sequence@@streamplotopts]];
 
@@ -6307,20 +6325,29 @@ If[solin==="FindEcoAttractor",
 Print[sol[0.1,0.2]];
 Print[dt[0.1,0.2]];*)
 
-iso1=ContourPlot[dt[\[FormalX],\[FormalY]][[1]],{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Contours->{0},ContourShading->False,
-	ContourStyle->Flatten[{color1,style1}],Evaluate[Sequence@@plotopts],ContourLabels->{None,Tooltip[Null,trait1]&}
+If[monitor,
+	nb=CreateDialog[Grid[{
+		{ExpressionCell[trait1],TextCell["="],Dynamic[EcoEvo`Private`xmon]},
+		{ExpressionCell[trait2],TextCell["="],Dynamic[EcoEvo`Private`ymon]}
+		}],WindowTitle->"PlotEvoIsoclines Progress...",WindowSize->All];
+];
+
+iso1=ContourPlot[({EcoEvo`Private`xmon,EcoEvo`Private`ymon}={\[FormalX],\[FormalY]};dt[\[FormalX],\[FormalY]][[1]]),{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},
+	Contours->{0},ContourShading->False,ContourStyle->Flatten[{color1,style1}],Evaluate[Sequence@@plotopts],ContourLabels->{None,Tooltip[Null,trait1]&}
 ];
 If[Global`debug,Print[iso1]];
 
 (* add flip option to save 50% time *)
 
-iso2=ContourPlot[dt[\[FormalX],\[FormalY]][[2]],{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},Contours->{0},ContourShading->False,
-	ContourStyle->Flatten[{color2,style2}],Evaluate[Sequence@@plotopts],ContourLabels->{None,Tooltip[Null,trait2]&}];
+iso2=ContourPlot[({EcoEvo`Private`xmon,EcoEvo`Private`ymon}={\[FormalX],\[FormalY]};dt[\[FormalX],\[FormalY]][[2]]),{\[FormalX],trait1min,trait1max},{\[FormalY],trait2min,trait2max},
+	Contours->{0},ContourShading->False,ContourStyle->Flatten[{color2,style2}],Evaluate[Sequence@@plotopts],ContourLabels->{None,Tooltip[Null,trait2]&}];
 If[Global`debug,Print[iso2]];
 
 If[monitor,NotebookClose[nb]];
 
-If[estest==False,Return[Show[iso1,iso2,FrameLabel->framelabel]]];
+If[estest==False,
+	Return[Show[iso1,iso2,FrameLabel->framelabel]]
+];
 
 (* ESTest\[Equal]True *)
 
@@ -6920,7 +6947,17 @@ Which[
 	Msg[FindEcoEvoCycle::badmtd];Return[$Failed]
 ];
 
-(* solve it*)
+If[monitor,
+	nb=CreateDialog[{
+		TextCell["evaluation: "],
+		Dynamic[$FindEcoEvoCycleSteps],
+		TextCell["vars:"],
+		Dynamic[FinalSlice[sol]]
+	},
+	WindowTitle->"FindEcoEvoCycle Progress...",WindowSize->All];
+];
+
+(* solve it *)
 $FindEcoEvoCycleSteps=0;
 Which[
 	method=="FindRoot",
