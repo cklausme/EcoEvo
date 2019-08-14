@@ -256,7 +256,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="0.9.11X (July 1, 2019)";
+$EcoEvoVersion="1.0.0 (August 13, 2019)";
 
 
 modelloaded=False;
@@ -292,8 +292,8 @@ StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\)}]] does the same.";
 
 
 (* for Interval range *)
-RestrictedTo[x_,range_]:=Module[{xmin,xmax},
-	{xmin,xmax}=MinMax[range];
+RestrictedTo[x_?NumericQ,range_]:=Module[{xmin,xmax},
+	{xmin,xmax}={Min[range],Max[range]};
 	Max[Min[x,xmax],xmin]
 ];
 
@@ -1761,7 +1761,8 @@ Sequence@@Flatten[Table[Table[Subscript[gcomp,sp]->Subscript[gcomp,sp],{gcomp,gc
 ExpRule::usage="Internal usage only ;)";
 
 
-ExpRule[vars_List,logged_]:=Table[If[logged===True&&comptype[var]==="Extensive",var[t]->E^log[var][t],Nothing],{var,vars}];
+(*ExpRule[vars_List,logged_]:=Table[If[logged===True&&comptype[var]==="Extensive",var[t]\[Rule]E^log[var][t],Nothing],{var,vars}];*)
+ExpRule[vars_List,logged_]:=DeleteCases[Table[If[logged===True&&comptype[var]==="Extensive",var[t]->E^log[var][t]],{var,vars}],Null];
 
 
 AddUnkts::usage="Internal usage only ;)";
@@ -2732,7 +2733,7 @@ StyleBox[\"traits\", \"TI\"]\) and initial guess \!\(\*
 StyleBox[\"pops\", \"TI\"]\).";
 
 
-EcoEq[traitsin:(_?TraitsQ):{},variables:(_?VariablesQ):{},vars:(_List):All,opts___?OptionQ]:=
+EcoEq[traitsin:(_?TraitsQ):{},variables:(_?VariablesQ):{},vars:(_List|All):All,opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["EcoEq"],
@@ -3767,20 +3768,19 @@ lookup2=LookUp[var2];
 (* set up isocline styles *)
 Which[
 	lookup1[[1]]=="gcomp",
-	style1=If[isoclinestyle===Automatic,Join[linestyle[var1],{Thickness[0.005],color[var1][0]}],isoclinestyle[[1]]],
+	style1=If[isoclinestyle===Automatic,Join[Flatten[{linestyle[var1]}],{Thickness[0.005],color[var1][0]}],isoclinestyle[[1]]],
 	lookup1[[1]]=="pcomp"||lookup1[[1]]=="aux",
-	style1=If[isoclinestyle===Automatic,Join[linestyle[var1],{Thickness[0.005],color[var1]}],isoclinestyle[[1]]]
+	style1=If[isoclinestyle===Automatic,Join[Flatten[{linestyle[var1]}],{Thickness[0.005],color[var1]}],isoclinestyle[[1]]]
 ];
 
 Which[
 	lookup2[[1]]=="gcomp",
-	style2=If[isoclinestyle===Automatic,Join[linestyle[var2],{Thickness[0.005],color[var2][1]}],isoclinestyle[[2]]],
+	style2=If[isoclinestyle===Automatic,Join[Flatten[{linestyle[var2]}],{Thickness[0.005],color[var2][1]}],isoclinestyle[[2]]],
 	lookup2[[1]]=="pcomp"||lookup2[[1]]=="aux",
-	style2=If[isoclinestyle===Automatic,Join[linestyle[var2],{Thickness[0.005],color[var2]}],isoclinestyle[[2]]]
+	style2=If[isoclinestyle===Automatic,Join[Flatten[{linestyle[var2]}],{Thickness[0.005],color[var2]}],isoclinestyle[[2]]]
 ];
 
-(*Print[{style1,style2}];
-Print[{isoclinelabel1,isoclinelabel2}];*)
+(*Print[{style1,style2}];*)
 
 nonfixedvars={var1,var2};
 
@@ -3983,7 +3983,7 @@ If[showspecies,
 	If[markerstyle===Automatic,
 		markerstyle=Table[color[Subscript[gcomp,i]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,pos}]];
 	stix=ListPlot[
-		Map[List,Transpose[{data,Table[0,Length[pos]]}]],PlotStyle->markerstyle,
+		Map[List,Transpose[{data,Table[0,{Length[pos]}]}]],PlotStyle->markerstyle,
 		Evaluate[Sequence@@listplotopts],PlotMarkers->{"|",8}],
 	stix={}];
 Return[Show[stix,hist,AxesOrigin->{Max[data],0},PlotRange->plotrange]];
@@ -5740,7 +5740,7 @@ If[trait1=!=trait2,
 (* define inv21 & inv12 *)
 If[delayinv,
 	If[verbose,
-		With[{tr=Append[fixed,trait1->\[FormalX]],so=Global`sol1[\[FormalX]],ti=Append[invfixed,Subscript[tr2,0]->\[FormalY]],op=Sequence@@invopts,trinv=Subscript[trait[gu2,tr2],0]},
+		With[{tr=Append[fixed,trait1->\[FormalX]],so=Defer[Global`sol1][\[FormalX]],ti=Append[invfixed,Subscript[tr2,0]->\[FormalY]],op=Sequence@@invopts,trinv=Subscript[trait[gu2,tr2],0]},
 			PrintCall[Global`inv21[(System`\[FormalX])_?NumberQ,(System`\[FormalY])_?NumberQ]:=Global`inv21[System`\[FormalX],System`\[FormalY]]=Inv[tr,so,ti,op]]
 	]];
 	inv21[\[FormalX]_?NumberQ,\[FormalY]_?NumberQ]:=inv21[\[FormalX],\[FormalY]]=Module[{result},
@@ -5750,7 +5750,7 @@ If[delayinv,
 	];
 	If[trait1=!=trait2,
 		If[verbose,
-			With[{tr=Append[fixed,trait2->\[FormalX]],so=Global`sol2[\[FormalX]],ti=Append[invfixed,Subscript[tr1,0]->\[FormalY]],op=Sequence@@invopts},
+			With[{tr=Append[fixed,trait2->\[FormalX]],so=Defer[Global`sol2][\[FormalX]],ti=Append[invfixed,Subscript[tr1,0]->\[FormalY]],op=Sequence@@invopts},
 				PrintCall[Global`inv21[(System`\[FormalX])_?NumberQ,(System`\[FormalY])_?NumberQ]:=Global`inv21[System`\[FormalX],System`\[FormalY]]=Inv[tr,so,ti,op]]
 		]];
 		inv12[\[FormalX]_?NumberQ,\[FormalY]_?NumberQ]:=inv12[\[FormalX],\[FormalY]]=Module[{result},
@@ -5766,7 +5766,7 @@ If[delayinv,
 ,
 	(* nondelay inv *)
 	If[verbose,
-		With[{tr=Append[fixed,trait1->\[FormalX]],so=Global`sol1[\[FormalX]],ti=Append[invfixed,Subscript[tr2,0]->\[FormalY]],op=Sequence@@invopts},
+		With[{tr=Append[fixed,trait1->\[FormalX]],so=Defer[Global`sol1][\[FormalX]],ti=Append[invfixed,Subscript[tr2,0]->\[FormalY]],op=Sequence@@invopts},
 			PrintCall[Global`inv21[(System`\[FormalX])_,(System`\[FormalY])_]=Inv[tr,so,ti,op]]
 	]];
 	inv21[\[FormalX]_,\[FormalY]_]=
@@ -5803,7 +5803,7 @@ Which[
 			Contours->{invthreshold},PlotRange->All,ColorFunction->(If[#>invthreshold,Opacity[0],noninvstyle]&),ContourShading->True,ContourStyle->boundarystyle,ColorFunctionScaling->False],
 		pip2=pip1//AxisFlip
 	];
-	res=Show[Graphics[{invstyle,Rectangle[{trait1min,trait2min},{trait1max,trait2max}]}],pip2,pip1,Evaluate[Sequence@@plotopts],Frame->True,FrameLabel->framelabel,
+	res=Show[Graphics[{invstyle,Rectangle[{trait1min,trait2min},{trait1max,trait2max}]}],pip2,pip1,Frame->True,FrameLabel->framelabel,
 		Method->{"TransparentPolygonMesh"->True},AspectRatio->1],
 	plottype=="RegionMIP",
 	res=RegionPlot[Evaluate[(inv12[\[FormalY],\[FormalX]]>invthreshold&&inv21[\[FormalX],\[FormalY]]>invthreshold)],
@@ -5817,7 +5817,7 @@ Which[
 			Contours->{invthreshold},PlotRange->All,ColorFunction->({Opacity[0.5#],spcolors[[1]]}&),ContourShading->True,ContourStyle->boundarystyle,ColorFunctionScaling->False],
 		pip2=pip1/.spcolors[[2]]->spcolors[[1]]//AxisFlip
 	];
-	res=Show[Graphics[{noninvstyle,Rectangle[{trait1min,trait2min},{trait1max,trait2max}]}],pip2,pip1,Evaluate[Sequence@@plotopts],
+	res=Show[Graphics[{noninvstyle,Rectangle[{trait1min,trait2min},{trait1max,trait2max}]}],pip2,pip1,
 		Frame->True,FrameLabel->framelabel,Method->{"TransparentPolygonMesh"->True},AspectRatio->1],
 	plottype=="RegionOutcome",
 	res=RegionPlot[Evaluate[{inv21[\[FormalX],\[FormalY]]>invthreshold,inv12[\[FormalY],\[FormalX]]>invthreshold}]
@@ -6614,6 +6614,8 @@ Block[{\[ScriptCapitalN]},
 If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
 If[Global`debug,Print["In ",func]];
 
+If[Max[Table[ngcomps[gu],{gu,guilds}]]>1&&modelperiod!=0,Msg[EcoEvoSim::susmtd]];
+
 (* handle options *)
 
 verbose=Evaluate[Verbose/.Flatten[{opts,Options[EcoEvoSim]}]];
@@ -6743,6 +6745,9 @@ EcoEvoSim[ExtractTraits[sol],ExtractVariables[sol],Gs,tmax,opts];
 
 
 EcoEvoSim::badte="Bad TraitEqn (should be either \"QG\" or \"CE\").";
+
+EcoEvoSim::susmtd=
+"Warning: EcoEvoSim is likely to be inappropriate when there are multiple components and non-equilibrium dynamics.";
 
 
 FindEcoEvoEq::usage =
