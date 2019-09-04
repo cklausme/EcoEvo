@@ -44,7 +44,7 @@ $InvCount;$FindEcoCycleSteps;$FindEcoEvoCycleSteps;
 \[IGrave]::usage="\[IGrave] is a placeholder index in RuleList.";
 
 
-SimplifyLogE;RestrictedTo;SortRuleList;OrderedComplement;RuleListComplement;EqSort;
+SimplifyLogE;SortRuleList;OrderedComplement;RuleListComplement;EqSort;
 RHS;LHS;ReplaceRHS;ReplaceLHS;Eq;ZeroLHS;
 ZeroVector;
 SubscriptAdd;DeleteSubscript;ZeroSubscript;
@@ -275,31 +275,6 @@ StyleBox[\"x\", \"TI\"]\).";
 
 
 SimplifyLogE=Log[(a_:1) E^x_]:>x+Log[a];
-
-
-RestrictedTo::usage=
-"RestrictedTo[\!\(\*
-StyleBox[\"x\", \"TI\"]\), {\!\(\*
-StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\), \!\(\*
-StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\)}] restricts numerical value \!\(\*
-StyleBox[\"x\", \"TI\"]\) to the range {\!\(\*
-StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\), \!\(\*
-StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\)}.
-RestrictedTo[\!\(\*
-StyleBox[\"x\", \"TI\"]\), Interval[{\!\(\*
-StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\), \!\(\*
-StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\)}]] does the same.";
-
-
-(* for Interval range *)
-RestrictedTo[x_?NumericQ,range_]:=Module[{xmin,xmax},
-	{xmin,xmax}={Min[range],Max[range]};
-	Max[Min[x,xmax],xmin]
-];
-
-
-(* for Numeric range *)
-RestrictedTo[x_,{xmin_?NumericQ,xmax_?NumericQ}]:=Max[Min[x,xmax],xmin];
 
 
 SortRuleList::usage=
@@ -6684,7 +6659,7 @@ If[boundarydetection==True,
 		evoeqns=evoeqns/.(var_'[t]==rhs_)->var'[t]==rhs*in[var][t]
 	,
 		modeltype=="DiscreteTime",
-		evoeqns=evoeqns/.(var_[t+1]==rhs_)->var[t+1]==RestrictedTo[rhs,range[var]];
+		evoeqns=evoeqns/.(var_[t+1]==rhs_):>var[t+1]==Clip[rhs,{Min[range[var]],Max[range[var]]}];
 	];
 ,
 	bdwhens={};
