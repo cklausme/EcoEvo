@@ -256,7 +256,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.0.0 (August 13, 2019)";
+$EcoEvoVersion="1.0.0 (September 4, 2019)";
 
 
 modelloaded=False;
