@@ -5,6 +5,8 @@
 (* :Author: szhorvat *)
 (* :Date: 2016-11-28 *)
 
+(* Modified by C. Klausmeier 9/13/2019 for EcoEvo package *)
+
 (* Run this script optionally for minor improvements to the built documentation.
    Requires PackageTools, https://github.com/szhorvat/PackageTools
 *)

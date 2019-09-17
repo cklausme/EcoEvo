@@ -256,7 +256,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.0.0 (September 4, 2019)";
+$EcoEvoVersion="1.0.0 (September 15, 2019)";
 
 
 modelloaded=False;
@@ -880,13 +880,13 @@ Cov[f1_InterpolatingFunction,f2_InterpolatingFunction,{var_Symbol,varmin_?Numeri
 Cov[f1_TemporalData,f2_TemporalData,opts___?OptionQ]:=Module[{n},
 (*Print["td"];*)
 	n=(f1["LastTimes"]-f1["FirstTimes"])[[1]]+1;
-	Covariance[f1,f2]*(n-1)/n
+	Covariance[f1["Values"],f2["Values"]]*(n-1)/n
 ];
 
 Cov[f1_TemporalData,f2_TemporalData,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=Module[{n},
 	n=varmax-varmin+1;
 	(*Print["td2"];*)
-	Covariance[TimeSeriesWindow[f1,{varmin,varmax}],TimeSeriesWindow[f2,{varmin,varmax}]]*(n-1)/n
+	Covariance[TimeSeriesWindow[f1,{varmin,varmax}]["Values"],TimeSeriesWindow[f2,{varmin,varmax}]["Values"]]*(n-1)/n
 ];
 
 
@@ -1440,11 +1440,13 @@ StyleBox[\"tmax\", \"TI\"]\)] extracts the initial values ending at \!\(\*
 StyleBox[\"tmax\", \"TI\"]\).";
 
 
-InitialSlice[sol_,n:(_?NumericQ):0]:=
+InitialSlice[sol_,n:(_?NumericQ):0]:=Module[{x},
+	x=If[modeltype=="ContinuousTime",10.^-100,0];
 	If[n==0,
-		Return[Slice[sol,InitialTime[sol]+10.^-100]],
-		Return[Slice[sol,{InitialTime[sol]+10.^-100,InitialTime[sol]+n}]]
-	];
+		Return[Slice[sol,InitialTime[sol]+x]],
+		Return[Slice[sol,{InitialTime[sol]x,InitialTime[sol]+n}]]
+	]
+];
 
 
 FinalSlice::usage=
@@ -2894,6 +2896,7 @@ fixedvars=fixed[[All,1]];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 (*Print["fixed=",fixed];*)
 
+
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][traits];
 
@@ -2947,10 +2950,15 @@ If[method==="EcoSim",
 
 	Do[
 		triggerval=triggervar/.ics4;
-		
+
 		sol=EcoSim[traits,ics4,tmax,WhenEvents->{
 			WhenEvent[event,"StopIntegration",Evaluate[Sequence@@wheneventopts]]
 			/.event->(triggervar[t]<triggerval)},Fixed->fixed,Evaluate[Sequence@@ecosimopts]];
+
+(*Print[Show[
+PlotDynamics[sol,{Global`x},PlotRange\[Rule]{0.8221,0.82215}],
+Plot[triggerval,{t,0,FinalTime[sol]}]
+]];*)
 
 		diff=Sum[Abs[(var/.FinalSlice[sol])-(var/.ics4)],{var,nonfixedvars}];
 		If[diff<10^-accuracygoal,Break[]];
@@ -3031,7 +3039,7 @@ Return[Sort[sol]];
 Options[FindEcoCycle]={
 Method->Automatic,Fixed->{},FindRootOpts->{},EcoSimOpts->{},MaxIterations->100,AccuracyGoal->6,Logged->False,
 WarmUp->1000,WarmUp2->100,WarmUp3->0.1,TMax->1000,TriggerVariable->Automatic,
-WhenEventOpts->{(*"DetectionMethod"\[Rule]"Interpolation","LocationMethod"\[Rule]{"Brent",MaxIterations\[Rule]1000}*)},
+WhenEventOpts->{"DetectionMethod"->"Interpolation","LocationMethod"->{"Brent",MaxIterations->1000}},
 Period->Automatic,
 Monitor->False,PrintTrace->False,
 Verbose->False,VerboseAll->False
@@ -3548,7 +3556,7 @@ If[method=="FindEcoCycle",
 			With[{ics=ics,options=Sequence@@findecocycleopts},
 				PrintCall[FindEcoCycle[traits,ics,options],"eq:"]]
 		];
-		eq=Select[{FindEcoCycle[traits,ics,Evaluate[Sequence@@findecocycleopts]]},#=!=$Failed&]
+		eq=Select[{FindEcoCycle[traits,ics,VerboseAll->verboseall,Evaluate[Sequence@@findecocycleopts]]},#=!=$Failed&]
 	];	
 ];
 
@@ -3596,8 +3604,8 @@ If[Length[stableeq]>=2,Msg[FindEcoAttractor::musteq,Length[stableeq],traits];Got
 
 (* if we're still here, no stable equilibrium, so switch to EcoSim *)
 (* method EcoSim *)
-
 Label[ecosim];
+
 If[method=="EcoSim",
 	If[verbose,Print[func,": EcoSim Mode"]];
 	If[variables=={},Msg[FindEcoAttractor::novars,"EcoSim"];Abort[]];
@@ -6476,7 +6484,7 @@ Return[Show[pes,pei,mip]]
 
 
 (* two species *)
-PlotEvoPhasePlane[eq1:(_?RuleListQ):"FindEcoAttractor",eq2:(_?RuleListQ):"FindEcoAttractor",Gs:(_?RuleListQ):{},
+PlotEvoPhasePlane[eq1:(_?RuleListQ|_?(#=="FindEcoAttractor"&)):"FindEcoAttractor",eq2:(_?RuleListQ|_?(#=="FindEcoAttractor"&)):"FindEcoAttractor",Gs:(_?RuleListQ):{},
 {trait1_,trait1min_?NumericQ,trait1max_?NumericQ},opts___?OptionQ]:=
 Module[{
 func=FuncStyle["PlotEvoIsoclines (2Sp)"],
