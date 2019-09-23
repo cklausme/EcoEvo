@@ -6,12 +6,12 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 - Install directly with
 
-      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.0.0/EcoEvo-1.0.0.paclet"]
+      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.0.1/EcoEvo-1.0.1.paclet"]
 
-- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.0.0.paclet` was downloaded into the directory `~/Downloads`, evaluate
+- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.0.1.paclet` was downloaded into the directory `~/Downloads`, evaluate
 
       Needs["PacletManager`"]
-      PacletInstall["~/Downloads/EcoEvo-1.0.0.paclet"]
+      PacletInstall["~/Downloads/EcoEvo-1.0.1.paclet"]
 
 ## Usage
 
@@ -31,6 +31,10 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 ## Version History
 
+### v1.0.1 (September 23, 2019)
+
+ - Fixed a problem with documentation
+ 
 ### v1.0.0 (September 15, 2019)
 
  - Now tested with Mathematica v10.0 to 12.0.
