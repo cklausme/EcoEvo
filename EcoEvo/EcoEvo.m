@@ -256,7 +256,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.0.2x (September 24, 2019)";
+$EcoEvoVersion="1.0.2 (September 26, 2019)";
 
 
 modelloaded=False;
@@ -5150,29 +5150,9 @@ StyleBox[\"var2max\", \"TI\"]\)}, \!\(\*
 StyleBox[\"inv\", \"TI\"]\)] uses equilibrium \!\(\*
 StyleBox[\"eq0\", \"TI\"]\).";
 
-PlotZNGI::usage =
-"PlotZNGI[{\!\(\*
-StyleBox[\"var1\", \"TI\"]\), \!\(\*
-StyleBox[\"var1min\", \"TI\"]\), \!\(\*
-StyleBox[\"var1max\", \"TI\"]\)}, {\!\(\*
-StyleBox[\"var2\", \"TI\"]\), \!\(\*
-StyleBox[\"var2min\", \"TI\"]\), \!\(\*
-StyleBox[\"var2max\", \"TI\"]\)}, \!\(\*
-StyleBox[\"sp\", \"TI\"]\)] plots a zero net growth isocline of \!\(\*
-StyleBox[\"sp\", \"TI\"]\).
-PlotZNGI[{\!\(\*
-StyleBox[\"var1\", \"TI\"]\), \!\(\*
-StyleBox[\"var1min\", \"TI\"]\), \!\(\*
-StyleBox[\"var1max\", \"TI\"]\)}, {\!\(\*
-StyleBox[\"var2\", \"TI\"]\), \!\(\*
-StyleBox[\"var2min\", \"TI\"]\), \!\(\*
-StyleBox[\"var2max\", \"TI\"]\)}, {\!\(\*
-StyleBox[\"sp1\", \"TI\"]\), \!\(\*
-StyleBox[\"sp2\", \"TI\"]\), \[Ellipsis]}] plots multiple ZNGIs.";
-
 
 PlotZIP[solin_:"FindEcoAttractor",{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},
-invaderin_Symbol:Automatic,opts___?OptionQ]:=
+invaderin:(_?InvaderQ):Automatic,opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["PlotZIP"],
@@ -5238,7 +5218,8 @@ If[luv2[[1]]==="gtrait",
 Print["traitinv=",traitinv];
 Print["subrule=",subrule];*)
 
-If[invaderin===Automatic,
+If[
+	invaderin===Automatic,
 	If[MemberQ[guilds,gu],
 		invader=traitinv,
 		Message[PlotZIP::unkinv];Return[$Failed]
@@ -5308,7 +5289,7 @@ If[delayinv,
 		With[{tr=fixed,so=sol[\[FormalX],\[FormalY]],in=invader,op=Sequence@@invopts,sr=subrule,trinv=traitinv},
 			PrintCall[Global`inv[(System`\[FormalX])_,(System`\[FormalY])_]=Inv[tr,so,in,op]/.sr/.trinv]
 	]];
-	inv[\[FormalX]_,\[FormalY]_]=Inv[fixed,sol[\[FormalX],\[FormalY]],invader,Evaluate[Sequence@@invopts],VerboseAll->verboseall]/.subrule/.traitinv;
+	inv[\[FormalX]_,\[FormalY]_]=Inv[fixed,sol[\[FormalX],\[FormalY]],invader/.Subscript[var_, sub_]->Subscript[var, 0],Evaluate[Sequence@@invopts],VerboseAll->verboseall]/.subrule/.traitinv;
 	If[verbose,Print[func,": inv[\[FormalX],\[FormalY]]=",inv[\[FormalX],\[FormalY]]]]
 ];
 
@@ -5357,14 +5338,6 @@ Options[PlotZIP]={
 };
 
 
-PlotZNGI[{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},
-invader_,opts___?OptionQ]:=PlotZIP[{},{var1,var1min,var1max},{var2,var2min,var2max},invader,opts,InvStyle->Opacity[0]];
-
-
-PlotZNGI[{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},
-invaders_List,opts___?OptionQ]:=Show[PlotZIP[{},{var1,var1min,var1max},{var2,var2min,var2max},#,opts,InvStyle->Opacity[0]]&/@invaders];
-
-
 PlotZIP::unkinv=
 "Can't figure out who's invading: please specify.";
 
@@ -5372,6 +5345,83 @@ PlotZIP::diffsp=
 "\!\(\*
 StyleBox[\"x\", \"TI\"]\)- and \!\(\*
 StyleBox[\"y\", \"TI\"]\)-axes should have the same species.";
+
+
+PlotZNGI::usage =
+"PlotZNGI[\!\(\*
+StyleBox[\"sp\", \"TI\"]\), {\!\(\*
+StyleBox[\"var1\", \"TI\"]\), \!\(\*
+StyleBox[\"var1min\", \"TI\"]\), \!\(\*
+StyleBox[\"var1max\", \"TI\"]\)}, {\!\(\*
+StyleBox[\"var2\", \"TI\"]\), \!\(\*
+StyleBox[\"var2min\", \"TI\"]\), \!\(\*
+StyleBox[\"var2max\", \"TI\"]\)}] plots a zero net growth isocline of \!\(\*
+StyleBox[\"sp\", \"TI\"]\).
+PlotZNGI[{\!\(\*
+StyleBox[\"sp1\", \"TI\"]\), \!\(\*
+StyleBox[\"sp2\", \"TI\"]\), \[Ellipsis]}, {\!\(\*
+StyleBox[\"var1\", \"TI\"]\), \!\(\*
+StyleBox[\"var1min\", \"TI\"]\), \!\(\*
+StyleBox[\"var1max\", \"TI\"]\)}, {\!\(\*
+StyleBox[\"var2\", \"TI\"]\), \!\(\*
+StyleBox[\"var2min\", \"TI\"]\), \!\(\*
+StyleBox[\"var2max\", \"TI\"]\)}] plots multiple ZNGIs.
+PlotZNGI[\!\(\*
+StyleBox[\"traits\", \"TI\"]\), {\!\(\*
+StyleBox[\"var1\", \"TI\"]\), \!\(\*
+StyleBox[\"var1min\", \"TI\"]\), \!\(\*
+StyleBox[\"var1max\", \"TI\"]\)}, {\!\(\*
+StyleBox[\"var2\", \"TI\"]\), \!\(\*
+StyleBox[\"var2min\", \"TI\"]\), \!\(\*
+StyleBox[\"var2max\", \"TI\"]\)}] plots ZNGIs with \!\(\*
+StyleBox[\"traits\", \"TI\"]\).";
+
+
+PlotZNGI[invaders_?RuleListQ,{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["PlotZNGI"],
+(* options *)
+plotstyle,
+(* other variables *)
+boundarystyle
+},
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+
+plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotZNGI]}]];
+
+(* figure out number of species in guilds *)
+Set\[ScriptCapitalN][invaders];
+If[Global`debug,Print[func," \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
+
+Return[Show[Table[Table[
+	If[plotstyle===Automatic,
+		boundarystyle={color[Subscript[gcomps[gu][[1]],0]][SpFrac[sp,\[ScriptCapitalN][gu]]],Opacity[1]},
+		boundarystyle=Flatten[{plotstyle,Opacity[1]}]
+	];
+	PlotZIP[{},{var1,var1min,var1max},{var2,var2min,var2max},Table[Subscript[gtrait, 0]->Subscript[gtrait, sp]/.invaders,{gtrait,gtraits[gu]}],
+		opts,InvStyle->Opacity[0],BoundaryStyle->boundarystyle]
+,{sp,\[ScriptCapitalN][gu]}],{gu,guilds}]]]
+]
+];
+
+
+PlotZNGI[invaders_List,{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},opts___?OptionQ]:=
+	Show[PlotZIP[{},{var1,var1min,var1max},{var2,var2min,var2max},#,opts,InvStyle->Opacity[0]]&/@invaders];
+
+
+PlotZNGI[invader_,{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},opts___?OptionQ]:=
+	PlotZIP[{},{var1,var1min,var1max},{var2,var2min,var2max},invader,opts,InvStyle->Opacity[0]];
+
+
+Options[PlotZNGI]={
+	PlotStyle->Automatic
+};
 
 
 PlotPIP::usage =
