@@ -1,0 +1,17 @@
+<pre name='i_51_in' id='i_51_in' class='IFT'>SetModel[{
+   Pop[p1] -&gt; {Equation :&gt; p1[t]*(\[Mu]1 R[t]/(R[t] + K1) - m)},
+   Pop[p2] -&gt; {Equation :&gt; p2[t]*(\[Mu]2 R[t]/(R[t] + K2) - m)},
+   Aux[R] -&gt; {Equation :&gt; (Rin - R[t]) - \[Mu]1 R[t]/(R[t] + K1) p1[
+         t] - \[Mu]2 R[t]/(R[t] + K2) p2[t]},
+   Period :&gt; \[Tau]
+   }];
+\[Mu]1 := 
+  Piecewise[{{1, Mod[t, \[Tau]] &lt; \[Phi] \[Tau]}, {0, 
+     Mod[t, \[Tau]] &gt;= \[Phi] \[Tau]}}];
+\[Mu]2 := 
+  Piecewise[{{2, Mod[t, \[Tau]] &lt; \[Phi] \[Tau]}, {0, 
+     Mod[t, \[Tau]] &gt;= \[Phi] \[Tau]}}];
+Rin = 20;
+\[Phi] = 0.6; \[Tau] = 365;
+K1 = 1; K2 = 4;
+m = 0.2;</pre><div class='IFU'><a name='571756897'></a>http://wolfram.com/xid/088iwodmszzff-jqo0qb</div>

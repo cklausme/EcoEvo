@@ -1,0 +1,15 @@
+<pre name='i_37_in' id='i_37_in' class='IFT'>traits = {Subscript[x, 1] -&gt; -0.2, Subscript[y, 1] -&gt; 0.1, 
+   Subscript[x, 2] -&gt; 0.2, Subscript[y, 2] -&gt; 0.2};
+eq = FindEcoAttractor[traits];
+Show[
+ Plot3D[0, {Subscript[x, 0], -1, 1}, {Subscript[y, 0], -1, 1}, 
+  PlotStyle -&gt; {Black, Opacity[0.4]}, Mesh -&gt; False],
+ Plot3D[Evaluate[Inv[traits, eq]], {Subscript[x, 0], -1, 
+   1}, {Subscript[y, 0], -1, 1}, 
+  RegionFunction -&gt; Function[{x, y}, x^2 + y^2 &lt; 0.99], 
+  MeshFunctions -&gt; {#3 &amp;}, Mesh -&gt; 40, PlotRange -&gt; {-0.5, All}],
+ ListPointPlot3D[
+  Table[{{Subscript[x, i], Subscript[y, i], 0.02}} /. traits, {i, 2}],
+   PlotStyle -&gt; {Red, Blue}],
+ PlotRange -&gt; {-0.5, All}, AxesLabel -&gt; {&quot;x&quot;, &quot;y&quot;, &quot;Inv&quot;}
+ ]</pre><div class='IFU'><a name='1379034740'></a>http://wolfram.com/xid/01wf7i65ieldo87-w3bsau</div>
