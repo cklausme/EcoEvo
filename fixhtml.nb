@@ -1,0 +1,491 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     22003,        481]
+NotebookOptionsPosition[     20510,        453]
+NotebookOutlinePosition[     20870,        469]
+CellTagsIndexPosition[     20827,        466]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"Directory", " ", "containing", " ", "html", " ", "folder"}], ",", 
+    RowBox[{"e", ".", "g", ".", 
+     RowBox[{"C", ":", 
+      RowBox[{
+       RowBox[{
+        RowBox[{
+         RowBox[{"/", "project"}], "/", "build"}], "/", "projectname"}], "-", 
+       
+       RowBox[{"HTML", "/", "html"}]}]}]}]}], "*)"}], 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+    "$htmlDirectory", "=", "\"\</Users/klaus/github/EcoEvo/html\>\""}], ";"}],
+    "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+    "1.1", " ", "Copy", " ", "Dependencies", " ", "to", " ", "Main", " ", 
+     "Folder"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"localFiles", "=", 
+    RowBox[{"FileNameJoin", "[", 
+     RowBox[{"{", 
+      RowBox[{"$htmlDirectory", ",", "\"\<standard\>\""}], "}"}], "]"}]}], 
+   "\n", 
+   RowBox[{"folders", "=", 
+    RowBox[{"FileNames", "[", 
+     RowBox[{"\"\<*\>\"", ",", "localFiles"}], "]"}]}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{
+      RowBox[{"CopyDirectory", "[", 
+       RowBox[{"#", ",", 
+        RowBox[{"FileNameJoin", "[", 
+         RowBox[{"{", 
+          RowBox[{"$htmlDirectory", ",", 
+           RowBox[{"Last", "[", 
+            RowBox[{"FileNameSplit", "[", "#", "]"}], "]"}]}], "}"}], "]"}]}],
+        "]"}], "&"}], "/@", "folders"}], ";"}], "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+    "1.2", " ", "Fix", " ", "HTML", " ", "Links", " ", "and", " ", 
+     "Scripts"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"htmlFiles", "=", 
+    RowBox[{"FileNames", "[", 
+     RowBox[{"\"\<*.html\>\"", ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"FileNameJoin", "[", 
+         RowBox[{"{", 
+          RowBox[{"$htmlDirectory", ",", "\"\<ref\>\""}], "}"}], "]"}], ",", 
+        RowBox[{"FileNameJoin", "[", 
+         RowBox[{"{", 
+          RowBox[{"$htmlDirectory", ",", "\"\<guide\>\""}], "}"}], "]"}], ",", 
+        RowBox[{"FileNameJoin", "[", 
+         RowBox[{"{", 
+          RowBox[{"$htmlDirectory", ",", "\"\<tutorial\>\""}], "}"}], "]"}]}],
+        "}"}]}], "]"}]}], "\n", "\[IndentingNewLine]", 
+   RowBox[{"Do", "[", 
+    RowBox[{
+     RowBox[{"Block", "[", 
+      RowBox[{
+       RowBox[{"{", "source", "}"}], ",", 
+       RowBox[{
+        RowBox[{"source", "=", 
+         RowBox[{"Import", "[", 
+          RowBox[{"file", ",", "\"\<Source\>\""}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{"Insert", " ", "jQuery"}], "*)"}], 
+        RowBox[{"source", "=", 
+         RowBox[{"StringReplace", "[", 
+          RowBox[{"source", ",", 
+           RowBox[{
+           "\"\<<script \
+src=\\\"/webMathematica/Resources/Documentation/English/javascript/reference.\
+js\\\"></script>\>\"", "\[Rule]", 
+            "\"\<\n            <link rel=\\\"stylesheet\\\" \
+href=\\\"../css/clipboard.css\\\" />\n            <script \
+src=\\\"../javascript/jquery/core/1.7.2/jquery.min.js\\\"></script>\n         \
+   <script src=\\\"../javascript/reference.js\\\"></script>\n        \
+\>\""}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{"fix", " ", "relative", " ", "paths"}], "*)"}], 
+        RowBox[{"source", "=", 
+         RowBox[{"StringReplace", "[", 
+          RowBox[{"source", ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{
+             "\"\</webMathematica/Resources/Documentation/English/\>\"", 
+              "\[Rule]", "\"\<../\>\""}], ",", 
+             RowBox[{
+             "\"\</2013/javascript/\>\"", "\[Rule]", 
+              "\"\<../javascript/\>\""}]}], "}"}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{"fix", " ", 
+          RowBox[{"bullet", ".", "gif"}]}], "*)"}], 
+        RowBox[{"source", "=", 
+         RowBox[{"StringReplace", "[", 
+          RowBox[{"source", ",", 
+           RowBox[{
+           "\"\<../images/mathematicaImages/bullet.gif\>\"", "\[Rule]", 
+            "\"\<../images/bullet-greysq.gif\>\""}]}], "]"}]}], ";", 
+        "\[IndentingNewLine]", 
+        RowBox[{"(*", "save", "*)"}], 
+        RowBox[{"Export", "[", 
+         RowBox[{"file", ",", "source", ",", "\"\<Text\>\""}], "]"}], ";"}]}],
+       "]"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"file", ",", "htmlFiles"}], "}"}]}], "]"}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{"2.2", " ", "Adjust", " ", "the", " ", "CSS"}], "*)"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"cssFontFile", "=", 
+    RowBox[{"FileNameJoin", "[", 
+     RowBox[{"{", 
+      RowBox[{
+      "$htmlDirectory", ",", "\"\<css\>\"", ",", "\"\<fonts.css\>\""}], "}"}],
+      "]"}]}], "\n", 
+   RowBox[{
+    RowBox[{"css", "=", 
+     RowBox[{"Import", "[", 
+      RowBox[{"cssFontFile", ",", "\"\<Text\>\""}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"css", "=", 
+     RowBox[{"StringReplace", "[", 
+      RowBox[{"css", ",", 
+       RowBox[{
+       "\"\</fonts/sourcesanspro/v8/fonts/\>\"", "\[Rule]", 
+        "\"\</fonts/sourcesanspro/v8/\>\""}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", "\n", "\[IndentingNewLine]", 
+   RowBox[{"Export", "[", 
+    RowBox[{"cssFontFile", ",", "css", ",", "\"\<Text\>\""}], "]"}], "\n", 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+    "3.", " ", "Fix", " ", "Missing", " ", "Content", " ", "in", " ", 
+     "Collapsed", " ", "Containers"}], "*)"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"fasterPageLoadFile", "=", 
+    RowBox[{"FileNameJoin", "[", 
+     RowBox[{"{", 
+      RowBox[{
+      "$htmlDirectory", ",", "\"\<javascript\>\"", ",", 
+       "\"\<faster-page-load.js\>\""}], "}"}], "]"}]}], "\n", 
+   RowBox[{
+    RowBox[{"js", "=", 
+     RowBox[{"Import", "[", 
+      RowBox[{"fasterPageLoadFile", ",", "\"\<Text\>\""}], "]"}]}], ";"}], 
+   "\n", 
+   RowBox[{
+    RowBox[{"js", "=", 
+     RowBox[{"StringReplace", "[", 
+      RowBox[{"js", ",", 
+       RowBox[{
+       "\"\<baselang.slice(0,-3)\>\"", "\[Rule]", "\"\<baselang\>\""}]}], 
+      "]"}]}], ";"}], "\[IndentingNewLine]", "\n", "\[IndentingNewLine]", 
+   RowBox[{"Export", "[", 
+    RowBox[{"fasterPageLoadFile", ",", "js", ",", "\"\<Text\>\""}], "]"}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+    "4.", " ", "Fix", " ", "Click", " ", "to", " ", "Copy", " ", "Cells"}], 
+    "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"subpagesFile", "=", 
+     RowBox[{"FileNameJoin", "[", 
+      RowBox[{"{", 
+       RowBox[{
+       "$htmlDirectory", ",", "\"\<javascript\>\"", ",", 
+        "\"\<sub-pages.js\>\""}], "}"}], "]"}]}], ";"}], "\n", 
+   RowBox[{"subpagesFile", "//", "FileExistsQ"}], "\n", 
+   RowBox[{"DeleteFile", "[", "subpagesFile", "]"}], "\[IndentingNewLine]", 
+   "\n", "\[IndentingNewLine]", 
+   RowBox[{"Export", "[", 
+    RowBox[{"subpagesFile", ",", 
+     RowBox[{
+     "Uncompress", "[", 
+      "\"\<1:eJzdVstu2zAQzLWH/\
+gNrGCCFtopdtDn0cUp7yClAc0yDghZXJlFaEkTKThH437uUrFgPylCawC1CWJBN7c5yZ4YyXy3S71c\
+vXp6cTJlIo2IFiQ3CHLj4zUhcJJFVacICcvdjNn9HcEwZDS+\
+Sc9CaqNWSBiHwSDJfpBsqZlNmpTJBqAyj14Jb/\
+tbk0Q0NOpFVNMHwjUpEugnCjRJWIuBncjabeaLdWPOcIBz5Quoy3Nqc0boODT4NpW0GklZca2zLZFp\
+ZRgkNrmc3gyByNMjcD+JaxnWG2DPcXsaM/nw/+\
+0Bd00MtVyJUJbM8zRh1fb5xNKBumeYRoERZssS5Eq38HviJ6IOVrGPqZmyCBLWUFjOkP2PbndwS0Aa\
+OpedCLR+rZg9iQMsBVfxLfhDr4xlvsX3/Y1sF4jU/PSWmWLhPPTNlkxBuM56Iq/\
+LBRZJATvhubhKEkVbRr/\
+0Wh50xXa67AJcFa3xvfIWYF9qyfbEKfrd2nmOM6RS7LCzkroZUWmAAWrd6DIK699AqXcO55gZfHlIJ\
+6OjfxmYtmCjVmmcGHgDDhegH1X3kYIs8ITFH894/\
+aBA7RGO9jn9KpLezMSxWGEfisGPQAx49tk2ftVOPb9Zn4tcGkyCIPPsYq9zYSRO0nKE9h/\
+Msg0QQJQyx6c7vBGH21icGSuIbW4D2NzxpktY+iangzidI9b+\
+mhDsdIMq324yS10QdVs9TmXagTDXbxyqPgJSHKXZcpkluWox3jNWsPyRiO/\
+YAL0NWGgEwYlfWCFuvNajX8o9UzPyNYIOa/TeiPYVuTyId3v4ABBnUIw==\>\"", "]"}], ",", 
+     "\"\<Text\>\""}], "]"}], "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", 
+    RowBox[{
+    "5.", " ", "Fix", " ", "Code", " ", "Copying", " ", "from", " ", "Web", 
+     " ", "Page"}], "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"clipboardJs", "=", 
+     RowBox[{"FileNameJoin", "[", 
+      RowBox[{"{", 
+       RowBox[{
+       "$htmlDirectory", ",", "\"\<javascript\>\"", ",", 
+        "\"\<clipboard.en.js\>\""}], "}"}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"clipboardJsNew", "=", 
+     RowBox[{"FileNameJoin", "[", 
+      RowBox[{"{", 
+       RowBox[{
+       "$htmlDirectory", ",", "\"\<javascript\>\"", ",", 
+        "\"\<clipboard.js\>\""}], "}"}], "]"}]}], ";"}], "\n", 
+   RowBox[{"RenameFile", "[", 
+    RowBox[{"clipboardJs", ",", "clipboardJsNew"}], "]"}], "\n", 
+   "\[IndentingNewLine]", 
+   RowBox[{"clipboardCss", "=", 
+    RowBox[{"FileNameJoin", "[", 
+     RowBox[{"{", 
+      RowBox[{
+      "$htmlDirectory", ",", "\"\<css\>\"", ",", "\"\<clipboard.css\>\""}], 
+      "}"}], "]"}]}], "\n", 
+   RowBox[{
+    RowBox[{"css", "=", 
+     RowBox[{"Import", "[", 
+      RowBox[{"clipboardCss", ",", "\"\<Text\>\""}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{"css", "=", 
+     RowBox[{"StringReplace", "[", 
+      RowBox[{"css", ",", 
+       RowBox[{
+       "\"\</webMathematica/Resources/Documentation/English/images/\>\"", 
+        "\[Rule]", "\"\<../images/\>\""}]}], "]"}]}], ";"}], "\n", 
+   RowBox[{"Export", "[", 
+    RowBox[{"clipboardCss", ",", "css", ",", "\"\<Text\>\""}], 
+    "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.7785650408296537`*^9, 3.778565040831184*^9}, 
+   3.778565080725072*^9, {3.778566853852385*^9, 3.778566855944213*^9}, {
+   3.7785705707600603`*^9, 
+   3.7785705730880947`*^9}},ExpressionUUID->"8e09da2b-1ac1-4d49-97f9-\
+c6a21d1e9aa8"],
+
+Cell[BoxData["\<\"~/github/EcoEvo/html/standard\"\>"], "Output",
+ CellChangeTimes->{3.778565093884863*^9},
+ CellLabel->"Out[2]=",ExpressionUUID->"2be49692-854a-4b69-a972-15ad0c8589d8"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"\<\"~/github/EcoEvo/html/standard/css\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/standard/fonts\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/standard/images\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/standard/includes\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/standard/javascript\"\>"}], "}"}]], "Output",\
+
+ CellChangeTimes->{3.778565093892275*^9},
+ CellLabel->"Out[3]=",ExpressionUUID->"fbfaf2d6-cf75-4e05-aaec-7712d7715809"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"\<\"~/github/EcoEvo/html/guide/EcoEvo.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/Avg.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/AxisFlip.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ClearCache.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/CompoundAnd.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/CompoundOr.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/Cov.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/DInv.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EcoEigenvalues.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EcoEqns.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EcoEvoEigenvalues.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EcoEvoJacobian.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EcoEvoSim.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EcoJacobian.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EcoSim.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EcoStableQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EqSort.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EvoEigenvalues.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EvoEqns.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/EvoJacobian.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ExtractAuxs.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ExtractGuilds.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ExtractPlotPoints.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ExtractPops.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ExtractTraits.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ExtractVariables.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FinalDerivatives.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FinalSlice.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FinalTime.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindEcoAttractor.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindEcoCycleEvoEq.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindEcoCycle.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindEcoEq.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindEcoEvoCycle.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindEcoEvoEq.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindEvoEq.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindExtrema.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindMaxima.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/FindMinima.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/GlobalESSQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/InitialSlice.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/InitialTime.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/InterpolatingFunctionFunctionQ.html\"\>\
+", ",", "\<\"~/github/EcoEvo/html/ref/InterpolatingFunctionTake.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/Inv.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/InvSPS.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ListMultiplier.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ListOfVariablesQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/MakeRuleList.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/MatrixToGuildComponents.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/MatrixToPopComponents.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/MaximizeInv.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ModelInfo.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ModPart.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/MyStreamPlot.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/NDInv.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/NSolveEcoEq.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/NSolveEvoEq.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/NumberedGridForm.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/NumericFlattenedListQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/NumericListQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/NumericRuleListQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/NumericRuleListToNumericList.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/OrderedComplement.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotDynamics.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotEcoIsoclines.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotEcoPhasePlane.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotEcoStreams.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotEvoIsoclines.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotEvoPhasePlane.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotEvoStreams.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotInv.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotMIP.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotPIP.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotTAD.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotZIP.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PlotZNGI.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/PrestonPlot.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RealSimplify.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ReproductiveValues.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RouthHurwitzCriteria.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RuleListAdd.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RuleListComplement.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RuleListDistance.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RuleListListQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RuleListMultiply.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RuleListQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RuleListSubtract.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/RuleListTweak.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ScriptCapitalN.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/SelectEcoStable.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/SelectValid.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/SetModel.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/Slice.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/SolveEcoEq.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/SolveEvoEq.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/SortedEigensystem.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/SortRuleList.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/StablePopulationStructure.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/TemporalDataFunctionQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/TraitsAndVariablesQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/TraitsQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/UnsetModel.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/Var.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/VariablesQ.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/WhittakerPlot.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/ref/ZeroVector.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/CompetitionInAPeriodicEnvironment.\
+html\"\>", ",", "\<\"~/github/EcoEvo/html/tutorial/ExampleModels.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/MatrixPopulationModels.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/ModelStructure.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/OverallPrinciples.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/RickerModel.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/Rosenzweig-MacArthurPredator-Prey.\
+html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/SeasonalResourceCompetition.html\"\
+\>", ",", \
+"\<\"~/github/EcoEvo/html/tutorial/Trait-BasedLotka-VolterraCompetition.html\"\
+\>", ",", \
+"\<\"~/github/EcoEvo/html/tutorial/Trait-BasedLotka-VolterraPredator-Prey.\
+html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/Two-SpeciesLotka-\
+VolterraCompetition.html\"\>", 
+   ",", "\<\"~/github/EcoEvo/html/tutorial/Two-TraitLotka-Volterra.html\"\>"}]\
+, "}"}]], "Output",
+ CellChangeTimes->{3.778565094282652*^9},
+ CellLabel->"Out[5]=",ExpressionUUID->"59fce279-a454-4771-896e-723dcec12b9a"],
+
+Cell[BoxData["\<\"~/github/EcoEvo/html/css/fonts.css\"\>"], "Output",
+ CellChangeTimes->{3.778565097236445*^9},
+ CellLabel->"Out[7]=",ExpressionUUID->"89931250-0d19-4d27-998c-7ac728008a28"],
+
+Cell[BoxData["\<\"~/github/EcoEvo/html/css/fonts.css\"\>"], "Output",
+ CellChangeTimes->{3.778565097238165*^9},
+ CellLabel->"Out[10]=",ExpressionUUID->"a49e2625-0d15-4198-abd5-1057f9f9805e"],
+
+Cell[BoxData["\<\"~/github/EcoEvo/html/javascript/faster-page-load.js\"\>"], \
+"Output",
+ CellChangeTimes->{3.7785650972398863`*^9},
+ CellLabel->"Out[11]=",ExpressionUUID->"5489a2bf-5c5c-4e18-adf2-28522716f619"],
+
+Cell[BoxData["\<\"~/github/EcoEvo/html/javascript/faster-page-load.js\"\>"], \
+"Output",
+ CellChangeTimes->{3.778565097241892*^9},
+ CellLabel->"Out[14]=",ExpressionUUID->"eafc7d8c-d296-4e26-8b18-010f532f57b3"],
+
+Cell[BoxData["True"], "Output",
+ CellChangeTimes->{3.7785650972437887`*^9},
+ CellLabel->"Out[16]=",ExpressionUUID->"31d32410-a0e3-4bb2-a4fa-b99d72bf5010"],
+
+Cell[BoxData["\<\"~/github/EcoEvo/html/javascript/sub-pages.js\"\>"], "Output",
+ CellChangeTimes->{3.7785650972454977`*^9},
+ CellLabel->"Out[18]=",ExpressionUUID->"ae210dc8-307a-464e-bc3b-a3bbab3bdfb9"],
+
+Cell[BoxData["\<\"/Users/klaus/github/EcoEvo/html/javascript/clipboard.js\"\>\
+"], "Output",
+ CellChangeTimes->{3.7785650972476*^9},
+ CellLabel->"Out[21]=",ExpressionUUID->"9328a93c-e236-40ec-b095-d1a36884309e"],
+
+Cell[BoxData["\<\"~/github/EcoEvo/html/css/clipboard.css\"\>"], "Output",
+ CellChangeTimes->{3.778565097249764*^9},
+ CellLabel->"Out[22]=",ExpressionUUID->"eafe3ac3-4b19-4c3d-bbed-206af15e13a6"],
+
+Cell[BoxData["\<\"~/github/EcoEvo/html/css/clipboard.css\"\>"], "Output",
+ CellChangeTimes->{3.778565097251487*^9},
+ CellLabel->"Out[25]=",ExpressionUUID->"b21824df-a88f-487f-9b9a-916ab94eb9a6"]
+}, Open  ]]
+},
+Evaluator->"Local 3",
+WindowSize->{808, 886},
+WindowMargins->{{Automatic, 316}, {20, Automatic}},
+FrontEndVersion->"12.0 for Mac OS X x86 (64-bit) (April 8, 2019)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 9556, 244, 1732, "Input",ExpressionUUID->"8e09da2b-1ac1-4d49-97f9-c6a21d1e9aa8"],
+Cell[10139, 268, 184, 2, 34, "Output",ExpressionUUID->"2be49692-854a-4b69-a972-15ad0c8589d8"],
+Cell[10326, 272, 458, 9, 77, "Output",ExpressionUUID->"fbfaf2d6-cf75-4e05-aaec-7712d7715809"],
+Cell[10787, 283, 7926, 128, 1862, "Output",ExpressionUUID->"59fce279-a454-4771-896e-723dcec12b9a"],
+Cell[18716, 413, 189, 2, 34, "Output",ExpressionUUID->"89931250-0d19-4d27-998c-7ac728008a28"],
+Cell[18908, 417, 190, 2, 34, "Output",ExpressionUUID->"a49e2625-0d15-4198-abd5-1057f9f9805e"],
+Cell[19101, 421, 211, 3, 34, "Output",ExpressionUUID->"5489a2bf-5c5c-4e18-adf2-28522716f619"],
+Cell[19315, 426, 209, 3, 34, "Output",ExpressionUUID->"eafc7d8c-d296-4e26-8b18-010f532f57b3"],
+Cell[19527, 431, 154, 2, 34, "Output",ExpressionUUID->"31d32410-a0e3-4bb2-a4fa-b99d72bf5010"],
+Cell[19684, 435, 202, 2, 34, "Output",ExpressionUUID->"ae210dc8-307a-464e-bc3b-a3bbab3bdfb9"],
+Cell[19889, 439, 211, 3, 34, "Output",ExpressionUUID->"9328a93c-e236-40ec-b095-d1a36884309e"],
+Cell[20103, 444, 194, 2, 34, "Output",ExpressionUUID->"eafe3ac3-4b19-4c3d-bbed-206af15e13a6"],
+Cell[20300, 448, 194, 2, 34, "Output",ExpressionUUID->"b21824df-a88f-487f-9b9a-916ab94eb9a6"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
+

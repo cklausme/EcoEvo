@@ -51,7 +51,8 @@ SubscriptAdd;DeleteSubscript;ZeroSubscript;
 HighlightChanges;
 ExtractColors;AxisFlip;
 FuncStyle;PrintCall;
-MakeRuleList;RuleListQ;RuleListListQ;NumericRuleListQ;RuleListDistance;RuleListTweak;RuleListAdd;RuleListSubtract;RuleListMultiply;NumericRuleListToNumericList;
+MakeRuleList;RuleListQ;RuleListListQ;NumericRuleListQ;TemporalRuleListQ;
+RuleListDistance;RuleListTweak;RuleListAdd;RuleListSubtract;RuleListMultiply;NumericRuleListToNumericList;
 ClearCache;
 InterpolatingFunctionFunctionQ;TemporalDataFunctionQ;
 Avg;Var;Cov;
@@ -256,7 +257,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.0.2 (September 26, 2019)";
+$EcoEvoVersion="1.0.3 (October 6, 2019)";
 
 
 modelloaded=False;
@@ -1144,7 +1145,7 @@ NumericFlattenedListQ[x_]:=If[ListQ[x],NumericListQ[Flatten[x]],False];
 NumericRuleListQ::usage=
 "NumericRuleListQ[\!\(\*
 StyleBox[\"x\", \"TI\"]\)] returns True if \!\(\*
-StyleBox[\"x\", \"TI\"]\) is a list of replacement rules with numeric values, False otherwise.";
+StyleBox[\"x\", \"TI\"]\) is a RuleList with numeric values, False otherwise.";
 
 
 NumericRuleListQ[x_]:=If[RuleListQ[x],VectorQ[x,NumericQ[#[[2]]]&],False];
@@ -1234,6 +1235,14 @@ StyleBox[\"x\", \"TI\"]\) is a list of replacement rules, False otherwise.";
 
 
 RuleListQ[x_]:=VectorQ[x,(#[[0]]==Rule||#[[0]]==RuleDelayed)&];
+
+
+TemporalRuleListQ::usage="TemporalRuleListQ[\!\(\*
+StyleBox[\"x\", \"TI\"]\)] returns True if \!\(\*
+StyleBox[\"x\", \"TI\"]\) is a RuleList with temporal values, False otherwise.";
+
+
+TemporalRuleListQ[x_]:=If[RuleListQ[x],VectorQ[x,MatchQ[#,_Symbol|_Subscript->_InterpolatingFunction|_List|_TemporalData]&],False];
 
 
 RuleListListQ::usage=
@@ -1405,7 +1414,7 @@ StyleBox[\"tmin\", \"TI\"]\) to \!\(\*
 StyleBox[\"tmax\", \"TI\"]\).";
 
 
-Slice[sol_,t_?NumericQ]:=Which[
+Slice[sol_?TemporalRuleListQ,t_?NumericQ]:=Which[
 	MemberQ[{InterpolatingFunction,TemporalData},Head[#[[2]]]],
 	ReplacePart[#,2->(#[[1]][t]/.#)]
 ,
@@ -1415,7 +1424,7 @@ Slice[sol_,t_?NumericQ]:=Which[
 	Else,#
 ]&/@sol;
 
-Slice[sol_,{t1_?NumericQ,t2_?NumericQ}]:=
+Slice[sol_?TemporalRuleListQ,{t1_?NumericQ,t2_?NumericQ}]:=
 Which[
 	Head[#[[2]]]===InterpolatingFunction,
 	ReplacePart[#,2->InterpolatingFunctionTake[#[[2]],{t1,t2}]]
@@ -1429,6 +1438,8 @@ Which[
 	Else,#
 ]&/@sol
 
+Slice[sol_?RuleListQ,___]:=sol;
+
 
 InitialSlice::usage=
 "InitialSlice[\!\(\*
@@ -1440,13 +1451,16 @@ StyleBox[\"tmax\", \"TI\"]\)] extracts the initial values ending at \!\(\*
 StyleBox[\"tmax\", \"TI\"]\).";
 
 
-InitialSlice[sol_,n:(_?NumericQ):0]:=Module[{x},
+InitialSlice[sol_?TemporalRuleListQ,n:(_?NumericQ):0]:=Module[{x},
 	x=If[modeltype=="ContinuousTime",10.^-100,0];
 	If[n==0,
 		Return[Slice[sol,InitialTime[sol]+x]],
 		Return[Slice[sol,{InitialTime[sol]x,InitialTime[sol]+n}]]
 	]
 ];
+
+
+InitialSlice[sol_?RuleListQ,___]:=sol;
 
 
 FinalSlice::usage=
@@ -1459,11 +1473,14 @@ StyleBox[\"tmin\", \"TI\"]\)] extracts the final values starting at \!\(\*
 StyleBox[\"tmin\", \"TI\"]\).";
 
 
-FinalSlice[sol_,n:(_?NumericQ):0]:=
+FinalSlice[sol_?TemporalRuleListQ,n:(_?NumericQ):0]:=
 	If[n==0,
 		Return[Slice[sol,FinalTime[sol]]],
 		Return[Slice[sol,{FinalTime[sol]-n,FinalTime[sol]}]]
 	];
+
+
+FinalSlice[sol_?RuleListQ,___]:=sol;
 
 
 FinalDerivatives::usage=
@@ -1476,7 +1493,7 @@ StyleBox[\"\[Delta]\", \"TI\"]\)] averages over the final values starting at \!\
 StyleBox[\"\[Delta]\", \"TI\"]\).";
 
 
-FinalDerivatives[sol_,dt:(_?NumericQ):0]:=Module[{res},
+FinalDerivatives[sol_?TemporalRuleListQ,dt:(_?NumericQ):0]:=Module[{res},
 	If[dt==0,
 		res=Which[
 			Head[#[[2]]]===InterpolatingFunction,
@@ -1512,6 +1529,9 @@ FinalDerivatives[sol_,dt:(_?NumericQ):0]:=Module[{res},
 	];
 	Return[res]
 ]
+
+
+FinalDerivatives[sol_?NumericRuleListQ,___]:=ReplacePart[#,{1->#[[1]]',2->0}]&/@sol
 
 
 InitialTime::usage=
