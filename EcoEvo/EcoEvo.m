@@ -1145,9 +1145,14 @@ MaximumValues[f_?TemporalRuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?Optio
 MaximumValues[f_?RuleListQ]:=f/.(x_->val_):>(x->{val});
 
 
-(* List *)
+(* Lists *)
 MaximumValues[l_List]:=MaximumValues[TimeSeries[l]];
 MaximumValues[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=MaximumValues[TimeSeries[l],{tmin,tmax}];
+
+
+(* Numeric *)
+MaximumValues[x_?NumericQ]:={x};
+MaximumValues[x_?NumericQ,{tmin_?NumericQ,tmax_?NumericQ}]:={x};
 
 
 Options[MaximumValues]={SameThreshold->10^-4};
@@ -1199,9 +1204,14 @@ MinimumValues[f_?TemporalRuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?Optio
 MinimumValues[f_?RuleListQ]:=f/.(x_->val_):>(x->{val});
 
 
-(* List *)
+(* Lists *)
 MinimumValues[l_List]:=MinimumValues[TimeSeries[l]];
 MinimumValues[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=MinimumValues[TimeSeries[l],{tmin,tmax}];
+
+
+(* Numeric *)
+MinimumValues[x_?NumericQ]:={x};
+MinimumValues[x_?NumericQ,{tmin_?NumericQ,tmax_?NumericQ}]:={x};
 
 
 Options[MinimumValues]={SameThreshold->10^-4};
@@ -1243,7 +1253,7 @@ samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[ExtremumValues]}]];
 ];
 
 
-(* thread over RuleLists *)
+(* thread over TemporalRuleLists *)
 ExtremumValues[f_?TemporalRuleListQ,opts___?OptionQ]:=f/.(x_->val_):>(x->ExtremumValues[val,opts]);
 ExtremumValues[f_?TemporalRuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=
 	f/.(x_->val_):>(x->ExtremumValues[val,{tmin,tmax},opts]);
@@ -1253,9 +1263,14 @@ ExtremumValues[f_?TemporalRuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?Opti
 ExtremumValues[f_?RuleListQ]:=f/.(x_->val_):>(x->{val});
 
 
-(* List *)
+(* Lists *)
 ExtremumValues[l_List]:=ExtremumValues[TimeSeries[l]];
 ExtremumValues[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=ExtremumValues[TimeSeries[l],{tmin,tmax}];
+
+
+(* Numeric *)
+ExtremumValues[x_?NumericQ]:={x};
+ExtremumValues[x_?NumericQ,{tmin_?NumericQ,tmax_?NumericQ}]:={x};
 
 
 Options[ExtremumValues]={SameThreshold->10^-4};
