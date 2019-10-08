@@ -57,7 +57,9 @@ ClearCache;
 InterpolatingFunctionFunctionQ;TemporalDataFunctionQ;
 Avg;Var;Cov;
 ExtractPlotPoints;Else;SpFrac;ModPart;
-FindMaxima;FindMinima;FindExtrema;FindPeriod;
+FindMaxima;FindMinima;FindExtrema;
+MaximumValues;MinimumValues;ExtremumValues;
+FindPeriod;
 NumberedGridForm;MyStreamPlot;RealSimplify;TD;CompoundAnd;CompoundOr;
 NumericListQ;NumericFlattenedListQ;
 InterpolatingFunctionTake;Slice;InitialSlice;FinalSlice;FinalDerivatives;InitialTime;FinalTime;
@@ -223,6 +225,7 @@ QSSICs::usage = "QSSICs is an option for Inv that sets initial conditions for so
 QSSMethod::usage = "QSSMethod is an option for Inv that selects how to solve for qualitative structure of the invader.";
 RelativeStepSize::usage = "RelativeStepSize is an option for NDInv that sets the relative step size.";
 RV::usage = "RV is an option for InvSPS when called from ReproductiveValues.";
+SameThreshold::usage = "SameThreshold is an option for various EcoEvo functions that is the threshold to consider two numbers the same.";
 ShowSpecies::usage = "ShowSpecies is an option for various EcoEvo functions that specifies how to show species markers.";
 SimplifyResult::usage = "SimplifyResult is an option for various EcoEvo functions that applies Simplify before returning results.";
 SolveEcoEqOpts::usage = "SolveEcoEqOpts is an option for various EcoEvo functions that passes options to SolveEcoEq.";
@@ -257,7 +260,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.0.3 (October 6, 2019)";
+$EcoEvoVersion="1.0.3 (October 8, 2019)";
 
 
 modelloaded=False;
@@ -970,68 +973,292 @@ StyleBox[\"list\", \"TI\",\nFontSlant->\"Italic\"]\) in a table with numbers";
 NumberedGridForm[list_List]:=Grid[Transpose[{Range[Length[list]],list}],Alignment->Left];
 
 
-FindMaxima::usage=
-"FindMaxima[\!\(\*
-StyleBox[\"f\", \"TI\"]\), {\!\(\*
-StyleBox[\"tmin\", \"TI\"]\), \!\(\*
-StyleBox[\"tmax\", \"TI\"]\)}] finds local maxima of InterpolatingFunction \!\(\*
-StyleBox[\"f\", \"TI\"]\) between \!\(\*
-StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
-StyleBox[\"tmax\", \"TI\"]\).
-FindMaxima[\!\(\*
-StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
-StyleBox[\"f\", \"TI\"]\).";
-
 FindMinima::usage=
 "FindMinima[\!\(\*
 StyleBox[\"f\", \"TI\"]\), {\!\(\*
 StyleBox[\"tmin\", \"TI\"]\), \!\(\*
-StyleBox[\"tmax\", \"TI\"]\)}] finds local minima of InterpolatingFunction \!\(\*
+StyleBox[\"tmax\", \"TI\"]\)}] finds local minima of temporal rule list \!\(\*
 StyleBox[\"f\", \"TI\"]\) between \!\(\*
 StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
 StyleBox[\"tmax\", \"TI\"]\).
 FindMinima[\!\(\*
 StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
-StyleBox[\"f\", \"TI\"]\).";
+StyleBox[\"f\", \"TI\"]\).
+FindMinima[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
+
+
+(* based on idea from Daniel Lichtblau <http://mathematica.stackexchange.com/a/5591/6358>
+& a trick from Mr Wizard <http://mathematica.stackexchange.com/a/67671/6358> *)
+
+
+(* InterpolatingFunction *)
+FindMinima[if_InterpolatingFunction,{tmin_?NumericQ,tmax_?NumericQ}]:=Reap[
+	NDSolve[{y'[t]==Evaluate[D[if[t],t]],WhenEvent[y'[t]>0,Sow[{t,y[t]}]],y[tmin]==if[tmin]},
+	y[t],{t,tmin,tmax}]][[2]]/.{x_List}:>x;
+FindMinima[if_InterpolatingFunction]:=FindMinima[if,if["Domain"][[1]]];
+
+
+(* TemporalData *)
+FindMinima[td_TemporalData]:=Normal[TimeSeriesMap[Minus,FindPeaks[TimeSeriesMap[Minus,td]]]];
+FindMinima[td_TemporalData,{tmin_?NumericQ,tmax_?NumericQ}]:=FindMinima[TimeSeriesWindow[td,{tmin,tmax}]];
+
+
+(* thread over RuleLists *)
+FindMinima[f_?RuleListQ,opts___?OptionQ]:=f/.(x_->val_):>(x->FindMinima[val,opts]);
+FindMinima[f_?RuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=f/.(x_->val_):>(x->FindMinima[val,{tmin,tmax},opts]);
+
+
+(* List *)
+FindMinima[l_List]:=FindMinima[TimeSeries[l]];
+FindMinima[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=FindMinima[TimeSeries[l],{tmin,tmax}];
+
+
+FindMaxima::usage=
+"FindMaxima[\!\(\*
+StyleBox[\"f\", \"TI\"]\), {\!\(\*
+StyleBox[\"tmin\", \"TI\"]\), \!\(\*
+StyleBox[\"tmax\", \"TI\"]\)}] finds local maxima of temporal rule list \!\(\*
+StyleBox[\"f\", \"TI\"]\) between \!\(\*
+StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
+StyleBox[\"tmax\", \"TI\"]\).
+FindMaxima[\!\(\*
+StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
+StyleBox[\"f\", \"TI\"]\).
+FindMaxima[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
+
+
+(* based on idea from Daniel Lichtblau <http://mathematica.stackexchange.com/a/5591/6358>
+& a trick from Mr Wizard <http://mathematica.stackexchange.com/a/67671/6358> *)
+
+
+(* InterpolatingFunction *)
+FindMaxima[if_InterpolatingFunction,{tmin_?NumericQ,tmax_?NumericQ}]:=Reap[
+	NDSolve[{y'[t]==Evaluate[D[if[t],t]],WhenEvent[y'[t]<0,Sow[{t,y[t]}]],y[tmin]==if[tmin]},
+	y[t],{t,tmin,tmax}]][[2]]/.{x_List}:>x;
+FindMaxima[if_InterpolatingFunction]:=FindMaxima[if,if["Domain"][[1]]];
+
+
+(* TemporalData *)
+FindMaxima[td_TemporalData]:=Normal[FindPeaks[td]];
+FindMaxima[td_TemporalData,{tmin_?NumericQ,tmax_?NumericQ}]:=FindMaxima[TimeSeriesWindow[td,{tmin,tmax}]];
+
+
+(* thread over RuleLists *)
+FindMaxima[f_?RuleListQ,opts___?OptionQ]:=f/.(x_->val_):>(x->FindMaxima[val,opts]);
+FindMaxima[f_?RuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=f/.(x_->val_):>(x->FindMaxima[val,{tmin,tmax},opts]);
+
+
+(* List *)
+FindMaxima[l_List]:=FindMaxima[TimeSeries[l]];
+FindMaxima[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=FindMaxima[TimeSeries[l],{tmin,tmax}];
+
 
 FindExtrema::usage=
 "FindExtrema[\!\(\*
 StyleBox[\"f\", \"TI\"]\), {\!\(\*
 StyleBox[\"tmin\", \"TI\"]\), \!\(\*
-StyleBox[\"tmax\", \"TI\"]\)}] finds local extrema of InterpolatingFunction \!\(\*
+StyleBox[\"tmax\", \"TI\"]\)}] finds local extrema of temporal rule list \!\(\*
 StyleBox[\"f\", \"TI\"]\) between \!\(\*
 StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
 StyleBox[\"tmax\", \"TI\"]\).
 FindExtrema[\!\(\*
 StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
-StyleBox[\"f\", \"TI\"]\).";
+StyleBox[\"f\", \"TI\"]\).
+FindExtrema[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
 
 
-(* based on idea from Daniel Lichtblau <http://mathematica.stackexchange.com/a/5591/6358> & a trick from Mr Wizard <http://mathematica.stackexchange.com/a/67671/6358> *)
+(* based on idea from Daniel Lichtblau <http://mathematica.stackexchange.com/a/5591/6358>
+& a trick from Mr Wizard <http://mathematica.stackexchange.com/a/67671/6358> *)
 
 
-FindMaxima[if_InterpolatingFunction,{tmin_?NumericQ,tmax_?NumericQ}]:=Reap[
-	NDSolve[{y'[t]==Evaluate[D[if[t],t]],WhenEvent[y'[t]<0,Sow[{t,y[t]}]],y[tmin]==if[tmin]},
-	y[t],{t,tmin,tmax}]][[2]]/.{x_List}:>x;
-
-
-FindMaxima[if_InterpolatingFunction]:=FindMaxima[if,if["Domain"][[1]]];
-
-
-FindMinima[if_InterpolatingFunction,{tmin_?NumericQ,tmax_?NumericQ}]:=Reap[
-	NDSolve[{y'[t]==Evaluate[D[if[t],t]],WhenEvent[y'[t]>0,Sow[{t,y[t]}]],y[tmin]==if[tmin]},
-	y[t],{t,tmin,tmax}]][[2]]/.{x_List}:>x;
-
-
-FindMinima[if_InterpolatingFunction]:=FindMinima[if,if["Domain"][[1]]];
-
-
+(* InterpolatingFunction *)
 FindExtrema[if_InterpolatingFunction,{tmin_?NumericQ,tmax_?NumericQ}]:=Reap[
 	NDSolve[{y'[t]==Evaluate[D[if[t],t]],WhenEvent[y'[t]==0,Sow[{t,y[t]}]],y[tmin]==if[tmin]},
 	y[t],{t,tmin,tmax}]][[2]]/.{x_List}:>x;
-
-
 FindExtrema[if_InterpolatingFunction]:=FindExtrema[if,if["Domain"][[1]]];
+
+
+(* TemporalData *)
+FindExtrema[td_TemporalData]:=Sort[Join[FindMinima[td],FindMaxima[td]]];
+FindExtrema[td_TemporalData,{tmin_?NumericQ,tmax_?NumericQ}]:=FindExtrema[TimeSeriesWindow[td,{tmin,tmax}]];
+
+
+(* thread over RuleLists *)
+FindExtrema[f_?RuleListQ,opts___?OptionQ]:=((*Print["rulelist1"];*)f/.(x_->val_):>(x->FindExtrema[val,opts]));
+FindExtrema[f_?RuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=f/.(x_->val_):>(x->FindExtrema[val,{tmin,tmax},opts]);
+
+
+(* List *)
+FindExtrema[l_List]:=FindExtrema[TimeSeries[l]];
+FindExtrema[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=FindExtrema[TimeSeries[l],{tmin,tmax}];
+
+
+MaximumValues::usage=
+"MaximumValues[\!\(\*
+StyleBox[\"f\", \"TI\"]\), {\!\(\*
+StyleBox[\"tmin\", \"TI\"]\), \!\(\*
+StyleBox[\"tmax\", \"TI\"]\)}] finds local maximum values of temporal rule list \!\(\*
+StyleBox[\"f\", \"TI\"]\) between \!\(\*
+StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
+StyleBox[\"tmax\", \"TI\"]\).
+MaximumValues[\!\(\*
+StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
+StyleBox[\"f\", \"TI\"]\).
+MaximumValues[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
+
+
+MaximumValues[x:(_InterpolatingFunction|_TemporalData),opts___?OptionQ]:=Module[{samethreshold},
+samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MaximumValues]}]];
+
+	If[samethreshold!=0,
+		Return[Sort[DeleteDuplicates[FindMaxima[x][[All,2]],Abs[#1-#2]<samethreshold&]]],
+		Return[Sort[FindMaxima[x][[All,2]]]]
+	];
+];
+
+
+MaximumValues[x:(_InterpolatingFunction|_TemporalData),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
+samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MaximumValues]}]];
+
+	If[samethreshold!=0,
+		Return[Sort[DeleteDuplicates[FindMaxima[x,{tmin,tmax}][[All,2]],Abs[#1-#2]<samethreshold&]]],
+		Return[Sort[FindMaxima[x,{tmin,tmax}][[All,2]]]]
+	];
+];
+
+
+(* thread over RuleLists *)
+MaximumValues[f_?TemporalRuleListQ,opts___?OptionQ]:=f/.(x_->val_):>(x->MaximumValues[val,opts]);
+MaximumValues[f_?TemporalRuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=
+	f/.(x_->val_):>(x->MaximumValues[val,{tmin,tmax},opts]);
+
+
+(* non-TemporalRuleLists *)
+MaximumValues[f_?RuleListQ]:=f/.(x_->val_):>(x->{val});
+
+
+(* List *)
+MaximumValues[l_List]:=MaximumValues[TimeSeries[l]];
+MaximumValues[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=MaximumValues[TimeSeries[l],{tmin,tmax}];
+
+
+Options[MaximumValues]={SameThreshold->10^-4};
+
+
+MinimumValues::usage=
+"MinimumValues[\!\(\*
+StyleBox[\"f\", \"TI\"]\), {\!\(\*
+StyleBox[\"tmin\", \"TI\"]\), \!\(\*
+StyleBox[\"tmax\", \"TI\"]\)}] finds local minimum values of temporal rule list \!\(\*
+StyleBox[\"f\", \"TI\"]\) between \!\(\*
+StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
+StyleBox[\"tmax\", \"TI\"]\).
+MinimumValues[\!\(\*
+StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
+StyleBox[\"f\", \"TI\"]\).
+MinimumValues[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
+
+
+MinimumValues[x:(_InterpolatingFunction|_TemporalData),opts___?OptionQ]:=Module[{samethreshold},
+samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MinimumValues]}]];
+
+	If[samethreshold!=0,
+		Return[Sort[DeleteDuplicates[FindMinima[x][[All,2]],Abs[#1-#2]<samethreshold&]]],
+		Return[Sort[FindMinima[x][[All,2]]]]
+	];
+];
+
+
+MinimumValues[x:(_InterpolatingFunction|_TemporalData),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
+samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MinimumValues]}]];
+
+	If[samethreshold!=0,
+		Return[Sort[DeleteDuplicates[FindMinima[x,{tmin,tmax}][[All,2]],Abs[#1-#2]<samethreshold&]]],
+		Return[Sort[FindMinima[x,{tmin,tmax}][[All,2]]]]
+	];
+];
+
+
+(* thread over RuleLists *)
+MinimumValues[f_?TemporalRuleListQ,opts___?OptionQ]:=f/.(x_->val_):>(x->MinimumValues[val,opts]);
+MinimumValues[f_?TemporalRuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=
+	f/.(x_->val_):>(x->MinimumValues[val,{tmin,tmax},opts]);
+
+
+(* non-TemporalRuleLists *)
+MinimumValues[f_?RuleListQ]:=f/.(x_->val_):>(x->{val});
+
+
+(* List *)
+MinimumValues[l_List]:=MinimumValues[TimeSeries[l]];
+MinimumValues[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=MinimumValues[TimeSeries[l],{tmin,tmax}];
+
+
+Options[MinimumValues]={SameThreshold->10^-4};
+
+
+ExtremumValues::usage=
+"ExtremumValues[\!\(\*
+StyleBox[\"f\", \"TI\"]\), {\!\(\*
+StyleBox[\"tmin\", \"TI\"]\), \!\(\*
+StyleBox[\"tmax\", \"TI\"]\)}] finds local extremum values of temporal rule list \!\(\*
+StyleBox[\"f\", \"TI\"]\) between \!\(\*
+StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
+StyleBox[\"tmax\", \"TI\"]\).
+ExtremumValues[\!\(\*
+StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
+StyleBox[\"f\", \"TI\"]\).
+ExtremumValues[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
+
+
+ExtremumValues[x:(_InterpolatingFunction|_TemporalData),opts___?OptionQ]:=Module[{samethreshold},
+samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[ExtremumValues]}]];
+
+	If[samethreshold!=0,
+		Return[Sort[DeleteDuplicates[FindExtrema[x][[All,2]],Abs[#1-#2]<samethreshold&]]],
+		Return[Sort[FindExtrema[x][[All,2]]]]
+	];
+];
+
+
+ExtremumValues[x:(_InterpolatingFunction|_TemporalData),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
+samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[ExtremumValues]}]];
+
+	If[samethreshold!=0,
+		Return[Sort[DeleteDuplicates[FindExtrema[x,{tmin,tmax}][[All,2]],Abs[#1-#2]<samethreshold&]]],
+		Return[Sort[FindExtrema[x,{tmin,tmax}][[All,2]]]]
+	];
+];
+
+
+(* thread over RuleLists *)
+ExtremumValues[f_?TemporalRuleListQ,opts___?OptionQ]:=f/.(x_->val_):>(x->ExtremumValues[val,opts]);
+ExtremumValues[f_?TemporalRuleListQ,{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=
+	f/.(x_->val_):>(x->ExtremumValues[val,{tmin,tmax},opts]);
+
+
+(* non-TemporalRuleLists *)
+ExtremumValues[f_?RuleListQ]:=f/.(x_->val_):>(x->{val});
+
+
+(* List *)
+ExtremumValues[l_List]:=ExtremumValues[TimeSeries[l]];
+ExtremumValues[l_List,{tmin_?NumericQ,tmax_?NumericQ}]:=ExtremumValues[TimeSeries[l],{tmin,tmax}];
+
+
+Options[ExtremumValues]={SameThreshold->10^-4};
 
 
 FindPeriod::usage=

@@ -31,9 +31,11 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 ## Version History
 
-### v1.0.3 (October 6, 2019)
+### v1.0.3 (October 8, 2019)
 
  - Added TemporalRuleListQ and let *Slice work on non-TemporalRuleLists
+ - Added ExtremumValues, MaximumValues, and MinimumValues
+ - Extended FindExtrema, FindMaxima, and FindMinima to TemporalData, Lists, and RuleLists
 
 ### v1.0.2 (September 26, 2019)
 
