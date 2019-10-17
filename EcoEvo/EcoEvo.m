@@ -260,7 +260,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.0.3 (October 8, 2019)";
+$EcoEvoVersion="1.0.4x (October 17, 2019)";
 
 
 modelloaded=False;
@@ -1326,7 +1326,7 @@ ClearAll[MyStreamPlot]
 Options[MyStreamPlot]=Options[StreamPlot];
 
 MyStreamPlot[f_,{x_,x0_,x1_},{y_,y0_,y1_},opts:OptionsPattern[]]:=Module[
-	{u,v,a=OptionValue[AspectRatio]/.Automatic->1,rf=OptionValue[RegionFunction],nb,res},
+	{u,v,a=OptionValue[AspectRatio]/.Automatic->1,rf=OptionValue[RegionFunction],res},
 		
 	res=Show[StreamPlot[({EcoEvo`Private`xmon,EcoEvo`Private`ymon}={Rescale[u,{0,1},{x0,x1}],Rescale[v,{0,a},{y0,y1}]};
 	{1/(x1-x0),a/(y1-y0)} (f/.{x->Rescale[u,{0,1},{x0,x1}],y->Rescale[v,{0,a},{y0,y1}]})),{u,0,1},{v,0,a},
@@ -6434,7 +6434,7 @@ PlotEvoStreams[solin1,Gs,{trait1,trait1min,trait1max},{SubscriptAdd[trait1],trai
 
 Options[PlotEvoStreams]={Fixed->{},Time->t,FindEcoAttractorOpts->{},DInvOpts->{},DelayDInv->False,
 FrameLabel->Automatic,StreamStyle->Gray,
-UseSymmetry->False,FitnessGradient->"DInv",ICs->{},EvoEquation->"QG",EcoAttractorNumber->1,
+UseSymmetry->False,FitnessGradient->"DInv",ICs->{},EvoEquation->"QG",EcoAttractorNumber->1,TraitShiftRate->{},
 Monitor->False,PrintTrace->False,Verbose->False,VerboseAll->False};
 
 
@@ -6691,15 +6691,16 @@ Return[Show[
 
 ]];
 
-Options[PlotEvoIsoclines]={Fixed->{},Time->t,
-	FitnessGradient->"DInv",ICs->{},EvoEquation->"QG",EcoAttractorNumber->1,ExcludeDiagonal->True,
-	FindEcoAttractorOpts->{},DelayDInv->False,DInvOpts->{},PlotOpts->{},FrameLabel->Automatic,
-	ESTest->True,DelayDInv2->False,DInv2Opts->{},IsoclineStyle->Automatic,
-	Verbose->False,VerboseAll->False,Monitor->False,PrintTrace->False};
-
 
 PlotEvoIsoclines[solin1:(_?RuleListQ|_?(#=="FindEcoAttractor"&)):"FindEcoAttractor",Gs_List:{},{trait1_,trait1min_?NumericQ,trait1max_?NumericQ},opts___?OptionQ]:=
 PlotEvoIsoclines[solin1,Gs,{trait1,trait1min,trait1max},{SubscriptAdd[trait1],trait1min,trait1max},opts];
+
+
+Options[PlotEvoIsoclines]={Fixed->{},Time->t,
+	FitnessGradient->"DInv",ICs->{},EvoEquation->"QG",EcoAttractorNumber->1,ExcludeDiagonal->True,TraitShiftRate->{},
+	FindEcoAttractorOpts->{},DelayDInv->False,DInvOpts->{},PlotOpts->{},FrameLabel->Automatic,
+	ESTest->True,DelayDInv2->False,DInv2Opts->{},IsoclineStyle->Automatic,
+	Verbose->False,VerboseAll->False,Monitor->False,PrintTrace->False};
 
 
 PlotEvoPhasePlane::usage=
