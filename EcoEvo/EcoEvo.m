@@ -77,6 +77,7 @@ PlotDynamics;SelectValid;
 
 SetModel;UnsetModel;ModelInfo;
 MatrixToPopComponents;MatrixToGuildComponents;
+TotalAbundance;
 
 
 LookUp::usage =
@@ -252,6 +253,7 @@ VerboseAll::usage =  "VerboseAll is an option for various EcoEvo functions that 
 WarmUp::usage =  "WarmUp is an option for various EcoEvo functions that numerical solves a model before refining.";
 WarmUp2::usage = "WarmUp2 is an option for various EcoEvo functions that numerical solves a model before refining.";
 WarmUp3::usage = "WarmUp3 is an option for various EcoEvo functions that numerical solves a model before refining.";
+WeightFunction::usage = "WeightFunction is an option for PlotTAD that defines abundance in structured populations.";
 WhenEventOpts::usage = "WhenEventOpts is an option for various EcoEvo functions that passes options to WhenEvent.";
 WhenEvents::usage = "WhenEvents is an option for various EcoEvo simulation functions that adds WhenEvents to NDSolve.";
 ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 along the diagonal.";
@@ -260,7 +262,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.0.4x (October 17, 2019)";
+$EcoEvoVersion="1.1.0 (October 22, 2019)";
 
 
 modelloaded=False;
@@ -584,6 +586,16 @@ StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\).";
 
 
+(* thread over RuleLists *)
+Avg[f_?RuleListQ,opts___?OptionQ]:=((*Print["rulelist1"];*)f/.(x_->val_):>(x->Avg[val,opts]));
+Avg[f_?RuleListQ,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=((*Print["rulelist2"];*)
+f/.(x_->val_):>(x->Avg[val,{var,varmin,varmax},opts]));
+
+
+(* thread over Lists *)
+(*Avg[list_List,rest___]:=Avg[#,rest]&/@list;*)
+
+
 (* main *)
 Avg[f_,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=Module[{integrateopts,nintegrateopts,method},
 (*Print["main"];*)
@@ -603,12 +615,6 @@ Avg[f_,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=Module[{
 		Msg[General::badmtd];Return[$Failed]
 	];
 ];
-
-
-(* thread over RuleLists *)
-Avg[f_?RuleListQ,opts___?OptionQ]:=((*Print["rulelist1"];*)f/.(x_->val_):>(x->Avg[val,opts]));
-Avg[f_?RuleListQ,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=((*Print["rulelist2"];*)
-f/.(x_->val_):>(x->Avg[val,{var,varmin,varmax},opts]));
 
 
 (* InterpolatingFunctionFunctions *)
@@ -1438,20 +1444,7 @@ StyleBox[\"min\", \"TI\"], \(i\)]\) to \!\(\*SubscriptBox[
 StyleBox[\"max\", \"TI\"], \(i\)]\).";
 
 
-MakeRuleList[var_Symbol,n_,val_]:=Table[Subscript[var,i]->val/.\[IGrave]->i,{i,n}];
-
-
-MakeRuleList[var_Symbol,n_,{min_?NumericQ,max_?NumericQ}]:=Table[Subscript[var,i]->min+(max-min)*(i-1)/(n-1),{i,n}];
-
-
 MakeRuleList[vars_List,n_,vals_List]:=Flatten[Table[Subscript[vars[[j]],i]->vals[[j]],{i,n},{j,Length[vars]}]];
-
-
-MakeRuleList[var_Symbol,ns_List,val_]:=
-	Thread[
-		Table[Subscript[var,i],{i,Times[Sequence@@ns]}]->
-		Table[val,{i,Times[Sequence@@ns]}]
-	]
 
 
 MakeRuleList[vars_List,ns_List,vals_List]:=Module[{n,min,max},
@@ -1464,6 +1457,19 @@ MakeRuleList[vars_List,ns_List,vals_List]:=Module[{n,min,max},
 			Table[min+(max-min)*(i-1)/(n-1),{i,n}]
 		,{j,Length[ns]}]]]
 		]
+	]
+
+
+MakeRuleList[var_,n_,val_]:=Table[Subscript[var,i]->val/.\[IGrave]->i,{i,n}];
+
+
+MakeRuleList[var_,n_,{min_?NumericQ,max_?NumericQ}]:=Table[Subscript[var,i]->min+(max-min)*(i-1)/(n-1),{i,n}];
+
+
+MakeRuleList[var_,ns_List,val_]:=
+	Thread[
+		Table[Subscript[var,i],{i,Times[Sequence@@ns]}]->
+		Table[val,{i,Times[Sequence@@ns]}]
 	]
 
 
@@ -2706,6 +2712,54 @@ MatrixToGuildComponents[a_,var_,ncompsin_:Automatic]:=Module[{ncomps,res},
 ];
 
 
+TotalAbundance::usage = 
+"TotalAbundance[\!\(\*
+StyleBox[\"pops\", \"TI\"]\), \!\(\*
+StyleBox[\"guild\", \"TI\"]\)] totals components in \!\(\*
+StyleBox[\"guild\", \"TI\"]\) (default=first).
+TotalAbundance[\!\(\*
+StyleBox[\"pops\", \"TI\"]\), \!\(\*
+StyleBox[\"guild\", \"TI\"]\), \!\(\*
+StyleBox[\"weightfunction\", \"TI\"]\)] weights components in \!\(\*
+StyleBox[\"guild\", \"TI\"]\) according to \!\(\*
+StyleBox[\"weightfunction\", \"TI\"]\).";
+
+
+TotalAbundance[sol_?VariablesQ,guild_:Automatic,weightfunction_:"Total",opts___?OptionQ]:=
+Module[{
+func=FuncStyle["TotalAbundance"],
+(* options *)
+(* other variables *)
+function,gu
+},
+
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Msg[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+
+(* figure out number of species in guilds *)
+Set\[ScriptCapitalN][{},sol];
+If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
+
+If[guild===Automatic,gu=guilds[[1]],gu=guild];
+
+Which[
+	weightfunction==="Total",
+	function=Total[Select[gcomps[gu],comptype[#]==="Extensive"&]],
+	weightfunction==="Components",
+	function=Select[gcomps[gu],comptype[#]==="Extensive"&],
+	Else,
+	function=weightfunction
+];
+
+Return[Table[Subscript[gu, sp]->(function/.(#->Subscript[#,sp]&/@gcomps[gu])/.sol),{sp,\[ScriptCapitalN][gu]}]]
+
+]];
+
+
 EcoEqns::usage=
 "EcoEqns[\!\(\*
 StyleBox[\"traits\", \"TI\"]\)] sets up ecological equations corresponding to species with \!\(\*
@@ -2849,7 +2903,7 @@ Do[
 
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][traits,Join[variables,fixed]];
-If[Global`debug,Print[func," \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
+If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 (* find time for ICs *)
 tic=If[modelwhenevents=={},tmin,tmin-10^-15]; (* hack to ensure that events are triggered at t=tmin *)
@@ -4192,7 +4246,7 @@ PrestonPlot[sol_?VariablesQ,opts___?OptionQ]:=
 Module[{
 func=FuncStyle["PrestonPlot"],
 (* options *)
-gu,gcomp,base,minpop,bandwidth,showspecies,markerstyle,plotopts,listplotopts,plotrange,
+gu,minpop,bandwidth,showspecies,markerstyle,plotopts,listplotopts,plotrange,weightfunction,time,
 (* other variables *)
 abunds,pos,data,\[ScriptCapitalD],hist,stix
 },
@@ -4205,9 +4259,6 @@ If[Global`debug,Print["In ",func]];
 (* handle options *)
 gu=Evaluate[Guild/.Flatten[{opts,Options[PrestonPlot]}]];
 If[gu===Automatic,gu=guilds[[1]]];
-gcomp=Evaluate[Component/.Flatten[{opts,Options[PrestonPlot]}]];
-If[gcomp===Automatic,gcomp=gcomps[gu][[1]]];
-base=Evaluate[Base/.Flatten[{opts,Options[PrestonPlot]}]];
 minpop=Evaluate[MinPop/.Flatten[{opts,Options[PrestonPlot]}]];
 bandwidth=Evaluate[Bandwidth/.Flatten[{opts,Options[PrestonPlot]}]];
 showspecies=Evaluate[ShowSpecies/.Flatten[{opts,Options[PrestonPlot]}]];
@@ -4215,20 +4266,28 @@ markerstyle=Evaluate[MarkerStyle/.Flatten[{opts,Options[PrestonPlot]}]];
 plotopts=FilterRules[Flatten[{opts,Options[PrestonPlot]}],Options[Plot]];
 listplotopts=FilterRules[Flatten[{opts,Options[PrestonPlot]}],Options[ListPlot]];
 plotrange=Evaluate[PlotRange/.Flatten[{opts,Options[PrestonPlot]}]];
+weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[PrestonPlot]}]];
+time=Evaluate[Time/.Flatten[{opts,Options[PrestonPlot]}]];
 
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][sol];
 
-abunds=Select[sol,#[[1,1]]===gcomp&&#[[2]]>minpop&];
+abunds=TotalAbundance[sol,gu,weightfunction];
+
+If[time===t,
+	abunds=Avg[abunds],
+	abunds=Slice[abunds,time];
+];
+
+abunds=Select[abunds,#[[2]]>minpop&];
 pos=abunds[[All,1,2]];
-data=Log[base,abunds[[All,2]]];
+data=Log[abunds[[All,2]]];
+
 \[ScriptCapitalD]=SmoothKernelDistribution[data,bandwidth,{"Bounded",{Min[data],Max[data]},"Gaussian"}];
-hist=Plot[PDF[\[ScriptCapitalD],x],{x,Min[data],Max[data]},Evaluate[Sequence@@plotopts]];
+hist=LogLinearPlot[PDF[\[ScriptCapitalD],Log[x]],{x,E^Min[data],E^Max[data]},PlotRange->All];
 If[showspecies,
-	If[markerstyle===Automatic,
-		markerstyle=Table[color[Subscript[gcomp,i]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,pos}]];
-	stix=ListPlot[
-		Map[List,Transpose[{data,Table[0,{Length[pos]}]}]],PlotStyle->markerstyle,
+	stix=ListLogLinearPlot[
+		Transpose[{E^data,Table[0,{Length[pos]}]}],PlotStyle->markerstyle,
 		Evaluate[Sequence@@listplotopts],PlotMarkers->{"|",8}],
 	stix={}];
 Return[Show[stix,hist,AxesOrigin->{Max[data],0},PlotRange->plotrange]];
@@ -4237,8 +4296,8 @@ Return[Show[stix,hist,AxesOrigin->{Max[data],0},PlotRange->plotrange]];
 
 
 Options[PrestonPlot]={
-Guild->Automatic,Component->Automatic,
-Base->10,MinPop->0,Bandwidth->"Scott",ShowSpecies->True,MarkerStyle->Automatic,PlotRange->{0,All}};
+Guild->Automatic,WeightFunction->"Total",Time->t,
+MinPop->0,Bandwidth->"Scott",ShowSpecies->True,MarkerStyle->Gray,PlotRange->{0,All}};
 
 
 WhittakerPlot::usage =
@@ -4251,7 +4310,7 @@ WhittakerPlot[sol_?VariablesQ,opts___?OptionQ]:=
 Module[{
 func=FuncStyle["WhittakerPlot"],
 (* options *)
-gu,gcomp,base,minpop,listplotopts,
+gu,minpop,plotopts,weightfunction,time,
 (* other variables *)
 abunds,data
 },
@@ -4264,21 +4323,29 @@ If[Global`debug,Print["In ",func]];
 (* handle options *)
 gu=Evaluate[Guild/.Flatten[{opts,Options[WhittakerPlot]}]];
 If[gu===Automatic,gu=guilds[[1]]];
-gcomp=Evaluate[Component/.Flatten[{opts,Options[WhittakerPlot]}]];
-If[gcomp===Automatic,gcomp=gcomps[gu][[1]]];
-base=Evaluate[Base/.Flatten[{opts,Options[WhittakerPlot]}]];
 minpop=Evaluate[MinPop/.Flatten[{opts,Options[WhittakerPlot]}]];
-listplotopts=FilterRules[Flatten[{opts,Options[WhittakerPlot]}],Options[ListPlot]];
+plotopts=FilterRules[Flatten[{opts,Options[WhittakerPlot]}],Options[ListLogPlot]];
+weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[WhittakerPlot]}]];
+time=Evaluate[Time/.Flatten[{opts,Options[WhittakerPlot]}]];
 
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][sol];
-abunds=Select[sol,#[[1,1]]===gcomp&&#[[2]]>minpop&];
-data=Log[base,abunds[[All,2]]];
-Return[ListPlot[Sort[data,Greater],Evaluate[Sequence@@listplotopts]]];
+
+abunds=TotalAbundance[sol,gu,weightfunction];
+
+If[time===t,
+	abunds=Avg[abunds],
+	abunds=Slice[abunds,time];
+];
+
+abunds=Select[abunds,#[[2]]>minpop&];
+
+Return[ListLogPlot[Sort[Table[Subscript[gu,i],{i,Subscript[\[ScriptCapitalN], gu]}]/.abunds,Greater],Evaluate[Sequence@@plotopts]]];
 
 ]];
 
-Options[WhittakerPlot]={Guild->Automatic,Component->Automatic,Base->10,MinPop->0,PlotRange->All};
+
+Options[WhittakerPlot]={Guild->Automatic,MinPop->0,PlotRange->All,WeightFunction->"Total",Time->t};
 
 
 PlotTAD::usage =
@@ -4293,7 +4360,7 @@ PlotTAD[traitsin_?TraitsQ,sol_?VariablesQ,opts___?OptionQ]:=
 Module[{
 func=FuncStyle["PlotTAD"],
 (* options *)
-logged,gu,gcomp,gtrait,minpop,plotstyle,markerstyle,plotopts,time,
+logged,gu,gtrait,minpop,plotstyle,plotopts,time,weightfunction,
 (* other variables *)
 traits,abunds,pos,plotmin
 },
@@ -4307,21 +4374,21 @@ If[Global`debug,Print["In ",func]];
 logged=Evaluate[Logged/.Flatten[{opts,Options[PlotTAD]}]];
 gu=Evaluate[Guild/.Flatten[{opts,Options[PlotTAD]}]];
 If[gu===Automatic,gu=guilds[[1]]];
-gcomp=Evaluate[Component/.Flatten[{opts,Options[PlotTAD]}]];
-If[gcomp===Automatic,gcomp=gcomps[gu][[1]]];
 gtrait=Evaluate[Trait/.Flatten[{opts,Options[PlotTAD]}]];
 If[gtrait===Automatic,gtrait=gtraits[gu][[1]]];
 minpop=Evaluate[MinPop/.Flatten[{opts,Options[PlotTAD]}]];
 plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotTAD]}]];
-markerstyle=Evaluate[MarkerStyle/.Flatten[{opts,Options[PlotTAD]}]];
 plotopts=FilterRules[Flatten[{opts,Options[PlotTAD]}],Options[ListPlot]];
 time=Evaluate[Time/.Flatten[{opts,Options[PlotTAD]}]];
+weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[PlotTAD]}]];
+If[weightfunction==="Components",weightfunction=Select[gcomps[gu],comptype[#]==="Extensive"&]];
 
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][traitsin,sol];
-If[Global`debug,Print[func," \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
+If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
-abunds=Quiet[Select[sol,#[[1,1]]===gcomp&],{Part::partd}];
+abunds=TotalAbundance[sol,gu,weightfunction];
+
 If[time===t,
 	abunds=Avg[abunds];
 	traits=Avg[traitsin]
@@ -4329,25 +4396,38 @@ If[time===t,
 	abunds=Slice[abunds,time];
 	traits=Slice[traitsin,time]
 ];
-abunds=Select[abunds,#[[2]]>minpop&];
-pos=abunds[[All,1,2]];
 
-If[markerstyle===Automatic,
-	markerstyle=Table[color[Subscript[gtrait,i]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,pos}]];
+If[plotstyle===Automatic,
+	If[ListQ[weightfunction],
+		plotstyle=Reverse[Table[Directive[ColorData[97,i],Thick,Opacity[1]],{i,Length[weightfunction]}]],
+		plotstyle=Table[color[Subscript[gtrait,1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}]
+	];
+];
 
 If[logged==False,
+	If[ListQ[weightfunction],
 	Return[ListPlot[
-		Table[{{Subscript[gtrait,i],0},{Subscript[gtrait,i],Subscript[gcomp,i]}},{i,pos}]/.abunds/.traits/.t->time,
-		PlotStyle->Join[plotstyle,markerstyle],
-		Evaluate[Sequence@@plotopts],
-		PlotRange->All,Joined->True
-	]]
+			Reverse[Transpose[{Table[Subscript[gtrait,i],{i,Subscript[\[ScriptCapitalN], gu]}],#}/.traits]&/@Accumulate[Transpose[Table[Subscript[gu,i],{i,Subscript[\[ScriptCapitalN], gu]}]/.abunds]]],
+			Filling->Table[j->{Axis,ModPart[plotstyle,j]},{j,Length[weightfunction]}],
+			PlotStyle->None,
+			Evaluate[Sequence@@plotopts],
+			PlotRange->All
+		]]
+	,
+		Return[ListPlot[
+			Table[{{Subscript[gtrait,i],0},{Subscript[gtrait,i],Subscript[gu,i]}},{i,Subscript[\[ScriptCapitalN], gu]}]/.traits/.abunds,
+			PlotStyle->plotstyle,
+			Evaluate[Sequence@@plotopts],
+			PlotRange->All,Joined->True
+		]]
+	]
 ,
-	plotmin=Min[Table[Subscript[gcomp,i],{i,pos}]/.sol];
+	abunds=Select[abunds,#[[2]]>minpop&];
+	pos=abunds[[All,1,2]]; (* positions *)
+	plotmin=Min[Table[Subscript[gu,i],{i,pos}]/.abunds];
 	Return[ListLogPlot[
-		Table[{{Subscript[gtrait,i],plotmin},
-		{Subscript[gtrait,i],Subscript[gcomp,i]}},{i,pos}]/.abunds/.traits,
-		PlotStyle->Join[plotstyle,markerstyle],
+		Table[{{Subscript[gtrait,i],plotmin},{Subscript[gtrait,i],Subscript[gu,i]}},{i,pos}]/.traits/.abunds,
+		PlotStyle->plotstyle,
 		Evaluate[Sequence@@plotopts],
 		PlotRange->{plotmin,All},Joined->True
 	]]
@@ -4357,8 +4437,8 @@ If[logged==False,
 
 
 Options[PlotTAD]={
-Guild->Automatic,Trait->Automatic,Component->Automatic,
-Logged->False,MinPop->0,MarkerStyle->Automatic,PlotStyle->{},Time->t};
+Guild->Automatic,Trait->Automatic,WeightFunction->"Total",
+Logged->False,MinPop->0,PlotStyle->Automatic,Time->t};
 
 
 (* split combined traitsandpops *)
@@ -5659,7 +5739,7 @@ plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotZNGI]}]];
 
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][invaders];
-If[Global`debug,Print[func," \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
+If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 Return[Show[Table[Table[
 	If[plotstyle===Automatic,
