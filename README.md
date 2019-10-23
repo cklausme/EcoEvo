@@ -6,12 +6,12 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 - Install directly with
 
-      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.0.3/EcoEvo-1.0.3.paclet"]
+      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.1.0/EcoEvo-1.1.0.paclet"]
 
-- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.0.3.paclet` was downloaded into the directory `~/Downloads`, evaluate
+- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.1.0.paclet` was downloaded into the directory `~/Downloads`, evaluate
 
       Needs["PacletManager`"]
-      PacletInstall["~/Downloads/EcoEvo-1.0.3.paclet"]
+      PacletInstall["~/Downloads/EcoEvo-1.1.0.paclet"]
 
 ## Usage
 
@@ -31,6 +31,11 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 ## Version History
 
+### v1.1.0 (October 22, 2019)
+
+ - Improvements to PlotTAD, WhittakerPlot, PrestonPlot -- now handle multiple components and averaging well.  
+ - Added TotalAbunance function.
+  
 ### v1.0.3 (October 8, 2019)
 
  - Added TemporalRuleListQ and let *Slice work on non-TemporalRuleLists
