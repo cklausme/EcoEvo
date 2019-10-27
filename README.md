@@ -34,7 +34,7 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 ### v1.1.0 (October 22, 2019)
 
  - Improvements to PlotTAD, WhittakerPlot, PrestonPlot -- now handle multiple components and averaging well.  
- - Added TotalAbunance function.
+ - Added TotalAbundance function.
   
 ### v1.0.3 (October 8, 2019)
 
