@@ -1,6 +1,14 @@
 # EcoEvo
 Analyze species- and trait-based ecological and eco-evolutionary models, including Adaptive Dynamics, in Mathematica.
 
+## Documentation
+
+- There is extensive documentation, including Tutorials, installed in Mathematica's built-in Documentation.  Go to Help - Wolfram Documentation and search for EcoEvo or run
+
+      EcoEvoDocs
+
+- Documentation is also [available online](https://www.wolframcloud.com/obj/EcoEvo/docs/guide/EcoEvo.nb).
+
 ## Installation
 - Requires Mathematica 10.0 or higher.
 
@@ -18,12 +26,6 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 - Load the pacakge with
 
       <<EcoEvo`
-
-## Documentation
-
-- There is extensive documentation, including Tutorials, installed in Mathematica's built-in Documentation.  Go to Help - Wolfram Documentation and search for EcoEvo or run
-
-      EcoEvoDocs
 
 ## Questions / Comments
 
