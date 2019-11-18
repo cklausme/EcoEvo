@@ -14,12 +14,12 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 - Install directly with
 
-      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.1.0/EcoEvo-1.1.0.paclet"]
+      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.1.1/EcoEvo-1.1.1.paclet"]
 
-- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.1.0.paclet` was downloaded into the directory `~/Downloads`, evaluate
+- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.1.1.paclet` was downloaded into the directory `~/Downloads`, evaluate
 
       Needs["PacletManager`"]
-      PacletInstall["~/Downloads/EcoEvo-1.1.0.paclet"]
+      PacletInstall["~/Downloads/EcoEvo-1.1.1.paclet"]
 
 ## Usage
 
@@ -32,6 +32,13 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 - Email klausme1@msu.edu
 
 ## Version History
+
+### v1.1.1 (November 18, 2019)
+
+- Reinterpolation - new function to recast a function of one or more InterpolatingFunctions
+- TotalAbundance - uses Reinterpolation
+- InvSPS - added InvSPS::whenevents warning
+- InvSPS - fixed problem with periodic & structured pops
 
 ### v1.1.0 (October 22, 2019)
 

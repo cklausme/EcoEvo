@@ -44,7 +44,7 @@ $InvCount;$FindEcoCycleSteps;$FindEcoEvoCycleSteps;
 \[IGrave]::usage="\[IGrave] is a placeholder index in RuleList.";
 
 
-SimplifyLogE;SortRuleList;OrderedComplement;RuleListComplement;EqSort;
+Reinterpolation;SimplifyLogE;SortRuleList;OrderedComplement;RuleListComplement;EqSort;
 RHS;LHS;ReplaceRHS;ReplaceLHS;Eq;ZeroLHS;
 ZeroVector;
 SubscriptAdd;DeleteSubscript;ZeroSubscript;
@@ -262,7 +262,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.1.0 (October 22, 2019)";
+$EcoEvoVersion="1.1.1 (November 18, 2019)";
 
 
 modelloaded=False;
@@ -270,6 +270,20 @@ modelloaded=False;
 
 SetOptions[NDSolve,MaxSteps->Infinity];
 (*SetOptions[NIntegrate,MaxRecursion\[Rule]30];*)
+
+
+Reinterpolation::usage="Reinterpolation[\!\(\*
+StyleBox[\"f\", \"TI\"]\)] reinterpolates a function containing one or more InterpolatingFunctions.";
+
+
+Reinterpolation[f_]:=Module[{ifs,grid},
+	ifs=Cases[f,_InterpolatingFunction];
+	If[ifs=={},Return[f]];
+	grid=Union[Flatten[Through[ifs["Grid"]],1]];
+	Return[Interpolation[Table[
+		{Sequence@@val,f/.(if_InterpolatingFunction->if[Sequence@@val])},
+	{val,grid}]]]
+];
 
 
 SimplifyLogE::usage=
@@ -2755,7 +2769,8 @@ Which[
 	function=weightfunction
 ];
 
-Return[Table[Subscript[gu, sp]->(function/.(#->Subscript[#,sp]&/@gcomps[gu])/.sol),{sp,\[ScriptCapitalN][gu]}]]
+(*Return[Table[Subscript[gu, sp]\[Rule](function/.(#\[Rule]Subscript[#,sp]&/@gcomps[gu])/.sol),{sp,\[ScriptCapitalN][gu]}]]*)
+Return[Table[Subscript[gu, sp]->Reinterpolation[function/.(#->Subscript[#,sp]&/@gcomps[gu])/.sol],{sp,\[ScriptCapitalN][gu]}]]
 
 ]];
 
@@ -4387,7 +4402,9 @@ If[weightfunction==="Components",weightfunction=Select[gcomps[gu],comptype[#]===
 Set\[ScriptCapitalN][traitsin,sol];
 If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
+(*Print["sol=",sol];*)
 abunds=TotalAbundance[sol,gu,weightfunction];
+(*Print["abunds=",abunds];*)
 
 If[time===t,
 	abunds=Avg[abunds];
@@ -4577,13 +4594,15 @@ variables=Expand\[ScriptCapitalN]InPops[solin];
 Set\[ScriptCapitalN][traits,variables];
 (*Print["\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];*)
 
+If[modelwhenevents!={},Msg[InvSPS::whenevents]];
+
 (* assemble sol [resident state] *)
 
 (* in case any extensive pops weren't given, assume they're 0 *)
 zeropcomps=Flatten[Table[Table[
 	If[comptype[pcomp]=="Extensive",pcomp->0,pcomp->pcomp]
 ,{pcomp,pcomps[pop]}],{pop,pops}]];
-sol=Join[variables,zeropcomps];
+sol=Normal@Merge[Join[variables,zeropcomps],First];
 
 (* if a time given, evaluate sol there *)
 If[time=!=t&&!NumericRuleListQ[sol],sol=Slice[sol,time]];
@@ -4702,7 +4721,6 @@ Which[
 	];
 	If[Global`debug,Print[func,": qsssol=",qsssol]];
 
-	removets={Subscript[x_/;comptype[x]=="Extensive",0][t]->Subscript[x,0],t->time};
 
 	Which[
 		(* one extensive component: use log pop eqn *)
@@ -4712,36 +4730,48 @@ Which[
 			If[Global`debug,Print[func,": ContinuousTime Floquet mode (1 comp): NIntegrate"]];
 			(*Print[invtraits];
 			If[invtraits==={},Msg[InvSPS::notraits];Return[{$Failed,$Failed}]];*)
+			(* add [t] to lhs of sol except for InterpolatingFunctions *)
+			sol=sol/.((lhs_->rhs:Except[_InterpolatingFunction])->(lhs[t]->rhs));
+(*Print[sol];*)
 			If[verbose,
-				With[{eq=Cancel[inveqns[[1]]/invunks[[1]][t]]/.removets/.traits/.invtraits,
+				With[{eq=Cancel[inveqns[[1]]/invunks[[1]][t]](*/.removets*)/.traits/.invtraits,
 				tstart=tstart,tend=tend,dt=tend-tstart,op=Sequence@@nintegrateopts},
 				PrintCall[Global`eval=NIntegrate[eq/.Global`sol/.Global`qsssol,{t,tstart,tend},op]/dt]
 			]];
-			eval=NIntegrate[Cancel[inveqns[[1]]/invunks[[1]][t]]/.removets/.traits/.invtraits/.sol/.qsssol,{t,tstart,tend},Evaluate[Sequence@@nintegrateopts]]/(tend-tstart);
+			eval=NIntegrate[Cancel[inveqns[[1]]/invunks[[1]][t]](*/.removets*)/.traits/.invtraits/.sol/.qsssol,{t,tstart,tend},Evaluate[Sequence@@nintegrateopts]]/(tend-tstart);
+(*Print["eval=",eval];*)
 			Return[{eval,"?"}]
 		,
 			method=="NDSolve",
 			If[Global`debug,Print[func,": ContinuousTime Floquet mode (1 comp): NDSolve"]];
 			If[verbose,
-				With[{eq=Cancel[inveqns[[1]]/invunks[[1]][t]]/.removets/.traits/.invtraits/.sol,
+				With[{eq=Cancel[inveqns[[1]]/invunks[[1]][t]](*/.removets*)/.traits/.invtraits/.sol,
 				tstart=tstart,tend=tend,dt=tend-tstart,op=Sequence@@ndsolveopts},
 				PrintCall[Global`invsol=NDSolve[{Global`x'[t]==eq/.Global`qsssol,Global`x[tstart]==0},Global`x,{t,tstart,tend},op]];
 				PrintCall[Global`eval=Global`x[tend]/dt/.Global`invsol]
 			]];
-			invsol=NDSolve[{x'[t]==Cancel[inveqns[[1]]/invunks[[1]][t]]/.removets/.traits/.invtraits/.sol/.qsssol,x[tstart]==0},x,
+			invsol=NDSolve[{x'[t]==Cancel[inveqns[[1]]/invunks[[1]][t]](*/.removets*)/.traits/.invtraits/.sol/.qsssol,x[tstart]==0},x,
 				{t,tstart,tend},Evaluate[Sequence@@ndsolveopts]][[1]];
 			eval=x[tend]/(tend-tstart)/.invsol;
+(*			inkunk=invunks\[LeftDoubleBracket]1\[RightDoubleBracket];
+			invsol=NDSolve[{inkunk'[t]\[Equal]Join[
+				{Cancel[inveqns\[LeftDoubleBracket]1\[RightDoubleBracket]/inkunk[t]]/.removets/.traits/.invtraits/.sol/.qsssol},(*modelwhenevents*)Global`weinv],inkunk[tstart]\[Equal]0},
+				inkunk,{t,tstart,tend},Evaluate[Sequence@@ndsolveopts]]\[LeftDoubleBracket]1\[RightDoubleBracket];
+			eval=inkunk[tend]/(tend-tstart)/.invsol;*)
 			Return[{eval,"?"}];
 		,
 			method=="Integrate",
 			If[Global`debug,Print[func,": ContinuousTime Floquet mode (1 comp): Integrate"]];
 			If[verbose,
-				With[{eq=Cancel[inveqns[[1]]/invunks[[1]][t]]/.removets/.traits/.invtraits/.sol,
+				With[{eq=Cancel[inveqns[[1]]/invunks[[1]][t]](*/.removets*)/.traits/.invtraits/.sol,
 				tstart=tstart,tend=tend,dt=tend-tstart,op=Sequence@@integrateopts},
 				PrintCall[Global`eval=Integrate[eq/.Global`qsssol,{t,tstart,tend},op]/dt]
 			]];
-			eval=Integrate[Cancel[inveqns[[1]]/invunks[[1]][t]]/.removets/.traits/.invtraits/.sol/.qsssol,{t,tstart,tend},Evaluate[Sequence@@integrateopts]]/(tend-tstart);
+			eval=Integrate[Cancel[inveqns[[1]]/invunks[[1]][t]](*/.removets*)/.traits/.invtraits/.sol/.qsssol,{t,tstart,tend},Evaluate[Sequence@@integrateopts]]/(tend-tstart);
 			Return[{Chop[eval],"?"}];
+		,
+			method=="EcoSim",
+			sol=EcoSim[];
 		,
 			Else,
 			Msg[InvSPS::bdmtd];
@@ -4751,6 +4781,8 @@ Which[
 		(* more than one extensive component, calculate Floquet exponent *)
 		Length[invunks]>1,
 		If[Global`debug,Print[func,": ContinuousTime Floquet mode (2+ comps)"]];
+		removets={Subscript[x_/;(comptype[x]=="Extensive"),0][t]->Subscript[x,0],t->time};
+(*Print[removets];*)
 		j=D[inveqns/.traits/.removets,{invunks}];
 		If[Global`debug,Print[func,": j=",j]];
 		If[verbose,
@@ -4949,6 +4981,9 @@ InvSPS::noqsssol=
 
 InvSPS::notraits=
 "Trait of invader not defined, so NIntegrate can't work.  Try Method->\"Integrate\" or give invader traits.";
+
+InvSPS::whenevents=
+"Warning: WhenEvents involving populations and guilds are not handled properly in InvSPS yet.";
 
 
 $InvCount::usage = "Counts number of times Inv called.";

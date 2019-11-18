@@ -5,7 +5,7 @@
 
 
 package="EcoEvo";
-version="1.1.0";
+version="1.1.1";
 
 
 Needs["PackageTools`"]
@@ -29,7 +29,7 @@ builddir=FileNameJoin[{rootdir,"build",package<>"-"<>version,package}]
 docdir=FileNameJoin[{builddir, "Documentation"}]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*fix docs*)
 
 
@@ -85,7 +85,7 @@ code =
 MRun[code, "10.0"]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*make paclet*)
 
 
@@ -117,7 +117,7 @@ paclet=PackPaclet[FileNameJoin[{rootdir,"build","EcoEvo-"<>version}]]
 PacletInstall[paclet]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*cloud docs*)
 
 
