@@ -14,9 +14,9 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 - Install directly with
 
-      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.1.1/EcoEvo-1.1.1.paclet"]
+      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.2.0/EcoEvo-1.2.0.paclet"]
 
-- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.1.1.paclet` was downloaded into the directory `~/Downloads`, evaluate
+- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.2.0.paclet` was downloaded into the directory `~/Downloads`, evaluate
 
       Needs["PacletManager`"]
       PacletInstall["~/Downloads/EcoEvo-1.1.1.paclet"]
@@ -32,6 +32,19 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 - Email klausme1@msu.edu
 
 ## Version History
+
+### v1.2.0 (December 8, 2019)
+
+- New functions:
+    - TotalAbundance: sums abundance within a guild
+    - TraitMean: mean trait within a guild (CWM)
+    - TraitVariance: trait variance within a guild (CWV)
+- 🙀 Renamed some functions:
+    - TotalAbundance -> WeightedAbundance
+    - Avg, Var, Cov -> TemporalMean, TemporalVariance, TemporalCovariance
+- Fixed Reinterpolation to work at arbitrary levels
+- SetModel now assigns colors and styles for traits and guilds without subscripts
+- PlotDynamics works on mean traits
 
 ### v1.1.1 (November 18, 2019)
 
