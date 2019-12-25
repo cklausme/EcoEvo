@@ -14,12 +14,12 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 - Install directly with
 
-      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.2.0/EcoEvo-1.2.0.paclet"]
+      PacletInstall["https://github.com/cklausme/EcoEvo/releases/download/v1.2.1/EcoEvo-1.2.1.paclet"]
 
-- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.2.0.paclet` was downloaded into the directory `~/Downloads`, evaluate
+- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.2.1.paclet` was downloaded into the directory `~/Downloads`, evaluate
 
       Needs["PacletManager`"]
-      PacletInstall["~/Downloads/EcoEvo-1.1.1.paclet"]
+      PacletInstall["~/Downloads/EcoEvo-1.2.1.paclet"]
 
 ## Usage
 
@@ -32,6 +32,15 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 - Email klausme1@msu.edu
 
 ## Version History
+
+### v1.2.1 (December 25, 2019)
+
+- Lots of little tweaks to make quasi-steady states easier to work with
+  - new function: JoinFirst (fixed prob w/ Normal@Merge in v10.0)
+  - EcoEqns: add [t]
+  - EcoEq: use JoinFirst to remove duplicates
+  - EcoEq: remove identity placeholders
+  - SelectEcoStable, EcoStableQ, FindEcoAttractor: added Fixed option
 
 ### v1.2.0 (December 8, 2019)
 

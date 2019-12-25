@@ -5,7 +5,7 @@
 
 
 package="EcoEvo";
-version="1.2.0";
+version="1.2.1";
 
 
 Needs["PackageTools`"]
@@ -117,7 +117,7 @@ paclet=PackPaclet[FileNameJoin[{rootdir,"build","EcoEvo-"<>version}]]
 PacletInstall[paclet]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*cloud docs*)
 
 
@@ -188,8 +188,9 @@ resetMagnification[nb_Notebook]:=nb
 
 removePulldownMenus[Notebook[content_,opts___]]:=Notebook[content[[2;;]],opts];
 
-publishDocNB[filename_String,target:CloudObject[targetURL_,___],prefix_]:=Module[{nb,newNB,obj},
+publishDocNB[filename_String,target:CloudObject[targetURL_,___],prefix_,pacletName_]:=Module[{nb,newNB,obj},
 	nb=Get[filename];
+	Print[filename];
 	newNB=resetMagnification@removePulldownMenus@removeDockedCells@fixPacletLinks[nb,targetURL];
 	obj=FileNameJoin[{target,prefix,FileNameTake[filename]}];
 	Print["Publishing ",filename," to ",obj];
@@ -205,7 +206,7 @@ publishDocDir[pacletDir_,subdir_,prefix_,target_]:=Module[{
 PublishPacletDocs[pacletDir_String,target_CloudObject]:=KeyValueMap[publishDocDir[pacletDir,#1,#2,target]&,dirPrefixes]
 
 
-PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.1.0/EcoEvo",CloudObject["docs"]];
+PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.2.0/EcoEvo",CloudObject["docs"]];
 
 
 
