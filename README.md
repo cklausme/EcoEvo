@@ -16,10 +16,10 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
       PacletInstall["EcoEvo", "Site" -> "http://raw.githubusercontent.com/cklausme/EcoEvo/master"]
 
-- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.2.1.paclet` was downloaded into the directory `~/Downloads`, evaluate
+- Alternatively, [download the latest release](https://github.com/cklausme/EcoEvo/releases), distributed as a `.paclet` file, and install it using the `PacletInstall` function in Mathematica.  For example, assuming that the file `EcoEvo-1.3.0.paclet` was downloaded into the directory `~/Downloads`, evaluate
 
       Needs["PacletManager`"]
-      PacletInstall["~/Downloads/EcoEvo-1.2.1.paclet"]
+      PacletInstall["~/Downloads/EcoEvo-1.3.0.paclet"]
 
 ## Usage
 
@@ -33,6 +33,15 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 ## Version History
 
+### v1.3.0 (January 11, 2020)
+
+- New functions
+    - RuleListPlot: plot temporal and constant rule lists 
+    - ListLinePlot3D
+- Minor tweaks
+    - PlotDynamics work without modelloaded
+    -  10.0 bugfix: InvaderQ now accepts Automatic
+    
 ### v1.2.1 (December 25, 2019)
 
 - Lots of little tweaks to make quasi-steady states easier to work with
@@ -44,11 +53,11 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 
 ### v1.2.0 (December 8, 2019)
 
-- New functions:
+- New functions
     - TotalAbundance: sums abundance within a guild
     - TraitMean: mean trait within a guild (CWM)
     - TraitVariance: trait variance within a guild (CWV)
-- 🙀 Renamed some functions:
+- 🙀 Renamed some functions
     - TotalAbundance -> WeightedAbundance
     - Avg, Var, Cov -> TemporalMean, TemporalVariance, TemporalCovariance
 - Fixed Reinterpolation to work at arbitrary levels
