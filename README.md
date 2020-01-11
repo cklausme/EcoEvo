@@ -36,7 +36,7 @@ Analyze species- and trait-based ecological and eco-evolutionary models, includi
 ### v1.3.0 (January 11, 2020)
 
 - New functions
-    - RuleListPlot: plot temporal and constant rule lists 
+    - [RuleListPlot](https://www.wolframcloud.com/obj/EcoEvo/docs/ref/RuleListPlot.nb): plot temporal and constant rule lists 
     - ListLinePlot3D
 - Minor tweaks
     - PlotDynamics work without modelloaded
