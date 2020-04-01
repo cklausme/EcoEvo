@@ -29,7 +29,7 @@ builddir=FileNameJoin[{rootdir,"build",package<>"-"<>version,package}]
 docdir=FileNameJoin[{builddir, "Documentation"}]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*fix docs*)
 
 
@@ -85,7 +85,7 @@ code =
 MRun[code, "10.0"]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*make paclet*)
 
 
@@ -117,7 +117,7 @@ paclet=PackPaclet[FileNameJoin[{rootdir,"build","EcoEvo-"<>version}]]
 PacletInstall[paclet]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*update pacletsite*)
 
 
@@ -186,7 +186,8 @@ fixPacletLink[str_,targetURL_]:=StringReplace[str,(StartOfString~~"paclet:"<>pac
 
 fixPacletLinks[nb_Notebook,targetDir_String]:=
 nb/.{
-TemplateBox[{content_,data_?pacletLinkQ},"RefLink",opts___]:>TemplateBox[{content,fixPacletLink[data,targetDir]},"WebLink",opts],
+TemplateBox[{content_,data_?pacletLinkQ},"RefLink",opts___]:>TemplateBox[{content,fixPacletLink[data,targetDir]},"WebLink",
+DisplayFunction :> (TagBox[ButtonBox[StyleBox[#, FontColor -> RGBColor[0.054902, 0.243137, 0.72549]], ButtonData -> {URL[#2], None}], MouseAppearanceTag["LinkHand"]] &),opts],
 ButtonBox[content_,opts1___,ButtonData->data_?pacletLinkQ,opts2___]:>ButtonBox[content,ButtonFunction:>(FrontEndExecute[NotebookLocate[{URL[#2],None}]]&),opts1,ButtonData->fixPacletLink[data,targetDir],opts2]
 };
 
@@ -217,9 +218,6 @@ PublishPacletDocs[pacletDir_String,target_CloudObject]:=KeyValueMap[publishDocDi
 
 
 PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.4.0/EcoEvo",CloudObject["docs"]];
-
-
-
 
 
 

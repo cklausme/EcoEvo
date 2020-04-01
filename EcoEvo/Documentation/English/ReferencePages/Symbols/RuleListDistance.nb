@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     21820,        724]
-NotebookOptionsPosition[     16518,        536]
-NotebookOutlinePosition[     17180,        562]
-CellTagsIndexPosition[     17101,        557]
+NotebookDataLength[     24298,        801]
+NotebookOptionsPosition[     18711,        603]
+NotebookOutlinePosition[     19375,        629]
+CellTagsIndexPosition[     19296,        624]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -24,7 +24,7 @@ Cell[TextData[{
   CellTags->"New",
   ExpressionUUID -> "26d5e633-6dc2-4b6c-af69-730d8dfea75d"],
  " | Modified in: ",
- Cell["1.4.0 ", "HistoryData",
+ Cell["1.4.1 ", "HistoryData",
   CellTags->"Modified",
   ExpressionUUID -> "e081195f-0fc3-4387-8246-9c7188749a49"],
  " | Obsolete in: ",
@@ -37,7 +37,8 @@ Cell[TextData[{
   ExpressionUUID -> "3b5af3f9-6c49-466e-8dad-810703287e41"]
 }], "History",
  CellChangeTimes->{{3.7101121677515907`*^9, 3.710112168078206*^9}, {
-  3.788978423799267*^9, 3.788978425259418*^9}},
+  3.788978423799267*^9, 3.788978425259418*^9}, {3.794700941702849*^9, 
+  3.7947009417666492`*^9}},
  CellID->1247902091,
  ExpressionUUID -> "e9c1e830-6ad4-4e10-9552-d2a73098206e"],
 
@@ -179,11 +180,17 @@ Cell[TextData[{
     StyleBox["rulelist1", "TI"], ",", 
     StyleBox["rulelist2", "TI"]}], "]"}]], "InlineFormula",
   ExpressionUUID -> "9120f65b-087e-49b2-b6d4-7535c5dcd911"],
- " \[LineSeparator]gives the distance between two rule lists."
+ " \[LineSeparator]gives the distance between two rule lists.\n",
+ Cell["      ", "ModInfo"],
+ Cell[BoxData[
+  RowBox[{"RuleListDistance", "[", 
+   StyleBox["rulelist", "TI"], "]"}]], "InlineFormula"],
+ "\[LineSeparator]gives the distance between a rulelist and the origin."
 }], "Usage",
  CellChangeTimes->{{3.710235395530032*^9, 3.710235412045786*^9}, {
   3.770376556219811*^9, 3.770376556666429*^9}, {3.788978428128806*^9, 
-  3.7889784377805*^9}},
+  3.7889784377805*^9}, {3.7947010252587337`*^9, 3.7947010325726423`*^9}, {
+  3.794701094009325*^9, 3.794701100927745*^9}},
  CellID->982511436,
  ExpressionUUID -> "06433bf4-e08e-4ba5-9bb9-7b93126fbde2"],
 
@@ -206,7 +213,31 @@ Cell[BoxData[GridBox[{
     "how to weigh different variables", "TableText"]}
   }]], "3ColumnTableMod",
  CellChangeTimes->{{3.788980106257822*^9, 3.788980255569206*^9}},
- CellID->136986562]
+ CellID->136986562],
+
+Cell[TextData[{
+ "Possible values of DistanceFunction are ",
+ ButtonBox["EuclideanDistance",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/EuclideanDistance"],
+ ", ",
+ ButtonBox["ManhattanDistance",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/ManhattanDistance"],
+ ", ",
+ ButtonBox["ChessboardDistance",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/ChessboardDistance"],
+ ", or any other measure described under ",
+ ButtonBox["Distance and Similarity Measures",
+  BaseStyle->"Link",
+  ButtonData->"guide/DistanceAndSimilarityMeasures"],
+ "."
+}], "Notes",
+ CellChangeTimes->{{3.794701111953622*^9, 3.794701131568234*^9}, {
+  3.794701259563528*^9, 3.794701413158882*^9}, {3.794701444357378*^9, 
+  3.794701465989553*^9}},
+ CellID->2081085912]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -221,7 +252,8 @@ Cell["XXXX", "Tutorials",
 Cell[CellGroupData[{
 
 Cell["Related Demonstrations", "RelatedDemonstrationsSection",
- CellID->1268215905,ExpressionUUID->"4373d05c-f8f6-407a-961a-80fc70c09af7"],
+ CellID->1268215905,
+ ExpressionUUID -> "4373d05c-f8f6-407a-961a-80fc70c09af7"],
 
 Cell["XXXX", "RelatedDemonstrations",
  CellID->1129518860,ExpressionUUID->"df969393-e92b-469c-ab9b-4595e92007fb"]
@@ -244,8 +276,10 @@ Cell["See Also", "SeeAlsoSection",
 Cell[TextData[ButtonBox["Norm",
  BaseStyle->"Link",
  ButtonData->"paclet:ref/Norm"]], "SeeAlso",
- CellChangeTimes->{{3.710236260465786*^9, 3.71023627483749*^9}},
- CellID->929782353,ExpressionUUID->"79efd4bb-ccc7-4008-9c9c-44ecc721be51"]
+ CellChangeTimes->{{3.710236260465786*^9, 3.71023627483749*^9}, 
+   3.7947010513387327`*^9},
+ CellID->929782353,
+ ExpressionUUID -> "79efd4bb-ccc7-4008-9c9c-44ecc721be51"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -282,8 +316,11 @@ Cell[BoxData[
  CellID->1798622808,
  ExpressionUUID -> "43342b08-ebdc-4308-bdf0-e9e08bced458"],
 
-Cell["The default is the p=2 norm:", "ExampleText",
- CellChangeTimes->{{3.7889803694749727`*^9, 3.788980385494156*^9}},
+Cell["\<\
+The default DistanceFunction is the EuclideanDistance (p=2) norm:\
+\>", "ExampleText",
+ CellChangeTimes->{{3.7889803694749727`*^9, 3.788980385494156*^9}, {
+  3.794701474557019*^9, 3.794701493324645*^9}},
  CellID->1693084721],
 
 Cell[CellGroupData[{
@@ -314,9 +351,9 @@ Cell[BoxData[
  CellChangeTimes->{
   3.710235877684143*^9, {3.7102360769188757`*^9, 3.7102360785693607`*^9}, 
    3.770376582328682*^9, 3.7775382111117363`*^9, {3.788980278052781*^9, 
-   3.788980290560079*^9}},
+   3.788980290560079*^9}, 3.794701598334448*^9},
  CellLabel->"Out[2]=",
- CellID->1377370515,
+ CellID->1081910196,
  ExpressionUUID -> "bf78ef2e-15c9-4cdd-8ed7-61b102317e41"]
 }, Open  ]],
 
@@ -351,9 +388,10 @@ Cell[BoxData[
 
 Cell[BoxData["1"], "Output",
  CellChangeTimes->{{3.710236071667137*^9, 3.710236083068986*^9}, 
-   3.770376593527141*^9, 3.777538211211076*^9, 3.7889803031531553`*^9},
+   3.770376593527141*^9, 3.777538211211076*^9, 3.7889803031531553`*^9, 
+   3.7947015996191807`*^9},
  CellLabel->"Out[3]=",
- CellID->364056002,
+ CellID->1768369111,
  ExpressionUUID -> "52b8813a-a74a-4f61-a540-d1319fe50a6d"]
 }, Open  ]],
 
@@ -389,9 +427,9 @@ Cell[BoxData[
 
 Cell[BoxData["2"], "Output",
  CellChangeTimes->{3.710236087473793*^9, 3.7703765980267553`*^9, 
-  3.777538211329018*^9, 3.788980323185337*^9},
+  3.777538211329018*^9, 3.788980323185337*^9, 3.794701600666881*^9},
  CellLabel->"Out[4]=",
- CellID->1477996302,
+ CellID->633046146,
  ExpressionUUID -> "7f4f39ae-8e4c-4a5e-91f0-edcfcbcc7500"]
 }, Open  ]],
 
@@ -410,20 +448,22 @@ Cell[BoxData[
    RowBox[{"{", 
     RowBox[{
      RowBox[{"x", "\[Rule]", "1.0"}], ",", 
-     RowBox[{"y", "\[Rule]", "2.0"}]}], "}"}], ",", 
+     RowBox[{"y", "\[Rule]", "3.0"}]}], "}"}], ",", 
    RowBox[{"{", 
     RowBox[{
      RowBox[{"x", "\[Rule]", "2.0"}], ",", 
      RowBox[{"y", "\[Rule]", "4.0"}]}], "}"}]}], "]"}]], "Input",
  CellChangeTimes->{{3.788979395204371*^9, 3.788979402961151*^9}, {
-  3.78898051893606*^9, 3.7889805419131203`*^9}},
+   3.78898051893606*^9, 3.7889805419131203`*^9}, 3.794701615383317*^9},
  CellLabel->"In[8]:=",
  CellID->986354046],
 
-Cell[BoxData["2.23606797749979`"], "Output",
- CellChangeTimes->{3.788980519377462*^9, 3.788980553473983*^9},
+Cell[BoxData["1.4142135623730951`"], "Output",
+ CellChangeTimes->{
+  3.788980519377462*^9, 3.788980553473983*^9, {3.794701601851988*^9, 
+   3.7947016166780252`*^9}},
  CellLabel->"Out[8]=",
- CellID->1703573515]
+ CellID->1888946522]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -434,7 +474,7 @@ Cell[BoxData[
    RowBox[{"{", 
     RowBox[{
      RowBox[{"x", "\[Rule]", "1.0"}], ",", 
-     RowBox[{"y", "\[Rule]", "2.0"}]}], "}"}], ",", 
+     RowBox[{"y", "\[Rule]", "3.0"}]}], "}"}], ",", 
    RowBox[{"{", 
     RowBox[{
      RowBox[{"x", "\[Rule]", "2.0"}], ",", 
@@ -443,14 +483,41 @@ Cell[BoxData[
     RowBox[{"{", 
      RowBox[{"y", "\[Rule]", "0.1"}], "}"}]}]}], "]"}]], "Input",
  CellChangeTimes->{{3.788979395204371*^9, 3.788979402961151*^9}, {
-  3.7889805440468884`*^9, 3.788980551279503*^9}},
- CellLabel->"In[7]:=",
+   3.7889805440468884`*^9, 3.788980551279503*^9}, 3.794701613719633*^9},
+ CellLabel->"In[9]:=",
  CellID->364451268],
 
-Cell[BoxData["1.019803902718557`"], "Output",
- CellChangeTimes->{{3.788980525067938*^9, 3.7889805518380003`*^9}},
- CellLabel->"Out[7]=",
- CellID->1963011431]
+Cell[BoxData["1.004987562112089`"], "Output",
+ CellChangeTimes->{{3.788980525067938*^9, 3.7889805518380003`*^9}, {
+  3.794701602477713*^9, 3.794701618420137*^9}},
+ CellLabel->"Out[9]=",
+ CellID->311954920]
+}, Open  ]],
+
+Cell["\<\
+If a single rule list is given, RuleListDistance gives its norm distance to \
+the origin):\
+\>", "ExampleText",
+ CellChangeTimes->{{3.794701532959196*^9, 3.79470156324517*^9}},
+ CellID->1574979724],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"RuleListDistance", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"x", "\[Rule]", "1.0"}], ",", 
+    RowBox[{"y", "\[Rule]", "3.0"}]}], "}"}], "]"}]], "Input",
+ CellChangeTimes->{{3.794701565013607*^9, 3.7947015767833033`*^9}, 
+   3.794701623687045*^9},
+ CellLabel->"In[10]:=",
+ CellID->1007416486],
+
+Cell[BoxData["3.1622776601683795`"], "Output",
+ CellChangeTimes->{{3.7947015772611732`*^9, 3.794701623942696*^9}},
+ CellLabel->"Out[10]=",
+ CellID->1240792871]
 }, Open  ]]
 }, Open  ]],
 
@@ -535,7 +602,7 @@ Cell[BoxData[
 }, Open  ]]
 },
 WindowSize->{842, 955},
-WindowMargins->{{4, Automatic}, {Automatic, 0}},
+WindowMargins->{{618, Automatic}, {Automatic, 0}},
 CellContext->"Global`",
 Magnification:>1.25 Inherited,
 FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
@@ -549,181 +616,191 @@ StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "FunctionPageStyles.nb",
 (*CellTagsOutline
 CellTagsIndex->{
  "ExtendedExamples"->{
-  Cell[13773, 458, 155, 2, 67, "ExtendedExamplesSection",
+  Cell[15966, 525, 155, 2, 67, "ExtendedExamplesSection",
    CellTags->"ExtendedExamples",
    CellID->1854448968]}
  }
 *)
 (*CellTagsIndex
 CellTagsIndex->{
- {"ExtendedExamples", 16962, 550}
+ {"ExtendedExamples", 19157, 617}
  }
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 746, 21, 30, "History",
+Cell[558, 20, 797, 22, 30, "History",
  CellID->1247902091],
 Cell[CellGroupData[{
-Cell[1329, 45, 127, 2, 34, "CategorizationSection",
+Cell[1380, 46, 127, 2, 34, "CategorizationSection",
  CellID->1122911449],
-Cell[1459, 49, 138, 3, 36, "Categorization",
+Cell[1510, 50, 138, 3, 36, "Categorization",
  CellID->686433507],
-Cell[1600, 54, 188, 4, 36, "Categorization",
+Cell[1651, 55, 188, 4, 36, "Categorization",
  CellID->605800465],
-Cell[1791, 60, 177, 4, 36, "Categorization",
+Cell[1842, 61, 177, 4, 36, "Categorization",
  CellID->468444828],
-Cell[1971, 66, 374, 7, 36, "Categorization",
+Cell[2022, 67, 374, 7, 36, "Categorization",
  CellID->916476059]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[2382, 78, 114, 2, 34, "KeywordsSection",
+Cell[2433, 79, 114, 2, 34, "KeywordsSection",
  CellID->477174294],
-Cell[2499, 82, 104, 2, 51, "Keywords",
+Cell[2550, 83, 104, 2, 63, "Keywords",
  CellID->1164421360]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[2640, 89, 124, 2, 21, "TemplatesSection",
+Cell[2691, 90, 124, 2, 21, "TemplatesSection",
  CellID->1872225408],
-Cell[2767, 93, 153, 3, 72, "Template",
+Cell[2818, 94, 153, 3, 90, "Template",
  CellID->1562036412],
-Cell[2923, 98, 141, 3, 72, "Template",
+Cell[2974, 99, 141, 3, 90, "Template",
  CellID->158391909],
-Cell[3067, 103, 140, 3, 72, "Template",
+Cell[3118, 104, 140, 3, 90, "Template",
  CellID->1360575930],
-Cell[3210, 108, 141, 3, 72, "Template",
+Cell[3261, 109, 141, 3, 90, "Template",
  CellID->793782254]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[3388, 116, 112, 2, 21, "DetailsSection",
+Cell[3439, 117, 112, 2, 21, "DetailsSection",
  CellID->307771771],
-Cell[3503, 120, 122, 3, 171, "Details",
+Cell[3554, 121, 122, 3, 213, "Details",
  CellID->670882175],
-Cell[3628, 125, 128, 3, 171, "Details",
+Cell[3679, 126, 128, 3, 213, "Details",
  CellID->350963985],
-Cell[3759, 130, 123, 3, 171, "Details",
+Cell[3810, 131, 123, 3, 213, "Details",
  CellID->8391405],
-Cell[3885, 135, 128, 3, 171, "Details",
+Cell[3936, 136, 128, 3, 213, "Details",
  CellID->3610269],
-Cell[4016, 140, 120, 3, 171, "Details",
+Cell[4067, 141, 120, 3, 213, "Details",
  CellID->401364205],
-Cell[4139, 145, 120, 3, 171, "Details",
+Cell[4190, 146, 120, 3, 213, "Details",
  CellID->350204745],
-Cell[4262, 150, 122, 3, 171, "Details",
+Cell[4313, 151, 122, 3, 213, "Details",
  CellID->732958810],
-Cell[4387, 155, 137, 3, 171, "Details",
+Cell[4438, 156, 137, 3, 213, "Details",
  CellID->222905350],
-Cell[4527, 160, 126, 3, 171, "Details",
+Cell[4578, 161, 126, 3, 213, "Details",
  CellID->240026365]
 }, Closed]],
 Cell[CellGroupData[{
-Cell[4690, 168, 182, 2, 78, "ObjectName",
+Cell[4741, 169, 182, 2, 78, "ObjectName",
  CellID->1224892054],
-Cell[4875, 172, 640, 15, 91, "Usage",
+Cell[4926, 173, 951, 21, 135, "Usage",
  CellID->982511436],
-Cell[5518, 189, 198, 3, 29, "Notes",
+Cell[5880, 196, 198, 3, 29, "Notes",
  CellID->1067943069],
-Cell[5719, 194, 563, 14, 50, "3ColumnTableMod",
- CellID->136986562]
+Cell[6081, 201, 563, 14, 50, "3ColumnTableMod",
+ CellID->136986562],
+Cell[6647, 217, 745, 22, 48, "Notes",
+ CellID->2081085912]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6319, 213, 112, 1, 53, "TutorialsSection",
+Cell[7429, 244, 112, 1, 53, "TutorialsSection",
  CellID->250839057],
-Cell[6434, 216, 100, 1, 20, "Tutorials",
+Cell[7544, 247, 100, 1, 20, "Tutorials",
  CellID->341631938]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6571, 222, 138, 1, 37, "RelatedDemonstrationsSection",
+Cell[7681, 253, 142, 2, 37, "RelatedDemonstrationsSection",
  CellID->1268215905],
-Cell[6712, 225, 113, 1, 20, "RelatedDemonstrations",
+Cell[7826, 257, 113, 1, 20, "RelatedDemonstrations",
  CellID->1129518860]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[6862, 231, 120, 1, 37, "RelatedLinksSection",
+Cell[7976, 263, 120, 1, 37, "RelatedLinksSection",
  CellID->1584193535],
-Cell[6985, 234, 104, 1, 20, "RelatedLinks",
+Cell[8099, 266, 104, 1, 20, "RelatedLinks",
  CellID->1038487239]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7126, 240, 110, 1, 37, "SeeAlsoSection",
+Cell[8240, 272, 110, 1, 37, "SeeAlsoSection",
  CellID->1255426704],
-Cell[7239, 243, 236, 4, 20, "SeeAlso",
+Cell[8353, 275, 268, 6, 20, "SeeAlso",
  CellID->929782353]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7512, 252, 112, 1, 37, "MoreAboutSection",
+Cell[8658, 286, 112, 1, 37, "MoreAboutSection",
  CellID->38303248],
-Cell[7627, 255, 101, 1, 20, "MoreAbout",
+Cell[8773, 289, 101, 1, 20, "MoreAbout",
  CellID->1665078683]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[7765, 261, 415, 12, 84, "PrimaryExamplesSection",
+Cell[8911, 295, 415, 12, 84, "PrimaryExamplesSection",
  CellID->880084151],
-Cell[8183, 275, 311, 7, 29, "Input",
+Cell[9329, 309, 311, 7, 29, "Input",
  CellID->1798622808],
-Cell[8497, 284, 140, 2, 26, "ExampleText",
+Cell[9643, 318, 234, 5, 26, "ExampleText",
  CellID->1693084721],
 Cell[CellGroupData[{
-Cell[8662, 290, 666, 19, 29, "Input",
+Cell[9902, 327, 666, 19, 29, "Input",
  CellID->629851133],
-Cell[9331, 311, 337, 8, 32, "Output",
- CellID->1377370515]
+Cell[10571, 348, 359, 8, 32, "Output",
+ CellID->1081910196]
 }, Open  ]],
-Cell[9683, 322, 157, 2, 26, "ExampleText",
+Cell[10945, 359, 157, 2, 26, "ExampleText",
  CellID->2041814324],
 Cell[CellGroupData[{
-Cell[9865, 328, 739, 21, 49, "Input",
+Cell[11127, 365, 739, 21, 49, "Input",
  CellID->104631749],
-Cell[10607, 351, 268, 5, 28, "Output",
- CellID->364056002]
+Cell[11869, 388, 297, 6, 28, "Output",
+ CellID->1768369111]
 }, Open  ]],
-Cell[10890, 359, 144, 2, 26, "ExampleText",
+Cell[12181, 397, 144, 2, 26, "ExampleText",
  CellID->84637321],
 Cell[CellGroupData[{
-Cell[11059, 365, 715, 22, 49, "Input",
+Cell[12350, 403, 715, 22, 49, "Input",
  CellID->128317771],
-Cell[11777, 389, 244, 5, 28, "Output",
- CellID->1477996302]
+Cell[13068, 427, 265, 5, 28, "Output",
+ CellID->633046146]
 }, Open  ]],
-Cell[12036, 397, 235, 5, 26, "ExampleText",
+Cell[13348, 435, 235, 5, 26, "ExampleText",
  CellID->2144698694],
 Cell[CellGroupData[{
-Cell[12296, 406, 485, 14, 29, "Input",
+Cell[13608, 444, 508, 14, 29, "Input",
  CellID->986354046],
-Cell[12784, 422, 152, 3, 28, "Output",
- CellID->1703573515]
+Cell[14119, 460, 209, 5, 28, "Output",
+ CellID->1888946522]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[12973, 430, 591, 17, 29, "Input",
+Cell[14365, 470, 614, 17, 29, "Input",
  CellID->364451268],
-Cell[13567, 449, 157, 3, 28, "Output",
- CellID->1963011431]
+Cell[14982, 489, 205, 4, 28, "Output",
+ CellID->311954920]
+}, Open  ]],
+Cell[15202, 496, 207, 5, 26, "ExampleText",
+ CellID->1574979724],
+Cell[CellGroupData[{
+Cell[15434, 505, 321, 9, 29, "Input",
+ CellID->1007416486],
+Cell[15758, 516, 159, 3, 28, "Output",
+ CellID->1240792871]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[13773, 458, 155, 2, 67, "ExtendedExamplesSection",
+Cell[15966, 525, 155, 2, 67, "ExtendedExamplesSection",
  CellTags->"ExtendedExamples",
  CellID->1854448968],
-Cell[13931, 462, 242, 5, 39, "ExampleSection",
+Cell[16124, 529, 242, 5, 39, "ExampleSection",
  CellID->1293636265],
-Cell[14176, 469, 265, 5, 23, "ExampleSection",
+Cell[16369, 536, 265, 5, 23, "ExampleSection",
  CellID->1020263627],
 Cell[CellGroupData[{
-Cell[14466, 478, 244, 5, 23, "ExampleSection",
+Cell[16659, 545, 244, 5, 23, "ExampleSection",
  CellID->2061341341],
-Cell[14713, 485, 247, 5, 28, "ExampleSubsection",
+Cell[16906, 552, 247, 5, 28, "ExampleSubsection",
  CellID->1757724783],
-Cell[14963, 492, 247, 5, 22, "ExampleSubsection",
+Cell[17156, 559, 247, 5, 22, "ExampleSubsection",
  CellID->1295379749]
 }, Open  ]],
-Cell[15225, 500, 248, 5, 39, "ExampleSection",
+Cell[17418, 567, 248, 5, 39, "ExampleSection",
  CellID->258228157],
-Cell[15476, 507, 259, 5, 23, "ExampleSection",
+Cell[17669, 574, 259, 5, 23, "ExampleSection",
  CellID->2123667759],
-Cell[15738, 514, 252, 5, 23, "ExampleSection",
+Cell[17931, 581, 252, 5, 23, "ExampleSection",
  CellID->1305812373],
-Cell[15993, 521, 257, 5, 23, "ExampleSection",
+Cell[18186, 588, 257, 5, 23, "ExampleSection",
  CellID->1653164318],
-Cell[16253, 528, 249, 5, 23, "ExampleSection",
+Cell[18446, 595, 249, 5, 23, "ExampleSection",
  CellID->589267740]
 }, Open  ]]
 }
