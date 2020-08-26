@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     24960,        744]
-NotebookOptionsPosition[     20706,        589]
-NotebookOutlinePosition[     21172,        607]
-CellTagsIndexPosition[     21129,        604]
+NotebookDataLength[     28644,        868]
+NotebookOptionsPosition[     23723,        687]
+NotebookOutlinePosition[     24187,        705]
+CellTagsIndexPosition[     24144,        702]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -173,21 +173,28 @@ Cell["There are three types of entities in an EcoEvo model:", "Text",
 
 Cell[BoxData[GridBox[{
    {
-    RowBox[{"Auxiliary", " ", "variables"}], Cell[
-    "Abiotic variables", "TableText",ExpressionUUID->
-     "bf428769-72c0-4307-919b-b4642cf75e73"]},
-   {"Populations", Cell["\<\
+    RowBox[{"Auxiliary", " ", "variables", " ", 
+     RowBox[{"(", "auxs", ")"}]}], Cell["Abiotic variables", "TableText",
+     ExpressionUUID -> "bf428769-72c0-4307-919b-b4642cf75e73"]},
+   {
+    RowBox[{"Populations", " ", 
+     RowBox[{"(", "pops", ")"}]}], Cell["\<\
 Biotic variables, possibly structured into multiple components\
-\>", "TableText",ExpressionUUID->"c0a907c4-a73f-4d61-a6f6-22fdeee6b5d4"]},
+\>", "TableText",
+     ExpressionUUID -> "c0a907c4-a73f-4d61-a6f6-22fdeee6b5d4"]},
    {"Guilds", Cell["\<\
 Like populations, but with an open-ended number of species and possibly with \
-one or more traits\
-\>", "TableText",ExpressionUUID->"29f3a705-9cf8-4192-a001-e4aeb6a2a474"]}
+one or more traits or interactions\
+\>", "TableText",
+     ExpressionUUID -> "29f3a705-9cf8-4192-a001-e4aeb6a2a474"]}
   }]], "DefinitionBox",
  CellChangeTimes->{{3.736546221013863*^9, 3.7365462281320963`*^9}, {
    3.736546422575264*^9, 3.736546497826745*^9}, {3.736546771713043*^9, 
-   3.736546840776161*^9}, 3.736589594363241*^9, 3.736589631434985*^9},
- CellID->2096742444,ExpressionUUID->"9978360e-5b20-4b00-99be-9cc85e3eb9c5"],
+   3.736546840776161*^9}, 3.736589594363241*^9, 3.736589631434985*^9, {
+   3.807402913531138*^9, 3.807402923080538*^9}, {3.807403257454699*^9, 
+   3.80740325955865*^9}},
+ CellID->2096742444,
+ ExpressionUUID -> "9978360e-5b20-4b00-99be-9cc85e3eb9c5"],
 
 Cell["\<\
 In addition, ModelType defines the type of model \[LongDash] ContinuousTime \
@@ -198,7 +205,8 @@ number for a periodically forced model, and 0 for an aperiodically forced one.\
  CellChangeTimes->{{3.736546898305991*^9, 3.736546947718116*^9}, {
   3.736548159287622*^9, 3.736548170839038*^9}, {3.7365893231097193`*^9, 
   3.736589365139544*^9}, {3.736589409972782*^9, 3.736589453858508*^9}},
- CellID->1560556915,ExpressionUUID->"7836f5ac-e2cf-40c0-8558-b51e1baf4607"],
+ CellID->1560556915,
+ ExpressionUUID -> "7836f5ac-e2cf-40c0-8558-b51e1baf4607"],
 
 Cell[TextData[{
  "The active model to be studied is set with ",
@@ -224,6 +232,14 @@ Cell[TextData[{
  CellChangeTimes->{{3.737038623928203*^9, 3.737038666483184*^9}, {
   3.770623172881998*^9, 3.770623192991106*^9}},
  CellID->1644429961,ExpressionUUID->"388665af-24a3-4fed-a513-d89e1cce7361"],
+
+Cell["\<\
+Together, auxs, pops and guilds are called \"variables\" and traits and \
+interactions are called \"attributes\".\
+\>", "Text",
+ CellChangeTimes->{{3.807402955458832*^9, 3.8074029739214497`*^9}, {
+  3.807403248680007*^9, 3.807403278111384*^9}},
+ CellID->1727987996],
 
 Cell[CellGroupData[{
 
@@ -447,12 +463,13 @@ that all share the same fitness-generating function (",
  StyleBox["sensu",
   FontSlant->"Italic"],
  " Vincent & Brown 2005)  They have unstructured or structured components as \
-populations have, but also can have a number of traits.  They are open-ended \
-in the number of species, which are indexed with subscripts. ",
+populations have, but also can have a number of traits or interactions.  They \
+are open-ended in the number of species, which are indexed with subscripts. \
+",
  Cell[BoxData[
   StyleBox[
    SubscriptBox["\[ScriptCapitalN]", "guild"], "TI"]], "InlineFormula",
-  ExpressionUUID->"f9cd4aa2-021a-47b9-82d4-dcca7e9c8353"],
+  ExpressionUUID -> "f9cd4aa2-021a-47b9-82d4-dcca7e9c8353"],
  " is a placeholder for the number of species in guild ",
  StyleBox["guild", "TI"],
  ".  \[ScriptCapitalN] (script N) can be entered with the shortcut \
@@ -463,8 +480,10 @@ in the number of species, which are indexed with subscripts. ",
   3.737039039357991*^9}, {3.737039197871624*^9, 3.737039202902646*^9}, {
   3.737039407073059*^9, 3.7370395524577017`*^9}, {3.737040202004435*^9, 
   3.737040267933094*^9}, {3.770817769099166*^9, 3.77081780113967*^9}, {
-  3.7708180215671797`*^9, 3.770818044480556*^9}},
- CellID->1460922534,ExpressionUUID->"97ecc9e4-4a7e-4499-b4b2-fece3e786a7e"],
+  3.7708180215671797`*^9, 3.770818044480556*^9}, {3.807402935920339*^9, 
+  3.807402938704154*^9}},
+ CellID->1460922534,
+ ExpressionUUID -> "97ecc9e4-4a7e-4499-b4b2-fece3e786a7e"],
 
 Cell[TextData[{
  "Note that it is easier to define equations outside the ",
@@ -508,7 +527,8 @@ Cell[BoxData[
  CellChangeTimes->{{3.7370401136833057`*^9, 3.7370401255382137`*^9}, {
   3.737040169966178*^9, 3.737040170308259*^9}, {3.7706232732426357`*^9, 
   3.770623280706852*^9}},
- CellID->315195208,ExpressionUUID->"cda492d0-fcff-4b3e-a4ee-2637cac44625"]
+ CellID->315195208,
+ ExpressionUUID -> "cda492d0-fcff-4b3e-a4ee-2637cac44625"]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -544,6 +564,84 @@ Cell[BoxData[
  CellChangeTimes->{{3.737040186604354*^9, 3.737040187948473*^9}, 
    3.770623284834402*^9, {3.7708178149646177`*^9, 3.770817818488166*^9}},
  CellID->859436906,ExpressionUUID->"537f40fd-5f8e-46cd-94cc-646003363f51"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Interactions", "Subsection",
+ CellChangeTimes->{{3.8074030025519*^9, 3.807403005768886*^9}},
+ CellID->1390918122],
+
+Cell["\<\
+Interactions are like traits, but describe how two individuals (in the same \
+or different guilds) interact. \
+\>", "Text",
+ CellChangeTimes->{{3.8074030106749887`*^9, 3.8074030502039003`*^9}, {
+  3.807403114725559*^9, 3.807403147004881*^9}, {3.807437411880275*^9, 
+  3.807437485623117*^9}},
+ CellID->255134865],
+
+Cell[CellGroupData[{
+
+Cell["Interactions between species in one guild:", "Text",
+ CellID->221196394],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Interaction", "[", "a", "]"}], "\[Rule]", 
+  RowBox[{"{", 
+   RowBox[{"Guilds", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"n", ",", "n"}], "}"}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.7370401136833057`*^9, 3.7370401255382137`*^9}, {
+  3.737040169966178*^9, 3.737040170308259*^9}, {3.7706232732426357`*^9, 
+  3.770623280706852*^9}, {3.807403084792694*^9, 3.8074030991894817`*^9}},
+ CellID->1010334847,
+ ExpressionUUID -> "cda492d0-fcff-4b3e-a4ee-2637cac44625"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Between two guilds:", "Text",
+ CellChangeTimes->{{3.807403126549752*^9, 3.8074031523734627`*^9}},
+ CellID->1709352321],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Interaction", "[", "a", "]"}], "\[Rule]", 
+  RowBox[{"{", 
+   RowBox[{"Guilds", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"n", ",", "p"}], "}"}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.7370401136833057`*^9, 3.7370401255382137`*^9}, {
+   3.737040169966178*^9, 3.737040170308259*^9}, {3.7706232732426357`*^9, 
+   3.770623280706852*^9}, {3.807403084792694*^9, 3.8074030991894817`*^9}, 
+   3.807403134560419*^9},
+ CellID->1731102090,
+ ExpressionUUID -> "cda492d0-fcff-4b3e-a4ee-2637cac44625"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Interaction coefficients between species ",
+ StyleBox["i", "TI"],
+ " and ",
+ StyleBox["j", "TI"],
+ " are written with a two-part subscript:"
+}], "Text",
+ CellChangeTimes->{{3.807403159934908*^9, 3.8074032242380657`*^9}},
+ CellID->1902494149],
+
+Cell[BoxData[
+ SubscriptBox["a", 
+  RowBox[{"i", ",", "j"}]]], "Input",
+ CellChangeTimes->{{3.737040186604354*^9, 3.737040187948473*^9}, 
+   3.770623284834402*^9, {3.7708178149646177`*^9, 3.770817818488166*^9}, {
+   3.8074031984347467`*^9, 3.8074032033428783`*^9}},
+ CellID->586663798,
+ ExpressionUUID -> "537f40fd-5f8e-46cd-94cc-646003363f51"]
 }, Open  ]]
 }, Open  ]],
 
@@ -588,7 +686,7 @@ Cell["XXXX", "TutorialRelatedLinks",
 }, Open  ]]
 },
 WindowSize->{1216, 986},
-WindowMargins->{{Automatic, 297}, {Automatic, -30}},
+WindowMargins->{{522, Automatic}, {Automatic, 0}},
 Magnification:>1.5 Inherited,
 FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
 2014)",
@@ -623,39 +721,39 @@ Cell[1983, 66, 427, 8, 44, "Categorization",
 Cell[CellGroupData[{
 Cell[2447, 79, 114, 2, 42, "KeywordsSection",
  CellID->477174294],
-Cell[2564, 83, 104, 2, 22, "Keywords",
+Cell[2564, 83, 104, 2, 49, "Keywords",
  CellID->1164421360],
-Cell[2671, 87, 124, 2, 26, "TemplatesSection",
+Cell[2671, 87, 124, 2, 58, "TemplatesSection",
  CellID->1872225408],
-Cell[2798, 91, 153, 3, 40, "Template",
+Cell[2798, 91, 153, 3, 90, "Template",
  CellID->1562036412],
-Cell[2954, 96, 141, 3, 40, "Template",
+Cell[2954, 96, 141, 3, 90, "Template",
  CellID->158391909],
-Cell[3098, 101, 140, 3, 40, "Template",
+Cell[3098, 101, 140, 3, 90, "Template",
  CellID->1360575930],
-Cell[3241, 106, 141, 3, 40, "Template",
+Cell[3241, 106, 141, 3, 90, "Template",
  CellID->793782254]
 }, Closed]],
 Cell[CellGroupData[{
 Cell[3419, 114, 113, 2, 26, "DetailsSection",
  CellID->1345657494],
-Cell[3535, 118, 122, 3, 36, "Details",
+Cell[3535, 118, 122, 3, 81, "Details",
  CellID->670882175],
-Cell[3660, 123, 129, 3, 36, "Details",
+Cell[3660, 123, 129, 3, 81, "Details",
  CellID->1315215101],
-Cell[3792, 128, 123, 3, 36, "Details",
+Cell[3792, 128, 123, 3, 81, "Details",
  CellID->8391405],
-Cell[3918, 133, 128, 3, 36, "Details",
+Cell[3918, 133, 128, 3, 81, "Details",
  CellID->3610269],
-Cell[4049, 138, 120, 3, 36, "Details",
+Cell[4049, 138, 120, 3, 81, "Details",
  CellID->401364205],
-Cell[4172, 143, 120, 3, 36, "Details",
+Cell[4172, 143, 120, 3, 81, "Details",
  CellID->350204745],
-Cell[4295, 148, 122, 3, 36, "Details",
+Cell[4295, 148, 122, 3, 81, "Details",
  CellID->732958810],
-Cell[4420, 153, 137, 3, 36, "Details",
+Cell[4420, 153, 137, 3, 81, "Details",
  CellID->222905350],
-Cell[4560, 158, 126, 3, 36, "Details",
+Cell[4560, 158, 126, 3, 81, "Details",
  CellID->771023936]
 }, Closed]],
 Cell[CellGroupData[{
@@ -663,86 +761,112 @@ Cell[4723, 166, 107, 1, 122, "Title",
  CellID->509267359],
 Cell[4833, 169, 213, 2, 33, "Text",
  CellID->1534169418],
-Cell[5049, 173, 856, 16, 145, "DefinitionBox",
+Cell[5049, 173, 1081, 23, 145, "DefinitionBox",
  CellID->2096742444],
-Cell[5908, 191, 626, 9, 81, "Text",
+Cell[6133, 198, 630, 10, 81, "Text",
  CellID->1560556915],
-Cell[6537, 202, 915, 23, 61, "Text",
+Cell[6766, 210, 915, 23, 61, "Text",
  CellID->1644429961],
+Cell[7684, 235, 275, 6, 33, "Text",
+ CellID->1727987996],
 Cell[CellGroupData[{
-Cell[7477, 229, 212, 3, 55, "Subsection",
+Cell[7984, 245, 212, 3, 55, "Subsection",
  CellID->544840492],
-Cell[7692, 234, 509, 8, 57, "Text",
+Cell[8199, 250, 509, 8, 57, "Text",
  CellID->1885503418],
 Cell[CellGroupData[{
-Cell[8226, 246, 260, 5, 33, "Text",
+Cell[8733, 262, 260, 5, 33, "Text",
  CellID->4844606],
-Cell[8489, 253, 449, 11, 34, "Input",
+Cell[8996, 269, 449, 11, 34, "Input",
  CellID->997361999]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[8987, 270, 175, 2, 58, "Subsection",
+Cell[9494, 286, 175, 2, 58, "Subsection",
  CellID->1349396302],
-Cell[9165, 274, 2237, 48, 157, "Text",
+Cell[9672, 290, 2237, 48, 157, "Text",
  CellID->118441052],
-Cell[11405, 324, 209, 2, 33, "Text",
+Cell[11912, 340, 209, 2, 33, "Text",
  CellID->867090134],
 Cell[CellGroupData[{
-Cell[11639, 330, 303, 5, 33, "Text",
+Cell[12146, 346, 303, 5, 33, "Text",
  CellID->1395408876],
-Cell[11945, 337, 521, 14, 34, "Input",
+Cell[12452, 353, 521, 14, 34, "Input",
  CellID->571859342]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[12503, 356, 475, 8, 57, "Text",
+Cell[13010, 372, 475, 8, 57, "Text",
  CellID->1148731986],
-Cell[12981, 366, 617, 16, 34, "Input",
+Cell[13488, 382, 617, 16, 34, "Input",
  CellID->1520879378]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[13635, 387, 254, 5, 33, "Text",
+Cell[14142, 403, 254, 5, 33, "Text",
  CellID->1608381022],
-Cell[13892, 394, 1395, 39, 81, "Input",
+Cell[14399, 410, 1395, 39, 81, "Input",
  CellID->1474597015]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[15336, 439, 169, 2, 130, "Subsection",
+Cell[15843, 455, 169, 2, 58, "Subsection",
  CellID->774951276],
-Cell[15508, 443, 1250, 23, 303, "Text",
+Cell[16015, 459, 1323, 26, 135, "Text",
  CellID->1460922534],
-Cell[16761, 468, 574, 12, 82, "Text",
+Cell[17341, 487, 574, 12, 35, "Text",
  CellID->982289642],
 Cell[CellGroupData[{
-Cell[17360, 484, 297, 6, 73, "Text",
+Cell[17940, 503, 297, 6, 33, "Text",
  CellID->634413793],
-Cell[17660, 492, 675, 18, 91, "Input",
+Cell[18240, 511, 679, 19, 34, "Input",
  CellID->315195208]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[18372, 515, 200, 2, 73, "Text",
+Cell[18956, 535, 200, 2, 33, "Text",
  CellID->928924823],
-Cell[18575, 519, 896, 26, 99, "Input",
+Cell[19159, 539, 896, 26, 42, "Input",
  CellID->859436906]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19520, 551, 120, 1, 240, "TutorialMoreAboutSection",
+Cell[20104, 571, 119, 2, 58, "Subsection",
+ CellID->1390918122],
+Cell[20226, 575, 321, 7, 33, "Text",
+ CellID->255134865],
+Cell[CellGroupData[{
+Cell[20572, 586, 78, 1, 33, "Text",
+ CellID->221196394],
+Cell[20653, 589, 500, 11, 34, "Input",
+ CellID->1010334847]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21190, 605, 124, 2, 33, "Text",
+ CellID->1709352321],
+Cell[21317, 609, 528, 12, 34, "Input",
+ CellID->1731102090]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21882, 626, 259, 8, 34, "Text",
+ CellID->1902494149],
+Cell[22144, 636, 344, 7, 39, "Input",
+ CellID->586663798]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22537, 649, 120, 1, 107, "TutorialMoreAboutSection",
  CellID->23220180],
-Cell[19643, 554, 109, 1, 72, "TutorialMoreAbout",
+Cell[22660, 652, 109, 1, 31, "TutorialMoreAbout",
  CellID->1567025153]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[19789, 560, 127, 1, 240, "RelatedTutorialsSection",
+Cell[22806, 658, 127, 1, 107, "RelatedTutorialsSection",
  CellID->415694126],
-Cell[19919, 563, 455, 13, 123, "RelatedTutorials",
+Cell[22936, 661, 455, 13, 54, "RelatedTutorials",
  CellID->1720175761]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[20411, 581, 153, 1, 240, "TutorialRelatedLinksSection",
+Cell[23428, 679, 153, 1, 107, "TutorialRelatedLinksSection",
  CellID->415694148],
-Cell[20567, 584, 111, 1, 72, "TutorialRelatedLinks",
+Cell[23584, 682, 111, 1, 31, "TutorialRelatedLinks",
  CellID->415694149]
 }, Open  ]]
 }, Open  ]]

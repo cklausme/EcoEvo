@@ -5,7 +5,7 @@
 
 
 package="EcoEvo";
-version="1.4.1";
+version="1.5.0";
 
 
 Needs["PackageTools`"]
@@ -218,6 +218,3 @@ PublishPacletDocs[pacletDir_String,target_CloudObject]:=KeyValueMap[publishDocDi
 
 
 PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.4.1/EcoEvo",CloudObject["docs"]];
-
-
-
