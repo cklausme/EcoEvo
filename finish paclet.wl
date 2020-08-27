@@ -29,7 +29,7 @@ builddir=FileNameJoin[{rootdir,"build",package<>"-"<>version,package}]
 docdir=FileNameJoin[{builddir, "Documentation"}]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*fix docs*)
 
 
@@ -85,7 +85,7 @@ code =
 MRun[code, "10.0"]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*make paclet*)
 
 
@@ -118,7 +118,7 @@ PacletInstall[paclet]
 
 
 (* ::Section:: *)
-(*update pacletsite*)
+(*update pacletsite (run after making release on github)*)
 
 
 <<PacletManager`
