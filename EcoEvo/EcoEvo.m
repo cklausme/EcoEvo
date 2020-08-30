@@ -6382,7 +6382,7 @@ gu1,tr1,per,res,inv,epilog,tad},
 
 Block[{\[ScriptCapitalN]},
 
-(*Print["traits=",traits];
+(*Print["attributes=",attributes];
 Print["sol=",sol];
 Print["{trait1,trait1min,trait1max}=",{trait1,trait1min,trait1max}];*)
 
@@ -6424,7 +6424,7 @@ If[species=!=None,
 			{If[guild1[interaction]===gu1,Subscript[interaction,0,sp\[Prime]_]->(Subscript[interaction,species,sp\[Prime]]/.attributes),Nothing],
 			If[guild2[interaction]===gu1,Subscript[interaction,sp\[Prime]_,0]->(Subscript[interaction,sp\[Prime],species]/.attributes),Nothing]}
 		,{interaction,EcoEvo`Private`interactions}],
-		Table[If[Subscript[gtrait,0]=!=trait1,Subscript[gtrait,0]->(Subscript[gtrait,species]/.traits),Nothing],{gtrait,gtraits[gu1]}]
+		Table[If[Subscript[gtrait,0]=!=trait1,Subscript[gtrait,0]->(Subscript[gtrait,species]/.attributes),Nothing],{gtrait,gtraits[gu1]}]
 		}
 ];
 (*Print["fixed=",fixed];*)
@@ -6445,7 +6445,7 @@ If[delayinv,
 ,
 	(* nondelay inv *)
 	Off[NIntegrate::inumr];
-	inv=Inv[attributes,sol,Guild->gu1,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall]/.fixed/.traits;
+	inv=Inv[attributes,sol,Guild->gu1,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall]/.fixed/.attributes;
 	iplot=Plot[inv,{trait1,trait1min,trait1max},
 		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
 	On[NIntegrate::inumr]
@@ -6457,9 +6457,9 @@ If[delayinv,
 Which[
 	plotspecies==="Axis",
 	If[markerstyle===Automatic,
-		epilog=Table[{PointSize[0.015],color[Subscript[tr1,sp]][SpFrac[sp,\[ScriptCapitalN][gu1]]],Point[{Subscript[tr1,sp]/.traits,0}]},{sp,\[ScriptCapitalN][gu1]}],
+		epilog=Table[{PointSize[0.015],color[Subscript[tr1,sp]][SpFrac[sp,\[ScriptCapitalN][gu1]]],Point[{Subscript[tr1,sp]/.attributes,0}]},{sp,\[ScriptCapitalN][gu1]}],
 		epilog=MapThread[Append,{PadRight[{},\[ScriptCapitalN][gu1],
-			Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr1,sp]/.traits,0}],{sp,\[ScriptCapitalN][gu1]}]}]
+			Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr1,sp]/.attributes,0}],{sp,\[ScriptCapitalN][gu1]}]}]
 	];
 	res=Show[iplot,Epilog->epilog]
 ,
