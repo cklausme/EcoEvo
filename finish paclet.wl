@@ -5,7 +5,7 @@
 
 
 package="EcoEvo";
-version="1.5.0";
+version="1.5.1";
 
 
 Needs["PackageTools`"]
@@ -85,7 +85,7 @@ code =
 MRun[code, "10.0"]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*make paclet*)
 
 
@@ -118,7 +118,7 @@ PacletInstall[paclet]
 
 
 (* ::Section:: *)
-(*update pacletsite (run after making release on github)*)
+(*update pacletsite (run after moving paclet to Paclets, then commit & push)*)
 
 
 <<PacletManager`
@@ -217,7 +217,4 @@ publishDocDir[pacletDir_,subdir_,prefix_,target_]:=Module[{
 PublishPacletDocs[pacletDir_String,target_CloudObject]:=KeyValueMap[publishDocDir[pacletDir,#1,#2,target]&,dirPrefixes]
 
 
-PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.5.0/EcoEvo",CloudObject["docs"]];
-
-
-
+PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.5.1/EcoEvo",CloudObject["docs"]];
