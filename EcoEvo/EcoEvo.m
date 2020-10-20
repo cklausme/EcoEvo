@@ -71,6 +71,7 @@ SortedEigensystem;ListMultiplier;RunFile;RouthHurwitzCriteria;
 JoinFirst;
 PlotDynamics;PlotInterpolatingFunction;ListLinePlot3D;RuleListPlot;
 TrackRoot;
+PartsAboveDiagonal;PrintMessage;
 
 
 Set\[ScriptCapitalN];
@@ -78,16 +79,18 @@ Set\[ScriptCapitalN];
 
 EcoEvoDocs;
 ExtractInteractions;ExtractTraits;ExtractAttributes;
-ExtractPops;ExtractAuxs;ExtractGuilds;ExtractVariables;
+ExtractPops;ExtractAuxs;ExtractGuilds;ExtractVariables;ExtractSpecies;
 TraitsQ;InteractionsQ;AttributesQ;VariablesQ;ListOfVariablesQ;AttributesAndVariablesQ;
 InvaderQ;NotInvaderTraitsQ;GsQ;
 DeleteInvaders;SelectValid;
+SplitSpecies;
 
 
 SetModel;UnsetModel;ModelInfo;
 MatrixToPopComponents;MatrixToGuildComponents;
 WeightedAbundance;TotalAbundance;
 TraitMean;TraitVariance;TraitDistance;FunctionalDistinctiveness;
+ExtantSpecies;ExtinctSpecies;
 
 
 LookUp::usage =
@@ -132,10 +135,12 @@ EcoEq;SolveEcoEq;NSolveEcoEq;FindEcoEq;FindEcoCycle;
 EcoJacobian;EcoEigenvalues;EcoStableQ;SelectEcoStable;FindEcoAttractor;
 PlotEcoIsoclines;PlotEcoStreams;PlotEcoPhasePlane;
 PrestonPlot;WhittakerPlot;PlotTAD;
+ImpactVector;PlotImpactVector;
 
 
 InvSPS;Inv;StablePopulationStructure;ReproductiveValues;
 DInv;NDInv;NumDInv;
+MaximizeInv;GlobalESSQ;LocalESSQ;
 PlotInv;PlotZIP;PlotZNGI;PlotPIP;PlotMIP;
 
 
@@ -143,9 +148,9 @@ EvoEqns;
 PlotEvoIsoclines;PlotEvoStreams;PlotEvoPhasePlane;
 EcoEvoSim;
 FindEcoEvoEq;FindEcoEvoCycle;FindEcoCycleEvoEq;
+TrackEcoEvoEq;
 EvoEq;SolveEvoEq;NSolveEvoEq;FindEvoEq;
 EcoEvoJacobian;EcoEvoEigenvalues;EvoJacobian;EvoEigenvalues;
-MaximizeInv;GlobalESSQ;
 
 
 AbsoluteStepSize::usage = "AbsoluteStepSize is an option for NDInv that sets the absolute step size.";
@@ -154,7 +159,6 @@ TemporalMeanOpts::usage = "TemporalMeanOpts is an option for TemporalVariance an
 Bandwidth::usage = "Bandwidth is an option for PrestonPlot that sets the bandwidth in SmoothKernelDistribution.";
 Base::usage = "Base is an option for PrestonPlot that sets the logarithm base.";
 BasePeriod::usage = "BasePeriod is an option for FindPeriod that gives the period to look at multiples of.";
-BifurcationAction::usage = "BifurcationAction is an option for TrackEcoEvoEq that selects what to do when a bifurcation is found.";
 BoundaryDetection::usage = "BoundaryDetection is an option for various EcoEvo functions to enforce variable/trait bounds.";
 Constraints::usage = "Constraints is an option for various EcoEvo functions that add extra constraints.";
 DelayDInv::usage = "DelayDInv is an option for various EcoEvo functions that delays the evaluation of DInv.";
@@ -195,6 +199,7 @@ Guild::usage = "Guild is an option for various EcoEvo functions that sets which 
 ICs::usage = "ICs is an option for PlotPIP and PlotMIP that supplies initial guesses for FindEcoAttractor.";
 IndeterminateMarker::usage = "IndeterminateMarker is an option for RuleListPlot that defines the marker style for indeterminate equilibria.";
 IntegrateOpts::usage = "IntegrateOpts is an option for various EcoEvo functions that passes options to Integrate.";
+InterpolationOpts::usage = "InterpolationOpts is an option for various EcoEvo functions that passes options to Interpolation.";
 InvOpts::usage = "InvOpts is an option for various EcoEvo functions that passes options to Inv.";
 InvStyle::usage = "InvStyle is an option for PlotMIP (PlotType->MIP) that defines the style for successful invasion.";
 InvThreshold::usage = "InvThreshold is an option for PlotMIP that sets the threshold for successful invasion.";
@@ -203,9 +208,13 @@ Logged::usage = "Logged is an option for EcoSim that logs population variables."
 MarkerStyle::usage = "MarkerStyle is an option for PrestonPlot that styles species markers.";
 MaximizeInvOpts::usage = "MaximizeInvOpts is an option for GlobalESSQ that passes options to MaximizeInv.";
 MaximizeOpts::usage = "MaximizeOpts is an option for various EcoEvo functions that passes options to Maximize.";
+MaxBend::usage = "MaxBend is an option for TrackEcoEvoEq that sets the minimum angle to trigger refinement.";
+MaxChange::usage = "MaxChange is an option for TrackEcoEvoEq that sets the minimum change to trigger refinement.";
 MaxPeriod::usage = "MaxPeriod is an option for FindEcoAttactor that sets the largest discrete-time period to look for a cycle.";
 MaxPeriodMultiplier::usage = "MaxPeriodMultiplier is an option for FindEcoAttractor that sets how many multiples of the Period to try.";
+MinDistance::usage = "MinDistance is an option for TrackEcoEvoEq that sets the threshold for calling two species converged.";
 MinPop::usage = "MinPop is an option for various EcoEvo functions that defines a minimum population size.";
+MinStepSize::usage = "MinStepSize is an option for various EcoEvo functions that specifies the minimum size of a single step used in generating a result.";
 Multipliers::usage = "Multipliers is an option for EcoEigenvalues that chooses Floquet multipliers (True) or exponents (False).";
 NDInvOpts::usage = "NDInvOpts is an option for various EcoEvo functions that passes options to NDInv.";
 NDOpts::usage = "NDOpts is an option for various EcoEvo functions that passes options to ND.";
@@ -259,6 +268,7 @@ Switches::usage = "Switches is an option for EcoSimSSD that says when external m
 TADVerticalScale::usage = "TADVerticalScale is an option for PlotInv that sets the vertical extent of the TAD. Should be between zero and one.";
 TestStability::usage = "TestStability is an option for FindEcoAttractor that determines whether to test for stable equilibria.";
 TestValidity::usage = "TestValidity is an option for FindEcoAttractor that determines whether to test for valid equilibria.";
+Tests::usage = "Tests is an option for TrackEcoEvoEq that gives which bifurcations/errors to look for.";
 Time::usage = "Time is an option for various EcoEvo functions that specifies when to evaluation the model.";
 TimeScale::usage = "TimeScale is an option for EcoSim that sets the overall timescale (default=1).";
 TMax::usage = "TMax is an option for FindEcoAttractor that sets the maximum time for EcoSim.";
@@ -286,10 +296,47 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.5.1 (August 29, 2020)";
+$EcoEvoVersion="1.5.2X (October 20, 2020)";
 
 
 modelloaded=False;
+
+
+NewFunction::usage=
+"NewFunction[\!\(\*
+StyleBox[\"args\", \"TI\"]\)] is a new function.";
+
+
+NewFunction[args_,opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["NewFunction"],
+(* options *)
+verbose
+(* other variables *)
+},
+
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[EcoSim]}]];
+If[Global`debug,verbose=True];
+
+Return[ret]
+]];
+
+
+Options[NewFunction]={
+};
+
+
+
+
+
+
 
 
 SetOptions[NDSolve,MaxSteps->Infinity];
@@ -346,14 +393,16 @@ ifs,grid},
 interpolationopts=FilterRules[Flatten[{opts,Options[Reinterpolation]}],Options[Interpolation]];
 interpolationpoints=Evaluate[InterpolationPoints/.Flatten[{opts,Options[Reinterpolation]}]];
 
-ifs=Cases[f,_InterpolatingFunction,\[Infinity]];
+ifs=Cases[f,_InterpolatingFunction,{0,\[Infinity]}];
 If[ifs=={},Return[f]];
+
 If[interpolationpoints===Automatic,
 	grid=Union[Flatten[Through[ifs["Grid"]],1]],
 (* using ifs\[LeftDoubleBracket]1,1\[RightDoubleBracket] because ifs\[LeftDoubleBracket]1\[RightDoubleBracket]["Domain"] fails sometimes?! - see "wtf domain.nb" *)
 	grid=Flatten[Subdivide[Sequence@@#,interpolationpoints]&/@ifs[[1,1]]]
 ];
-Return[Interpolation[Table[{Sequence@@val,f/.(if_InterpolatingFunction->if[Sequence@@val])},{val,grid}],interpolationopts]]
+
+Return[Interpolation[Table[{Sequence@@val,f/.(if_InterpolatingFunction->if[Sequence@@val])},{val,grid}],Evaluate[Sequence@@interpolationopts]]]
 ];
 
 
@@ -2508,6 +2557,16 @@ TrackRoot[{eqns},{unksnics},{par,ipar,parmin,parmax},opts];
 Options[TrackRoot]={FindRootOpts->{},NDSolveOpts->{},Method->"PseudoArcLength",SMin->-100,SMax->100};
 
 
+PartsAboveDiagonal[arr_?MatrixQ]:=Module[{dim},
+	dim=Dimensions[arr];
+	Flatten@Table[arr[[i,j]],{i,1,dim[[1]]},{j,i+1,dim[[2]]}]
+]
+
+
+(* by xzczd <https://mathematica.stackexchange.com/a/233122/6358> *)
+PrintMessage[mess_, val__] := Print@StringForm[mess, val];
+
+
 Set\[ScriptCapitalN][attributes:(_?AttributesQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,interxns,tnsp,pnsp,insp},
 (*Print["In Set\[ScriptCapitalN], attributes=",attributes," variables=",variables];*)
 (*Print[Table[\[ScriptCapitalN][gu]/.attributes,{gu,guilds}]];*)
@@ -2807,6 +2866,11 @@ ExtractVariables::usage=
 StyleBox[\"x\", \"TI\"]\)] extracts pops, guilds, and auxs from rulelist or list-of-rulelists \!\(\*
 StyleBox[\"x\", \"TI\"]\).";
 
+ExtractSpecies::usage=
+"ExtractSpecies[\!\(\*
+StyleBox[\"x\", \"TI\"]\)] extracts pops and guilds from rulelist or list-of-rulelists \!\(\*
+StyleBox[\"x\", \"TI\"]\).";
+
 
 ExtractInteractions[in_?RuleListQ]:=Module[{pattern},
 	pattern=Join[
@@ -2845,14 +2909,15 @@ ExtractGuilds[in_?RuleListQ,target_:All]:=Module[{res,pattern,gu,sp},
 		target===All,
 		pattern=Join[
 			Flatten[Table[Table[Subscript[gcomp, _],{gcomp,gcomps[gu]}],{gu,guilds}]],
-			Table[Subscript[\[ScriptCapitalN], gu],{gu,guilds}]
+			Table[Subscript[\[ScriptCapitalN], gu],{gu,guilds}],
+			Table[Subscript[gu, _],{gu,guilds}]
 		],
 		Head[target]===Subscript,
 		gu=target[[1]];sp=target[[2]];
-		pattern=Table[Subscript[gcomp, sp],{gcomp,gcomps[gu]}],
+		pattern=Join[Table[Subscript[gcomp, sp],{gcomp,gcomps[gu]}],{Subscript[gu, sp]}],
 		Else,
 		gu=target;
-		pattern=Append[Table[Subscript[gcomp, _],{gcomp,gcomps[gu]}],Subscript[\[ScriptCapitalN], gu]]
+		pattern=Join[Table[Subscript[gcomp, _],{gcomp,gcomps[gu]}],{Subscript[gu, _],Subscript[\[ScriptCapitalN], gu]}]
 	];
 	(*Print["pattern=",pattern];*)
 	res=FilterRules[in,pattern];
@@ -2869,6 +2934,9 @@ ExtractPops[in_?RuleListQ]:=FilterRules[in,Flatten[Table[pcomps[pop],{pop,pops}]
 ExtractVariables[in_?RuleListQ]:=Join[ExtractAuxs[in],ExtractPops[in],ExtractGuilds[in]];
 
 
+ExtractSpecies[in_?RuleListQ]:=Join[ExtractPops[in],ExtractGuilds[in]];
+
+
 (* make Listable *)
 ExtractTraits[in_?RuleListListQ,target___]:=ExtractTraits[#,target]&/@in;
 ExtractTraits[in_?RuleListQ,target_List]:=Flatten[Union[ExtractTraits[in,#]&/@target]];
@@ -2879,6 +2947,7 @@ ExtractGuilds[in_?RuleListQ,target_List]:=Flatten[Union[ExtractGuilds[in,#]&/@ta
 ExtractAuxs[in_?RuleListListQ]:=ExtractAuxs/@in;
 ExtractPops[in_?RuleListListQ]:=ExtractPops/@in;
 ExtractVariables[in_?RuleListListQ]:=ExtractVariables/@in;
+ExtractSpecies[in_?RuleListListQ]:=ExtractSpecies/@in;
 
 
 TraitsQ::usage=
@@ -3006,6 +3075,61 @@ Return[res]
 ];
 
 
+SplitSpecies::usage=
+"SplitSpecies[\!\(\*
+StyleBox[\"sol\", \"TI\"]\), \!\(\*
+StyleBox[\"target\", \"TI\"]\)] splits \!\(\*
+StyleBox[\"target\", \"TI\"]\) in two.";
+
+
+SplitSpecies[sol_?AttributesAndVariablesQ,target_,dtraitsin_:Automatic]:=Module[{
+func=FuncStyle["SplitSpecies"],
+(* options *)
+(* other variables *)
+gu,sp,dtraits,ecomps,tmp
+},
+
+Block[{\[ScriptCapitalN]},
+
+(* figure out target sp *)
+{gu,sp}=LookUp[target][[{2,4}]];
+
+Which[
+	dtraitsin===Automatic,
+	dtraits=Table[trait->0.01,{trait,gtraits[gu]}],
+	NumericQ[dtraitsin],
+	dtraits=Table[trait->dtraitsin,{trait,gtraits[gu]}],
+	Else,
+	dtraits=dtraitsin
+];
+(*Print["dtraits=",dtraits];*)
+
+(* figure out number of species in guilds *)
+Set\[ScriptCapitalN][ExtractAttributes[sol],ExtractVariables[sol]];
+If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
+
+ecomps=Select[gcomps[gu],comptype[#]=="Extensive"&];
+
+(* split target species' extensive components *)
+tmp=sol/.Table[(Subscript[var, sp]->val_)->(Subscript[var, sp]->val/2),{var,ecomps}];
+(*Print[tmp];*)
+
+(* add new species' components *)
+tmp=Join[tmp,Table[Subscript[var, \[ScriptCapitalN][gu]+1]->(Subscript[var, sp]/.tmp),{var,gcomps[gu]}]];
+(*Print[tmp];*)
+
+(* add new species' traits *)
+tmp=Join[tmp,Table[Subscript[trait, \[ScriptCapitalN][gu]+1]->((Subscript[trait, sp]/.tmp)+(trait/.dtraits)),{trait,gtraits[gu]}]];
+(*Print[tmp];*)
+
+(* change target species' traits *)
+tmp=RuleListSubtract[tmp,Table[Subscript[trait, sp]->(trait/.dtraits),{trait,gtraits[gu]}]];
+(*Print[tmp];*)
+
+Return[Sort[tmp]];
+]];
+
+
 Subscript[\[ScriptCapitalN], gu_]:=\[ScriptCapitalN][gu];
 Subscript[\[FormalCapitalN], gu_]:=\[FormalCapitalN][gu];
 
@@ -3047,35 +3171,6 @@ modelperiod:=Period/.Append[model,Period->0];
 
 stylecount=0;
 
-(* pops *)
-
-pops=Select[model,#[[1,0]]==Pop&][[All,1,1]];
-(*Print["pops=",pops];*)
-npops=Length[pops];
-(*Print["npops=",npops];*)
-pcompeqn[pop_,pco_]:=Equation/.If[RuleListQ[Component[pco]/.(Pop[pop]/.model)],Component[pco]/.(Pop[pop]/.model),Pop[pop]/.model];
-
-Do[
-	in=Pop[pop]/.model;
-	type[pop]="pop";
-	LookUp[pop]={"pop",pop};
-	pcomps[pop]=Select[in,#[[1,0]]==Component&][[All,1,1]];
-	If[pcomps[pop]=={},pcomps[pop]={pop}];
-	(*Print["pcomps["<>ToString@pop<>"]=",pcomps[pop]];*)
-	npcomps[pop]=Length[pcomps[pop]];
-	(*Print["npcomps["<>ToString[pop]<>"]=",npcomps[pop]];*)
-	Do[
-		stylecount++;
-		type[pcomp]="pcomp";
-		in=If[RuleListQ[Component[pcomp]/.(Pop[pop]/.model)],Component[pcomp]/.(Pop[pop]/.model),Pop[pop]/.model];
-		comptype[pcomp]=Type/.Append[in,Type->"Extensive"];
-		range[pcomp]=Range/.Append[in,Range->Interval[{0,\[Infinity]}]];
-		color[pcomp]=color[_[pcomp]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
-		linestyle[pcomp]=linestyle[_[pcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
-		plotmarker[pcomp]=plotmarker[_[pcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
-		LookUp[pcomp]=LookUp[_[pcomp]]={"pcomp",pop,pcomp};
-	,{pcomp,pcomps[pop]}];
-,{pop,pops}];
 
 (* auxs *)
 
@@ -3096,6 +3191,38 @@ Do[
 	LookUp[aux]=LookUp[_[aux]]={"aux",aux};
 ,{aux,auxs}];
 
+
+(* pops *)
+
+pops=Select[model,#[[1,0]]==Pop&][[All,1,1]];
+(*Print["pops=",pops];*)
+npops=Length[pops];
+(*Print["npops=",npops];*)
+pcompeqn[pop_,pco_]:=Equation/.If[RuleListQ[Component[pco]/.(Pop[pop]/.model)],Component[pco]/.(Pop[pop]/.model),Pop[pop]/.model];
+
+Do[
+	in=Pop[pop]/.model;
+	type[pop]="pop";
+	LookUp[pop]={"pop",pop};
+	comps[pop]=pcomps[pop]=Select[in,#[[1,0]]==Component&][[All,1,1]];
+	If[pcomps[pop]=={},comps[pop]=pcomps[pop]={pop}];
+	(*Print["pcomps["<>ToString@pop<>"]=",pcomps[pop]];*)
+	ncomps[pop]=npcomps[pop]=Length[pcomps[pop]];
+	(*Print["npcomps["<>ToString[pop]<>"]=",npcomps[pop]];*)
+	Do[
+		stylecount++;
+		type[pcomp]="pcomp";
+		in=If[RuleListQ[Component[pcomp]/.(Pop[pop]/.model)],Component[pcomp]/.(Pop[pop]/.model),Pop[pop]/.model];
+		comptype[pcomp]=Type/.Append[in,Type->"Extensive"];
+		range[pcomp]=Range/.Append[in,Range->Interval[{0,\[Infinity]}]];
+		color[pcomp]=color[_[pcomp]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
+		linestyle[pcomp]=linestyle[_[pcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
+		plotmarker[pcomp]=plotmarker[_[pcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
+		LookUp[pcomp]=LookUp[_[pcomp]]={"pcomp",pop,pcomp};
+	,{pcomp,pcomps[pop]}];
+,{pop,pops}];
+
+
 (* guilds *)
 
 stylecount=0;
@@ -3110,9 +3237,10 @@ Do[
 	(*Print[Guild[gu]/.model];*)
 	type[gu]="guild";
 	LookUp[gu]={"guild",gu};
-	gcomps[gu]=Select[Guild[gu]/.model,#[[1,0]]==Component&][[All,1,1]];
-	If[Length[gcomps[gu]]==0,gcomps[gu]={Guild[gu][[1]]}];
-	ngcomps[gu]=Length[gcomps[gu]];
+	comps[gu]=gcomps[gu]=Select[Guild[gu]/.model,#[[1,0]]==Component&][[All,1,1]];
+	If[Length[gcomps[gu]]==0,comps[gu]=gcomps[gu]={Guild[gu][[1]]}];
+	comps[Subscript[gu_,sp_]]:=Replace[comps[gu],var_->Subscript[var,sp],1];
+	ncomps[gu]=ngcomps[gu]=Length[gcomps[gu]];
 	gtraits[gu]=Select[Guild[gu]/.model,#[[1,0]]==Trait&][[All,1,1]];
 	ngtraits[gu]=Length[gtraits[gu]];
 	(*Print[gu," ",{gcomps[gu],gtraits[gu]}];*)
@@ -3344,18 +3472,16 @@ MatrixToGuildComponents[a_,var_,ncompsin_:Automatic]:=Module[{ncomps,res},
 
 WeightedAbundance::usage = 
 "WeightedAbundance[\!\(\*
-StyleBox[\"pops\", \"TI\"]\), \!\(\*
-StyleBox[\"target\", \"TI\"]\)] totals components in \!\(\*
-StyleBox[\"target\", \"TI\"]\) (default=first guild).";
+StyleBox[\"pops\", \"TI\"]\)] totals components in all guilds and pops.";
 
 
-WeightedAbundance[sol_?VariablesQ,target_(*:(_Symbol|_Integer|_Subscript)*):Automatic,opts___?OptionQ]:=
+WeightedAbundance[sol_?RuleListQ,opts___?OptionQ]:=
 Module[{
 func=FuncStyle["WeightedAbundance"],
 (* options *)
 weightfunction,minpop,
 (* other variables *)
-function,gu,sp
+f,gu,sp
 },
 
 Block[{\[ScriptCapitalN]},
@@ -3368,49 +3494,31 @@ minpop=Evaluate[MinPop/.Flatten[{opts,Options[WeightedAbundance]}]];
 weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[WeightedAbundance]}]];
 
 (* figure out number of species in guilds *)
-Set\[ScriptCapitalN][{},sol];
+Set\[ScriptCapitalN][ExtractAttributes[sol],ExtractVariables[sol]];
 If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 Which[
-	(* species target *)
-	Head[target]===Subscript,
-	gu=target[[1]];sp=target[[2]],
-	(* automatic *)
-	target===Automatic,
-	gu=guilds[[1]];sp="All",
-	(* guild target *)
-	MemberQ[guilds,target],
-	(*Head[target]===Integer||Head[target]===Symbol,*)
-	gu=target;sp="All",
-	Else,
-	Message[WeightedAbundance::badtgt];
-	Return[$Aborted];
-];
-(*Print["{gu,sp}=",{gu,sp}];*)
-
-Which[
 	weightfunction==="Total",
-	function=Total[Select[gcomps[gu],comptype[#]==="Extensive"&]],
+	f[var_]:=Total[Select[comps[var],comptype[#]==="Extensive"&]],
 	weightfunction==="Components",
-	function=Select[gcomps[gu],comptype[#]==="Extensive"&],
-	weightfunction==="PresenceAbsence",
-	function=If[Total[Select[gcomps[gu],comptype[#]==="Extensive"&]]>minpop,1,0],
+	f[var_]:=Select[comps[var],comptype[#]==="Extensive"&],
+	(*weightfunction==="PresenceAbsence",
+	f[var_]:=If[Total[Select[comps[var],comptype[#]==="Extensive"&]]>minpop,1,0],*)
 	Else,
-	function=weightfunction
+	f[Subscript[gu_,sp_]]:=weightfunction/.(#->Subscript[#,sp]&/@comps[gu]);
+	f[pop_]:=weightfunction;
 ];
 
-If[sp==="All",
-	Return[Table[Subscript[gu, sp]->Reinterpolation[function/.(#->Subscript[#,sp]&/@gcomps[gu])/.sol],{sp,\[ScriptCapitalN][gu]}]],
-	Return[Reinterpolation[function/.(#->Subscript[#,sp]&/@gcomps[gu])/.sol]]
-];
-
+Return[Flatten@Join[
+	Table[Table[Subscript[gu, sp]->Reinterpolation[f[Subscript[gu, sp]]/.sol],{sp,\[ScriptCapitalN][gu]}],{gu,guilds}],
+	Table[pop->Reinterpolation[f[pop]/.sol],{pop,pops}],
+	ExtractAuxs[sol],
+	ExtractAttributes[sol]
+]]
 ]];
 
 
 Options[WeightedAbundance]={WeightFunction->"Total",MinPop->10^-10};
-
-
-WeightedAbundance::badtgt="The target should be a guild, a species, or Automatic.";
 
 
 TotalAbundance::usage = 
@@ -3424,7 +3532,7 @@ func=FuncStyle["TotalAbundance"],
 (* options *)
 weightfunction,
 (* other variables *)
-sol
+sol,wa
 },
 
 Block[{\[ScriptCapitalN]},
@@ -3441,7 +3549,8 @@ sol=ExtractVariables[solin];
 Set\[ScriptCapitalN][{},sol];
 If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
-Return[Table[gu->Reinterpolation[Sum[Subscript[gu, i],{i,\[ScriptCapitalN][gu]}]/.WeightedAbundance[sol,gu,WeightFunction->weightfunction]],{gu,guilds}]]
+wa=WeightedAbundance[sol,WeightFunction->weightfunction];
+Return[Table[gu->Reinterpolation[Sum[Subscript[gu, i],{i,\[ScriptCapitalN][gu]}]/.wa],{gu,guilds}]]
 
 ]];
 
@@ -3459,8 +3568,9 @@ TraitMean[traits_?TraitsQ,sol_?VariablesQ,opts___?OptionQ]:=
 Module[{
 func=FuncStyle["TraitMean"],
 (* options *)
-weightfunction
+weightfunction,
 (* other variables *)
+wa
 },
 
 Block[{\[ScriptCapitalN]},
@@ -3475,14 +3585,12 @@ weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[TraitMean]}]];
 Set\[ScriptCapitalN][traits,sol];
 If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
+wa=WeightedAbundance[sol,WeightFunction->weightfunction];
+
 Return[
-	Flatten[
-		Table[
-			Table[
-				gtrait->Reinterpolation[Moment[WeightedData[Table[Subscript[gtrait, i],{i,\[ScriptCapitalN][gu]}]/.traits,Chop[Table[Subscript[gu, i],{i,\[ScriptCapitalN][gu]}]/.WeightedAbundance[sol,gu,WeightFunction->weightfunction]]],1]]
-			,{gtrait,gtraits[gu]}]
-		,{gu,guilds}]
-	]
+	Flatten@Table[Table[
+		gtrait->Reinterpolation[Moment[WeightedData[Table[Subscript[gtrait, i],{i,\[ScriptCapitalN][gu]}]/.traits,Chop[Table[Subscript[gu, i],{i,\[ScriptCapitalN][gu]}]]],1]/.wa]
+	,{gtrait,gtraits[gu]}],{gu,guilds}]
 ]
 
 ]];
@@ -3508,8 +3616,9 @@ TraitVariance[traits_?TraitsQ,sol_?VariablesQ,opts___?OptionQ]:=
 Module[{
 func=FuncStyle["TraitVariance"],
 (* options *)
-weightfunction
+weightfunction,
 (* other variables *)
+wa
 },
 
 Block[{\[ScriptCapitalN]},
@@ -3524,15 +3633,12 @@ weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[TraitVariance]}]];
 Set\[ScriptCapitalN][traits,sol];
 If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
+wa=WeightedAbundance[sol,WeightFunction->weightfunction];
+
 Return[
-	Flatten[
-		Table[
-			Table[
-				Var[gtrait]->Reinterpolation[CentralMoment[
-					WeightedData[Table[Subscript[gtrait, i],{i,\[ScriptCapitalN][gu]}]/.traits,Chop[Table[Subscript[gu, i],{i,\[ScriptCapitalN][gu]}]/.WeightedAbundance[sol,gu,WeightFunction->weightfunction]]],2]]
-			,{gtrait,gtraits[gu]}]
-		,{gu,guilds}]
-	]
+	Flatten@Table[Table[
+		Var[gtrait]->Reinterpolation[CentralMoment[WeightedData[Table[Subscript[gtrait, i],{i,\[ScriptCapitalN][gu]}]/.traits,Chop[Table[Subscript[gu, i],{i,\[ScriptCapitalN][gu]}]/.wa]],2]]
+	,{gtrait,gtraits[gu]}],{gu,guilds}]
 ]
 
 ]];
@@ -3671,7 +3777,7 @@ Which[
 		Return[Reinterpolation[Sum[dists[[sp,sp\[Prime]]],{sp\[Prime],Subscript[\[ScriptCapitalN], gu]}]/(distnorm*denom)]]
 	],
 	method==="AbundanceWeighted",
-	abunds=WeightedAbundance[sol,gu,WeightFunction->weightfunction];
+	abunds=ExtractGuilds[WeightedAbundance[sol,WeightFunction->weightfunction],gu];
 	If[verbose,Print[func,": abunds=",abunds]];
 	totalabundance=gu/.TotalAbundance[sol,WeightFunction->weightfunction];
 	If[verbose,Print[func,": totalabundance=",totalabundance]];
@@ -3703,6 +3809,110 @@ FunctionalDistinctiveness[ExtractTraits[traitsandpops],ExtractVariables[traitsan
 
 FunctionalDistinctiveness::badmtd="The Method option should be a built-in method name (\"Species\" or \"AbundanceWeighted\").";
 FunctionalDistinctiveness::badtgt="The target should be a guild, a species, or Automatic.";
+
+
+ExtinctSpecies::usage=
+"ExtinctSpecies[\!\(\*
+StyleBox[\"sol\", \"TI\"]\)] gives a list of extinct species in \!\(\*
+StyleBox[\"sol\", \"TI\"]\).";
+
+
+ExtinctSpecies[sol_?RuleListQ,opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["ExtinctSpecies"],
+(* options *)
+verbose,weightfunction,time,minpop,
+(* other variables *)
+wa
+},
+
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[ExtinctSpecies]}]];
+If[Global`debug,verbose=True];
+weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[ExtinctSpecies]}]];
+minpop=Evaluate[MinPop/.Flatten[{opts,Options[ExtinctSpecies]}]];
+time=Evaluate[Time/.Flatten[{opts,Options[ExtinctSpecies]}]];
+
+wa=ExtractVariables[WeightedAbundance[sol,WeightFunction->weightfunction]];
+(*If[verbose,Print[func,": wa=",wa]];*)
+
+If[time===t,
+	Which[
+		modelperiod==0,
+		wa=FinalSlice[wa],
+		modelperiod<\[Infinity],
+		wa=TemporalMean[FinalSlice[wa,modelperiod]],
+		Else,
+		wa=TemporalMean[wa]
+	]
+,
+	wa=Slice[wa,time]
+];
+If[verbose,Print[func,": WeightedAbundance=",wa]];
+
+Return[Keys[Select[Association[wa],#<=minpop&]]]
+]];
+
+
+Options[ExtinctSpecies]={Verbose->False,MinPop->10^-10,WeightFunction->"Total",Time->t};
+
+
+ExtantSpecies::usage=
+"ExtantSpecies[\!\(\*
+StyleBox[\"sol\", \"TI\"]\)] gives a list of extant species in \!\(\*
+StyleBox[\"sol\", \"TI\"]\).";
+
+
+ExtantSpecies[sol_?RuleListQ,opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["ExtantSpecies"],
+(* options *)
+verbose,weightfunction,time,minpop,
+(* other variables *)
+wa
+},
+
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[ExtantSpecies]}]];
+If[Global`debug,verbose=True];
+weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[ExtantSpecies]}]];
+minpop=Evaluate[MinPop/.Flatten[{opts,Options[ExtantSpecies]}]];
+time=Evaluate[Time/.Flatten[{opts,Options[ExtantSpecies]}]];
+
+wa=ExtractVariables[WeightedAbundance[sol,WeightFunction->weightfunction]];
+(*If[verbose,Print[func,": wa=",wa]];*)
+
+If[time===t,
+	Which[
+		modelperiod==0,
+		wa=FinalSlice[wa],
+		modelperiod<\[Infinity],
+		wa=TemporalMean[FinalSlice[wa,modelperiod]],
+		Else,
+		wa=TemporalMean[wa]
+	]
+,
+	wa=Slice[wa,time]
+];
+If[verbose,Print[func,": WeightedAbundance=",wa]];
+
+Return[Keys[Select[Association[wa],#>minpop&]]]
+]];
+
+
+Options[ExtantSpecies]={Verbose->False,MinPop->10^-10,WeightFunction->"Total",Time->t};
 
 
 EcoEqns::usage=
@@ -5246,7 +5456,7 @@ time=Evaluate[Time/.Flatten[{opts,Options[PrestonPlot]}]];
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][sol];
 
-abunds=WeightedAbundance[sol,gu,WeightFunction->weightfunction];
+abunds=ExtractGuilds[WeightedAbundance[sol,WeightFunction->weightfunction],gu];
 
 If[time===t,
 	abunds=TemporalMean[abunds],
@@ -5305,7 +5515,7 @@ time=Evaluate[Time/.Flatten[{opts,Options[WhittakerPlot]}]];
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][sol];
 
-abunds=WeightedAbundance[sol,gu,WeightFunction->weightfunction];
+abunds=ExtractGuilds[WeightedAbundance[sol,WeightFunction->weightfunction],gu];
 
 If[time===t,
 	abunds=TemporalMean[abunds],
@@ -5355,7 +5565,7 @@ plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotTAD]}]];
 plotopts=FilterRules[Flatten[{opts,Options[PlotTAD]}],Options[ListPlot]];
 time=Evaluate[Time/.Flatten[{opts,Options[PlotTAD]}]];
 weightfunction=Evaluate[WeightFunction/.Flatten[{opts,Options[PlotTAD]}]];
-If[weightfunction==="Components",weightfunction=Select[gcomps[gu],comptype[#]==="Extensive"&]];
+(*If[weightfunction==="Components",weightfunction=Select[gcomps[gu],comptype[#]==="Extensive"&]];*)
 species=Evaluate[Species/.Flatten[{opts,Options[PlotTAD]}]];
 
 (* figure out number of species in guilds *)
@@ -5363,8 +5573,7 @@ Set\[ScriptCapitalN][traitsin,sol];
 If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 (*Print["sol=",sol];*)
-abunds=WeightedAbundance[sol,gu,WeightFunction->weightfunction];
-(*Print["abunds=",abunds];*)
+abunds=ExtractGuilds[WeightedAbundance[sol,WeightFunction->weightfunction],gu];
 
 If[time===t,
 	abunds=TemporalMean[abunds];
@@ -5375,8 +5584,8 @@ If[time===t,
 ];
 
 If[plotstyle===Automatic,
-	If[ListQ[weightfunction],
-		plotstyle=Reverse[Table[Directive[ColorData[97,i],Thick,Opacity[1]],{i,Length[weightfunction]}]],
+	If[weightfunction==="Components",
+		plotstyle=Reverse[Table[Directive[ColorData[97,i],Thick,Opacity[1]],{i,Length[Select[gcomps[gu],comptype[#]==="Extensive"&]]}]],
 		If[species=!=None,
 			plotstyle=Table[If[i==species,
 				Directive[Thick,color[Subscript[gtrait,1]][SpFrac[i,\[ScriptCapitalN][gu]]]],
@@ -5388,10 +5597,10 @@ If[plotstyle===Automatic,
 ];
 
 If[logged==False,
-	If[ListQ[weightfunction],
+	If[weightfunction==="Components",
 	Return[ListPlot[
 			Reverse[Transpose[{Table[Subscript[gtrait,i],{i,Subscript[\[ScriptCapitalN], gu]}],#}/.traits]&/@Accumulate[Transpose[Table[Subscript[gu,i],{i,Subscript[\[ScriptCapitalN], gu]}]/.abunds]]],
-			Filling->Table[j->{Axis,ModPart[plotstyle,j]},{j,Length[weightfunction]}],
+			Filling->Table[j->{Axis,ModPart[plotstyle,j]},{j,Length[Select[gcomps[gu],comptype[#]==="Extensive"&]]}],
 			PlotStyle->None,
 			Evaluate[Sequence@@plotopts],
 			PlotRange->All
@@ -5427,6 +5636,72 @@ Logged->False,MinPop->0,PlotStyle->Automatic,Time->t};
 (* split combined traitsandpops *)
 PlotTAD[sol_?AttributesAndVariablesQ,opts___?OptionQ]:=
 PlotTAD[ExtractTraits[sol],ExtractVariables[sol],opts];
+
+
+ImpactVector::usage=
+"ImpactVector[{\!\(\*
+StyleBox[SubscriptBox[\"var\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"var\", \"2\"], \"TI\"]\)}, \!\(\*
+StyleBox[\"sp\", \"TI\"]\)] returns the impact of \!\(\*
+StyleBox[\"sp\", \"TI\"]\) on {\!\(\*
+StyleBox[SubscriptBox[\"var\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"var\", \"2\"], \"TI\"]\)}.";
+
+
+ImpactVector[{var1_,var2_},sp_]:=D[{eqn[var1],eqn[var2]}/.RemoveVariablets,sp];
+
+
+PlotImpactVector::usage=
+"PlotImpactVector[{\!\(\*
+StyleBox[SubscriptBox[\"var\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"var\", \"2\"], \"TI\"]\)}, \!\(\*
+StyleBox[\"sp\", \"TI\"]\), \!\(\*
+StyleBox[\"point\", \"TI\"]\)] plots the impact vector of \!\(\*
+StyleBox[\"sp\", \"TI\"]\) on {\!\(\*
+StyleBox[SubscriptBox[\"var\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"var\", \"2\"], \"TI\"]\)} at \!\(\*
+StyleBox[\"point\", \"TI\"]\).
+PlotImpactVector[{\!\(\*
+StyleBox[SubscriptBox[\"var\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"var\", \"2\"], \"TI\"]\)}, {\!\(\*
+StyleBox[SubscriptBox[
+StyleBox[\"sp\", \"TI\"], \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"sp\", \"2\"], \"TI\"]\), \[Ellipsis]}, \!\(\*
+StyleBox[\"point\", \"TI\"]\)] plots impact vectors of multiple species.
+PlotImpactVector[{\!\(\*
+StyleBox[SubscriptBox[\"var\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"var\", \"2\"], \"TI\"]\)}, \!\(\*
+StyleBox[\"sp\", \"TI\"]\), {\!\(\*
+StyleBox[SubscriptBox[\"point\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"point\", \"2\"], \"TI\"]\), \[Ellipsis]}] plots at multiple points.";
+
+
+(* make listable across points *)
+PlotImpactVector[{var1_,var2_},sp_,points_?RuleListListQ,opts___?OptionQ]:=(PlotImpactVector[{var1,var2},sp,#,opts]&/@points);
+
+
+(* make listable across sps *)
+PlotImpactVector[{var1_,var2_},sps_List,point_?RuleListQ,opts___?OptionQ]:=Module[{plotstyles,nsp},
+	plotstyles=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotImpactVector]}]];
+	nsp=Length[sps];
+	If[plotstyles===Automatic,plotstyles=Table[Automatic,{nsp}]];
+	Table[
+		PlotImpactVector[{var1,var2},sps[[i]],point,PlotStyle->ModPart[plotstyles,i],opts]
+	,{i,nsp}]
+];
+
+
+PlotImpactVector[{var1_,var2_},sp_,point_?RuleListQ,opts___?OptionQ]:=Module[{scale,plotstyle},
+(* handle options *)
+scale=Evaluate[Scale/.Flatten[{opts,Options[PlotImpactVector]}]];
+plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotImpactVector]}]];
+If[plotstyle===Automatic,plotstyle={color[sp],linestyle[sp]}];
+
+Graphics[Join[Flatten[{plotstyle}],{Arrow[{{var1,var2},{var1,var2}+scale*Normalize@ImpactVector[{var1,var2},sp]}/.point]}]]
+];
+
+
+Options[PlotImpactVector]={Scale->1,PlotStyle->Automatic};
 
 
 Inv::usage=
@@ -6354,6 +6629,192 @@ DInv[var:(_Subscript|_List|_Symbol):All,pointin:notDInvOpts:{},opts___?OptionQ]:
 
 
 NDInv[args___]:=DInv[args,Method->"NDInv"];
+
+
+MaximizeInv::usage = 
+"MaximizeInv[\!\(\*
+StyleBox[\"traits\", \"TI\"]\), \!\(\*
+StyleBox[\"sol\", \"TI\"]\)] finds the trait value(s) that maximize invasion fitness into a community with \!\(\*
+StyleBox[\"traits\", \"TI\"]\) and \!\(\*
+StyleBox[\"sol\", \"TI\"]\).";
+
+
+MaximizeInv[traits:(_?AttributesQ):{},sol:(_?VariablesQ):{},opts:OptionsPattern[]]:=
+ 
+Module[{
+func=FuncStyle["MaximizeInv"],
+(* options *)
+verbose,verboseall,guild,delayinv,invopts,maximizeopts,method,constraints,
+(* other variables *)
+vars,unks,inv,res},
+
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* reset $InvCount *)
+$InvCount=0;
+
+(* handle options *)
+
+verbose=OptionValue[Verbose];
+If[Global`debug,verbose=True];
+verboseall=OptionValue[VerboseAll];
+If[verboseall,verbose=True];
+
+guild=OptionValue[Guild];
+If[guild===Automatic,guild=guilds[[1]]];
+delayinv=OptionValue[DelayInv];
+invopts=OptionValue[InvOpts];
+maximizeopts=OptionValue[MaximizeOpts];
+method=OptionValue[Method];
+constraints=OptionValue[Constraints];
+
+vars=Table[Subscript[gtrait,0],{gtrait,gtraits[guild]}];
+unks=Table[Unk[Subscript[gtrait,0]],{gtrait,gtraits[guild]}];
+
+
+Which[
+	constraints==="None",
+	constraints={};
+,
+	constraints===Automatic,
+	constraints=Table[Min[range[gtrait]]<=Subscript[gtrait,0]<=Max[range[gtrait]],{gtrait,gtraits[guild]}]
+,
+	Else,
+	constraints=Table[Min[range[gtrait]]<=Subscript[gtrait,0]<=Max[range[gtrait]],{gtrait,gtraits[guild]}]
+];
+
+(*Print["constraints=",constraints];*)
+
+If[delayinv==True,
+	inv[varz_?NumericListQ]:=Inv[traits,sol,Thread[vars->varz],Evaluate[Sequence@@invopts],VerboseAll->verboseall];
+	res=NMaximize[Prepend[constraints/.ToUnks,inv[unks]],unks,Evaluate[Sequence@@maximizeopts]];
+	, (* else *)
+	Off[NIntegrate::inumr];
+	inv=Inv[traits,sol,Guild->guild,Evaluate[Sequence@@invopts],VerboseAll->verboseall];
+	If[Global`debug,Print[func,": inv=",inv]];
+	Which[
+		method=="Maximize",
+		res=Maximize[Prepend[constraints,inv],vars,Evaluate[Sequence@@maximizeopts]],
+		method=="NMaximize",
+		res=NMaximize[Prepend[constraints,inv],vars,Evaluate[Sequence@@maximizeopts]],
+		Else,
+		Message[MaximizeInv::badmtd];
+		Return[$Failed]
+	];
+	On[NIntegrate::inumr]
+];
+
+Return[res/.FromUnks];
+
+]];
+
+
+Options[MaximizeInv]={Guild->Automatic,DelayInv->False,InvOpts->{},MaximizeOpts->{},Constraints->Automatic,Method->"NMaximize",
+Verbose->False,VerboseAll->False};
+
+
+(* break up combined traitsandpops *)
+MaximizeInv[sol_?AttributesAndVariablesQ,opts___?OptionQ]:=
+	MaximizeInv[ExtractAttributes[sol],ExtractVariables[sol],opts];
+
+
+GlobalESSQ::usage =
+"GlobalESSQ[\!\(\*
+StyleBox[\"traits\", \"TI\"]\), \!\(\*
+StyleBox[\"sol\", \"TI\"]\)] checks global ESS stability with \!\(\*
+StyleBox[\"traits\", \"TI\"]\) and ecological attractor \!\(\*
+StyleBox[\"sol\", \"TI\"]\).";
+
+
+GlobalESSQ[traits_?AttributesQ,sol_?VariablesQ,opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["GlobalESSQ"],
+(* options *)
+verbose,verboseall,
+maximizeinvopts,invthreshold,
+(* other variables *)
+inv,tmp},
+
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+
+maximizeinvopts=Evaluate[MaximizeInvOpts/.Flatten[{opts,Options[GlobalESSQ]}]];
+invthreshold=Evaluate[InvThreshold/.Flatten[{opts,Options[GlobalESSQ]}]];
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[GlobalESSQ]}]];
+If[Global`debug,verbose=True];
+verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[GlobalESSQ]}]];
+If[verboseall,verbose=True];
+
+(* find max invader rate .. if > invthreshold, then not globaless *)
+
+Do[
+	tmp[gu]=MaximizeInv[traits,sol,Guild->gu,maximizeinvopts];
+	If[verbose,Print[func,": MaximizeInv guild ",gu,"=",tmp[gu]]];
+,{gu,guilds}];
+
+Return[{
+	Table[If[tmp[gu][[1]]>invthreshold,False,True],{gu,guilds}],
+	Table[{tmp[gu][[1]],Table[gtrait->(Subscript[gtrait,0]/.tmp[gu][[2]]),{gtrait,gtraits[gu]}]},{gu,guilds}]}
+];
+
+]];
+
+
+Options[GlobalESSQ]={MaximizeInvOpts->{},InvThreshold->10^-10,Verbose->False,VerboseAll->False};
+
+
+GlobalESSQ[eesol_?AttributesAndVariablesQ,opts___?OptionQ]:=
+	GlobalESSQ[ExtractAttributes[eesol],ExtractVariables[eesol],opts];
+
+
+LocalESSQ::usage=
+"LocalESSQ[\!\(\*
+StyleBox[\"traits\", \"TI\"]\), \!\(\*
+StyleBox[\"sol\", \"TI\"]\)] checks local ESS stability with \!\(\*
+StyleBox[\"traits\", \"TI\"]\) and ecological attractor \!\(\*
+StyleBox[\"sol\", \"TI\"]\).";
+
+
+LocalESSQ[traits_?AttributesQ,sol_?VariablesQ,opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["LocalESSQ"],
+(* options *)
+verbose,
+(* other variables *)
+res
+},
+
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[EcoSim]}]];
+If[Global`debug,verbose=True];
+
+res=Table[
+	NegativeDefiniteMatrixQ/@DInv[traits,sol,{Replace[gtraits[gu],var_Symbol->Subscript[var, 0],1],2}]
+,{gu,guilds}];
+
+Return[res]
+]];
+
+
+Options[LocalESSQ]={
+};
+
+
+LocalESSQ[eesol_?AttributesAndVariablesQ,opts___?OptionQ]:=LocalESSQ[ExtractAttributes[eesol],ExtractVariables[eesol],opts];
 
 
 PlotInv::usage =
@@ -8314,6 +8775,167 @@ FindEcoEvoEq::badfg="Bad FitnessGradient method (should be either DInv or NDInv)
 FindEcoEvoEq::badte="Bad TraitEqn (should be either \"QG\" or \"CE\").";
 
 
+TrackEcoEvoEq::usage=
+"TrackEcoEvoEq[\!\(\*
+StyleBox[\"sol\", \"TI\"]\), {\!\(\*
+StyleBox[\"par\", \"TI\"]\), \!\(\*
+StyleBox[\"parmin\", \"TI\"]\), \!\(\*
+StyleBox[\"parmax\", \"TI\"]\), \!\(\*
+StyleBox[\"dpar\", \"TI\"]\)}] tracks an eco-evolutionary equilibrium, with initial guess \!\(\*
+StyleBox[\"sol\", \"TI\"]\), over parameter \!\(\*
+StyleBox[\"par\", \"TI\"]\) from parmin to parmax, with initial step size \!\(\*
+StyleBox[\"dpar\", \"TI\"]\).";
+
+
+TrackEcoEvoEq[init_?AttributesAndVariablesQ,{parname_,parmin_?NumericQ,parmax_?NumericQ,dparin_:Automatic},opts___?OptionQ]:=
+
+Module[{
+func=FuncStyle["TrackEcoEvoEq"],
+(* options *)
+verbose,monitor,printtrace,
+tests,
+minstepsize,maxstepsize,maxsteps,mindist,maxbend,maxchange,
+findecoevoeqopts,interpolationopts,
+(* other variables *)
+par,dpar,tmp,ics,unks,count,sol
+},
+
+Block[{\[ScriptCapitalN]},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+If[Global`debug,Print["In ",func]];
+
+(* handle options *)
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+If[Global`debug,verbose=True];
+monitor=Evaluate[Monitor/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+
+printtrace=Evaluate[PrintTrace/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+If[dparin===Automatic,dpar=Sign[parmax-parmin],dpar=dparin];
+minstepsize=Evaluate[MinStepSize/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+If[minstepsize===Automatic,minstepsize=dpar*2^-10];
+maxstepsize=Evaluate[MaxStepSize/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+If[maxstepsize===Automatic,maxstepsize=dpar*2^3];
+maxsteps=Evaluate[MaxSteps/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+mindist=Evaluate[MinDistance/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+maxbend=Evaluate[MaxBend/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+maxchange=Evaluate[MaxChange/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+tests=Evaluate[Tests/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+findecoevoeqopts=Evaluate[FindEcoEvoEqOpts/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+interpolationopts=Evaluate[InterpolationOpts/.Flatten[{opts,Options[TrackEcoEvoEq]}]];
+
+If[monitor,PrintTemporary[Dynamic[count]," ",parname,"=",Dynamic[par]," d",parname,"=",Dynamic[dpar]]];
+
+Evaluate[parname]:=par;
+
+unks=Keys[init];
+tmp={};
+par=parmin;
+dpar=dpar/2;
+ics=init;
+count=0;
+
+While[count<maxsteps,
+	count++;
+	sol=Check[FindEcoEvoEq[ics,Evaluate[Sequence@@findecoevoeqopts]],"err"];
+	If[printtrace&&sol=!="err",Print[Defer@parname,"=",NumberForm@par," sol=",sol]];
+	(*Print[Flatten[Table[PartsAboveDiagonal[TraitDistance[sol,gu]],{gu,guilds}]]];*)
+	(*Print[Table[{
+				m1=((unk/.tmp\[LeftDoubleBracket]-1,2\[RightDoubleBracket])-(unk/.tmp\[LeftDoubleBracket]-2,2\[RightDoubleBracket]))/(tmp\[LeftDoubleBracket]-1,1\[RightDoubleBracket]-tmp\[LeftDoubleBracket]-2,1\[RightDoubleBracket]);
+				m0=((unk/.sol)-(unk/.tmp\[LeftDoubleBracket]-1,2\[RightDoubleBracket]))/(par-tmp\[LeftDoubleBracket]-1,1\[RightDoubleBracket]);
+				180/\[Pi] ArcTan[Abs[(m0-m1)/(1+m0 m1)]],
+				Abs[(unk/.sol)-(unk/.tmp\[LeftDoubleBracket]-1,2\[RightDoubleBracket])]/(Differences@MinMax[Table[unk/.ent\[LeftDoubleBracket]2\[RightDoubleBracket],{ent,tmp}]])\[LeftDoubleBracket]1\[RightDoubleBracket]}
+			,{unk,unks}]];*)
+	Which[
+		sol==="err",
+		If[par==parmin,Message[TrackEcoEvoEq::ferr,Defer@parname,NumberForm@par];Return[$Aborted]];
+		If[printtrace,Print[Defer@parname,"=",NumberForm@par," FindEcoEvoEq error"]];
+		dpar=dpar/2;
+		If[Abs[dpar]<Abs[minstepsize],Message[TrackEcoEvoEq::err,Defer@parname,NumberForm@par];Break[]];
+		par=par-dpar
+	,
+		MemberQ[tests,"CSS"]&&Max[Re[EcoEvoEigenvalues[sol]]]>0,
+		If[printtrace,Print[Defer@parname,"=",NumberForm@par," non-CSS, EcoEvoEigenvalues[sol]=",EcoEvoEigenvalues[sol]]];
+		dpar=dpar/2;
+		If[Abs[dpar]<Abs[minstepsize],Message[TrackEcoEvoEq::noncss,Defer@parname,NumberForm@par,EcoEvoEigenvalues[sol]];Break[]];
+		par=par-dpar
+	,
+		MemberQ[tests,"LocalESS"]&&!CompoundAnd[Flatten[LocalESSQ[sol]]],
+		If[printtrace,Print[Defer@parname,"=",NumberForm@par," non-local ESS, LocalESSQ[sol]=",LocalESSQ[sol]]];
+		dpar=dpar/2;
+		If[Abs[dpar]<Abs[minstepsize],Message[TrackEcoEvoEq::nonless,Defer@parname,NumberForm@par,LocalESSQ[sol]];Break[]];
+		par=par-dpar
+	,
+		MemberQ[tests,"GlobalESS"]&&!CompoundAnd[GlobalESSQ[sol][[1]]],
+		If[printtrace,Print[Defer@parname,"=",NumberForm@par," non-global ESS, GlobalESSQ[sol]=",GlobalESSQ[sol]]];
+		dpar=dpar/2;
+		If[Abs[dpar]<Abs[minstepsize],Message[TrackEcoEvoEq::nongess,Defer@parname,NumberForm@par,GlobalESSQ[sol]];Break[]];
+		par=par-dpar
+	,
+		MemberQ[tests,"Extinction"]&&Cases[ExtinctSpecies[sol],_Subscript]!={},
+		If[printtrace,Print[Defer@parname,"=",NumberForm@par," extinction, sol=",sol]];
+		dpar=dpar/2;
+		If[Abs[dpar]<Abs[minstepsize],Message[TrackEcoEvoEq::extinct,Defer@parname,NumberForm@par,sol];Break[]];
+		par=par-dpar
+	,
+		MemberQ[tests,"Convergence"]&&Min[Flatten[Table[PartsAboveDiagonal[TraitDistance[sol,gu]],{gu,guilds}]]]<mindist,
+		If[printtrace,Print[Defer@parname,"=",NumberForm@par," traits converged, sol=",sol]];
+		dpar=dpar/2;
+		If[Abs[dpar]<Abs[minstepsize],Message[TrackEcoEvoEq::converged,Defer@parname,NumberForm@par,sol];Break[]];
+		par=par-dpar;
+	,
+		MemberQ[tests,"MaxBend"]&&Length[tmp]>=2&&CompoundOr[Table[
+				m1=((unk/.tmp[[-1,2]])-(unk/.tmp[[-2,2]]))/(tmp[[-1,1]]-tmp[[-2,1]]);
+				m0=((unk/.sol)-(unk/.tmp[[-1,2]]))/(par-tmp[[-1,1]]);
+				180/\[Pi] ArcTan[Abs[(m0-m1)/(1+m0 m1)]]>maxbend
+				&&
+				Abs[(unk/.sol)-(unk/.tmp[[-1,2]])]/(10^-10+Differences@MinMax[Table[unk/.ent[[2]],{ent,tmp}]])[[1]]>maxchange
+			,{unk,unks}]],
+		If[printtrace,Print[Defer@parname,"=",NumberForm@par," MaxBend exceeded"]];
+		If[dpar>0,dpar=Max[minstepsize,dpar/2],dpar=Min[minstepsize,dpar/2]];
+		par=par-dpar;			
+	,
+		Else,
+		AppendTo[tmp,{par,sol}];
+		If[par==parmax,Break[]]; (* reached end *)
+		If[dpar>0,
+			dpar=Min[maxstepsize,2dpar];
+			par=Min[parmax,par+dpar];
+		,
+			dpar=Max[maxstepsize,2dpar];
+			par=Max[parmax,par+dpar];
+		];
+	];
+	ics=Quiet[Slice[RuleListInterpolation[tmp,Evaluate[Sequence@@interpolationopts]],par],{Interpolation::inhr,InterpolatingFunction::dmval}];
+];
+
+If[count==maxsteps,Message[TrackEcoEvoEq::mxst,maxsteps,Defer@parname,NumberForm@par]];
+
+Clear[parname];
+
+Return[RuleListInterpolation[tmp,Evaluate[Sequence@@interpolationopts]]]
+]];
+
+
+Options[TrackEcoEvoEq]={
+	Verbose->False,PrintTrace->False,Monitor->True,
+	MinStepSize->Automatic,MaxStepSize->Automatic,MaxSteps->100,
+	Tests->{"CSS","LocalESS","GlobalESS","Extinction","Convergence","MaxBend"},
+	FindEcoEvoEqOpts->{},InterpolationOpts->{},
+	MinDistance->10^-10,MaxBend->3,MaxChange->0.01
+};
+
+
+TrackEcoEvoEq::err="FindEcoEvoEq failed at `1`=`2`.";
+TrackEcoEvoEq::ferr="FindEcoEvoEq failed at initial parameter value,`1`=`2`, can not continue.";
+TrackEcoEvoEq::noncss="Non-convergence stable EcoEvoEq at `1`=`2`, eigenvalues=`3`).";
+TrackEcoEvoEq::nonless="Not a local ESS at `1`=`2`, LocalESSQ=`3`.";
+TrackEcoEvoEq::nongess="Not a global ESS at `1`=`2`, GlobalESSQ=`3`.";
+TrackEcoEvoEq::extinct="Extinction at `1`=`2`, sol=`3`.";
+TrackEcoEvoEq::converged="Traits converged at `1`=`2`, sol=`3`.";
+TrackEcoEvoEq::mxst="Maximum number of `1` steps reached at `2`=`3`";
+
+
 FindEcoEvoCycle::usage=
 "FindEcoEvoCycle[\!\(\*
 StyleBox[\"traits\", \"TI\"]\), \!\(\*
@@ -8898,150 +9520,6 @@ Options[EvoEigenvalues]={EvoEquation->"QG",Fixed->{},TraitShiftRate->{},Chop->Tr
 
 
 EvoEigenvalues::noper="EvoEigenvalues can't handle periodic models yet.";
-
-
-MaximizeInv::usage = 
-"MaximizeInv[\!\(\*
-StyleBox[\"traits\", \"TI\"]\), \!\(\*
-StyleBox[\"sol\", \"TI\"]\)] finds the trait value(s) that maximize invasion fitness into a community with \!\(\*
-StyleBox[\"traits\", \"TI\"]\) and \!\(\*
-StyleBox[\"sol\", \"TI\"]\).";
-
-
-MaximizeInv[traits:(_?AttributesQ):{},sol:(_?VariablesQ):{},opts:OptionsPattern[]]:=
- 
-Module[{
-func=FuncStyle["MaximizeInv"],
-(* options *)
-verbose,verboseall,guild,delayinv,invopts,maximizeopts,method,constraints,
-(* other variables *)
-vars,unks,inv,res},
-
-Block[{\[ScriptCapitalN]},
-
-If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
-If[Global`debug,Print["In ",func]];
-
-(* reset $InvCount *)
-$InvCount=0;
-
-(* handle options *)
-
-verbose=OptionValue[Verbose];
-If[Global`debug,verbose=True];
-verboseall=OptionValue[VerboseAll];
-If[verboseall,verbose=True];
-
-guild=OptionValue[Guild];
-If[guild===Automatic,guild=guilds[[1]]];
-delayinv=OptionValue[DelayInv];
-invopts=OptionValue[InvOpts];
-maximizeopts=OptionValue[MaximizeOpts];
-method=OptionValue[Method];
-constraints=OptionValue[Constraints];
-
-vars=Table[Subscript[gtrait,0],{gtrait,gtraits[guild]}];
-unks=Table[Unk[Subscript[gtrait,0]],{gtrait,gtraits[guild]}];
-
-
-Which[
-	constraints==="None",
-	constraints={};
-,
-	constraints===Automatic,
-	constraints=Table[Min[range[gtrait]]<=Subscript[gtrait,0]<=Max[range[gtrait]],{gtrait,gtraits[guild]}]
-,
-	Else,
-	constraints=Table[Min[range[gtrait]]<=Subscript[gtrait,0]<=Max[range[gtrait]],{gtrait,gtraits[guild]}]
-];
-
-(*Print["constraints=",constraints];*)
-
-If[delayinv==True,
-	inv[varz_?NumericListQ]:=Inv[traits,sol,Thread[vars->varz],Evaluate[Sequence@@invopts],VerboseAll->verboseall];
-	res=NMaximize[Prepend[constraints/.ToUnks,inv[unks]],unks,Evaluate[Sequence@@maximizeopts]];
-	, (* else *)
-	Off[NIntegrate::inumr];
-	inv=Inv[traits,sol,Guild->guild,Evaluate[Sequence@@invopts],VerboseAll->verboseall];
-	If[Global`debug,Print[func,": inv=",inv]];
-	Which[
-		method=="Maximize",
-		res=Maximize[Prepend[constraints,inv],vars,Evaluate[Sequence@@maximizeopts]],
-		method=="NMaximize",
-		res=NMaximize[Prepend[constraints,inv],vars,Evaluate[Sequence@@maximizeopts]],
-		Else,
-		Message[MaximizeInv::badmtd];
-		Return[$Failed]
-	];
-	On[NIntegrate::inumr]
-];
-
-Return[res/.FromUnks];
-
-]];
-
-
-Options[MaximizeInv]={Guild->Automatic,DelayInv->False,InvOpts->{},MaximizeOpts->{},Constraints->Automatic,Method->"NMaximize",
-Verbose->False,VerboseAll->False};
-
-
-(* break up combined traitsandpops *)
-MaximizeInv[sol_?AttributesAndVariablesQ,opts___?OptionQ]:=
-	MaximizeInv[ExtractAttributes[sol],ExtractVariables[sol],opts];
-
-
-GlobalESSQ::usage =
-"GlobalESSQ[\!\(\*
-StyleBox[\"traits\", \"TI\"]\), \!\(\*
-StyleBox[\"sol\", \"TI\"]\)] checks global ESS stability with \!\(\*
-StyleBox[\"traits\", \"TI\"]\) and ecological attractor \!\(\*
-StyleBox[\"sol\", \"TI\"]\).";
-
-
-GlobalESSQ[traits_?AttributesQ,sol_?VariablesQ,opts___?OptionQ]:=
-
-Module[{
-func=FuncStyle["GlobalESSQs"],
-(* options *)
-verbose,verboseall,
-maximizeinvopts,invthreshold,
-(* other variables *)
-inv,tmp},
-
-Block[{\[ScriptCapitalN]},
-
-If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
-If[Global`debug,Print["In ",func]];
-
-(* handle options *)
-
-maximizeinvopts=Evaluate[MaximizeInvOpts/.Flatten[{opts,Options[GlobalESSQ]}]];
-invthreshold=Evaluate[InvThreshold/.Flatten[{opts,Options[GlobalESSQ]}]];
-verbose=Evaluate[Verbose/.Flatten[{opts,Options[GlobalESSQ]}]];
-If[Global`debug,verbose=True];
-verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[GlobalESSQ]}]];
-If[verboseall,verbose=True];
-
-(* find max invader rate .. if > invthreshold, then not globaless *)
-
-Do[
-	tmp[gu]=MaximizeInv[traits,sol,Guild->gu,maximizeinvopts];
-	If[verbose,Print[func,": MaximizeInv guild ",gu,"=",tmp[gu]]];
-,{gu,guilds}];
-
-Return[{
-	Table[If[tmp[gu][[1]]>invthreshold,False,True],{gu,guilds}],
-	Table[{tmp[gu][[1]],Table[gtrait->(Subscript[gtrait,0]/.tmp[gu][[2]]),{gtrait,gtraits[gu]}]},{gu,guilds}]}
-];
-
-]];
-
-
-Options[GlobalESSQ]={MaximizeInvOpts->{},InvThreshold->10^-10,Verbose->False,VerboseAll->False};
-
-
-GlobalESSQ[eesol_?AttributesAndVariablesQ,opts___?OptionQ]:=
-	GlobalESSQ[ExtractAttributes[eesol],ExtractVariables[eesol],opts];
 
 
 (* Protect all package symbols *)

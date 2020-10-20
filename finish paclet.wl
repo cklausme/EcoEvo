@@ -118,7 +118,7 @@ PacletInstall[paclet]
 
 
 (* ::Section:: *)
-(*update pacletsite (run after moving paclet to Paclets, then commit & push)*)
+(*update pacletsite (run after moving paclet from build to Paclets, then commit & push)*)
 
 
 <<PacletManager`
@@ -218,3 +218,6 @@ PublishPacletDocs[pacletDir_String,target_CloudObject]:=KeyValueMap[publishDocDi
 
 
 PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.5.1/EcoEvo",CloudObject["docs"]];
+
+
+
