@@ -218,6 +218,3 @@ PublishPacletDocs[pacletDir_String,target_CloudObject]:=KeyValueMap[publishDocDi
 
 
 PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.5.2/EcoEvo",CloudObject["docs"]];
-
-
-
