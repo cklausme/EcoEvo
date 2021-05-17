@@ -1,11 +1,11 @@
 (* ::Package:: *)
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*directories*)
 
 
 package="EcoEvo";
-version="1.5.2";
+version="1.6.0";
 
 
 Needs["PackageTools`"]
@@ -29,7 +29,7 @@ builddir=FileNameJoin[{rootdir,"build",package<>"-"<>version,package}]
 docdir=FileNameJoin[{builddir, "Documentation"}]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*fix docs*)
 
 
