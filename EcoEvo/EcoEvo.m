@@ -73,7 +73,7 @@ NumericListQ;NumericFlattenedListQ;
 InterpolatingFunctionTake;Slice;InitialSlice;FinalSlice;FinalDerivatives;InitialTime;FinalTime;
 SortedEigensystem;ListMultiplier;RunFile;RouthHurwitzCriteria;
 JoinFirst;
-PlotDynamics;PlotInterpolatingFunction;ListLinePlot3D;RuleListPlot;
+PlotDynamics;PlotInterpolatingFunction;MyListLinePlot3D;RuleListPlot;
 TrackRoot;
 PartsAboveDiagonal;PrintMessage;
 GrayScale;
@@ -313,7 +313,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.6.0 (May 5, 2021)";
+$EcoEvoVersion="1.6.1 (May 23, 2021)";
 
 
 modelloaded=False;
@@ -2208,7 +2208,7 @@ StyleBox[\"l2\", \"TI\"]\)] joins two rulelists, taking the first definition in 
 JoinFirst[l1_List,l2_List]:=If[l1!={}||l2!={},Normal@Merge[{l1,l2},First],{}];
 
 
-ListLinePlot3D::usage="ListLinePlot3D[{{\!\(\*SubscriptBox[
+MyListLinePlot3D::usage="MyListLinePlot3D[{{\!\(\*SubscriptBox[
 StyleBox[\"x\", \"TI\"], 
 StyleBox[\"1\", \"TR\"]]\),\!\(\*SubscriptBox[
 StyleBox[\"y\", \"TI\"], 
@@ -2228,7 +2228,7 @@ StyleBox[\"y\", \"TI\"],
 StyleBox[\"i\", \"TI\"]]\),\!\(\*SubscriptBox[
 StyleBox[\"z\", \"TI\"], 
 StyleBox[\"i\", \"TI\"]]\)}.
-ListLinePlot3D[{\!\(\*SubscriptBox[
+MyListLinePlot3D[{\!\(\*SubscriptBox[
 StyleBox[\"data\", \"TI\"], 
 StyleBox[\"1\", \"TR\"]]\),\!\(\*SubscriptBox[
 StyleBox[\"data\", \"TI\"], 
@@ -2237,14 +2237,30 @@ StyleBox[\"\[Ellipsis]\", \"TR\"]\)}] plots several collections of points, by de
 
 
 (* based on user37744 <https://mathematica.stackexchange.com/a/107450/> *)
-ListLinePlot3D[arg_,opts___?OptionQ]:=
-If[Evaluate[Joined/.Flatten[{opts,Options[ListLinePlot3D]}]]===False,
-	ListPointPlot3D[arg,Sequence@@FilterRules[{opts},Options[ListPointPlot3D]]],
-	ListPointPlot3D[arg,Sequence@@FilterRules[{opts},Options[ListPointPlot3D]]]/.Point[a___]:>{Thick,Line[a]}
+MyListLinePlot3D[arg_,opts___?OptionQ]:=Module[{listpointplot3dopts},
+If[$VersionNumber>=12.3,(* use builtin ListLinePlot3D if available *)
+	ListLinePlot3D[arg,opts],
+	(* otherwise use homemade version *)
+	(*Print["{opts}=",{opts}];*)
+	listpointplot3dopts=FilterRules[{opts},Options[ListPointPlot3D]];
+	(*Print["listpointplot3dopts=",listpointplot3dopts];*)
+	If[Evaluate[Joined/.Flatten[{opts,Options[MyListLinePlot3D]}]]===False,
+		ListPointPlot3D[arg,Sequence@@listpointplot3dopts],
+		ListPointPlot3D[arg,Sequence@@listpointplot3dopts]/.Point[a___]:>{Thick,Line[a]}
+	]
 ]
+];
 
 
-Options[ListLinePlot3D]=FilterRules[Join[Options[ListPointPlot3D],{Joined->True}],Except[ColorFunction]];
+Options[MyListLinePlot3D]={Joined->True};
+
+
+(*Options[MyListLinePlot3D]=If[$VersionNumber>=12.3,(* use builtin ListLinePlot3D if available *)
+	Options[ListLinePlot3D],
+	(* otherwise use homemade version *)
+	(*FilterRules[Join[Options[ListPointPlot3D],{Joined\[Rule]True}],Except[ColorFunction]]*)
+	(*Join[FilterRules[Options[ListPointPlot3D],Except[ColorFunction]],{Joined\[Rule]True}]*)
+];*)
 
 
 PlotDynamics::usage=
@@ -2535,7 +2551,7 @@ parametricplot3dopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[P
 listplotopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ListPlot]];
 listlineplotopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ListLinePlot]];
 listpointplot3dopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ListPointPlot3D]];
-listlineplot3dopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ListLinePlot3D]];
+listlineplot3dopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[MyListLinePlot3D]];
 
 (* figure out number of species in guilds *)
 (*Set\[ScriptCapitalN][ExtractTraits[solsin\[LeftDoubleBracket]1\[RightDoubleBracket]],ExtractVariables[solsin\[LeftDoubleBracket]1\[RightDoubleBracket]]];
@@ -2604,11 +2620,11 @@ Which[
 			ParametricPlot3D[{vars[[1]][t],vars[[2]][t],vars[[3]][t]}/.sol,{t,InitialTime[sol],FinalTime[sol]},
 				PlotStyle->ModPart[plotstyle,i],PlotRange->plotrange,Evaluate[Sequence@@parametricplot3dopts]],
 			Head[sol[[1,2]]]===List,
-			ListLinePlot3D[Transpose[vars/.sol],PlotStyle->ModPart[plotstyle,i],
-				PlotRange->plotrange,PlotMarkers->None,Evaluate[Sequence@@listlineplot3dopts]],
+			MyListLinePlot3D[Transpose[vars/.sol],PlotStyle->ModPart[plotstyle,i],
+				PlotRange->plotrange,(*PlotMarkers\[Rule]None,*)Evaluate[Sequence@@listlineplot3dopts]],
 			Head[sol[[1,2]]]===TemporalData,
-			ListLinePlot3D[Transpose[Map[(#/.sol)["Values"]&,vars]],PlotStyle->ModPart[plotstyle,i],
-				PlotRange->plotrange,PlotMarkers->None,Evaluate[Sequence@@listlineplot3dopts]],
+			MyListLinePlot3D[Transpose[Map[(#/.sol)["Values"]&,vars]],PlotStyle->ModPart[plotstyle,i],
+				PlotRange->plotrange,(*PlotMarkers\[Rule]None,*)Evaluate[Sequence@@listlineplot3dopts]],
 			Else,
 			ListPointPlot3D[{vars/.sol},PlotStyle->ModPart[plotstyle,i],PlotRange->plotrange,Evaluate[Sequence@@listpointplot3dopts]]
 				(*/.Point[a___]\[RuleDelayed]Text[ModPart[plotmarkers,i],a]*)
@@ -5054,7 +5070,7 @@ Which[
 	variables!={}&&((variables[[1,2,0]]===InterpolatingFunction||(modeltype=="ContinousTime"&&modelperiod=!=0))&&time===t),
 	dim=Length[j];
 	per=FinalTime[variables];
-	xsol=NDSolve[{x'[t]==j . x[t],x[0]==IdentityMatrix[dim]},x,{t,0,per},Sequence@@ndsolveopts][[1]];
+	xsol=NDSolve[{x'[t]==j.x[t],x[0]==IdentityMatrix[dim]},x,{t,0,per},Sequence@@ndsolveopts][[1]];
 	If[Global`debug,Print[func,": x[per]/.xsol=",x[per]/.xsol]];
 	If[multipliers,
 		res=Eigenvalues[x[per]/.xsol],
@@ -5951,7 +5967,7 @@ arrayplotopts=Join[FilterRules[Flatten[{opts,Options[PlotGuild]}],Options[ArrayP
 	Evaluate[ArrayPlotOpts/.Flatten[{opts,Options[PlotGuild]}]]];
 listplot3dopts=Join[FilterRules[Flatten[{opts,Options[PlotGuild]}],Options[ListPlot3D]],
 	Evaluate[ListPlot3DOpts/.Flatten[{opts,Options[PlotGuild]}]]];
-listlineplot3dopts=Join[FilterRules[Flatten[{opts,Options[PlotGuild]}],Options[ListLinePlot3D]],
+listlineplot3dopts=Join[FilterRules[Flatten[{opts,Options[PlotGuild]}],Options[MyListLinePlot3D]],
 	Evaluate[ListLinePlot3DOpts/.Flatten[{opts,Options[PlotGuild]}]]];
 
 plotpoints=Evaluate[PlotPoints/.Flatten[{opts,Options[PlotGuild]}]];
@@ -6015,7 +6031,7 @@ If[TemporalRuleListQ[sol]&&time===t, (* temporal dynamics *)
 				PlotStyle->plotstyle,Evaluate[Sequence@@listlineplot3dopts],AxesLabel->{"t",tr,gu}]
 		,
 			dat=Table[Insert[Subscript[tr, sp]/.attributesin,2]/@(Subscript[gu, sp]/.sol)["Path"],{sp,Subscript[\[ScriptCapitalN], gu]}];
-			res=ListLinePlot3D[dat,PlotStyle->plotstyle,Evaluate[Sequence@@listlineplot3dopts],AxesLabel->{"t",tr,gu}]
+			res=MyListLinePlot3D[dat,PlotStyle->plotstyle,Evaluate[Sequence@@listlineplot3dopts],AxesLabel->{"t",tr,gu}]
 		]
 	,
 		Else,
@@ -6091,7 +6107,7 @@ If[logged==False,
 Options[PlotGuild]={
 PlotType->"ArrayPlot",PlotStyle->Automatic,PlotPoints->Automatic,
 ListPlotOpts->{},
-ListPlot3DOpts->{BoxRatios->{2,1,1},PlotRange->{0,All}},
+ListPlot3DOpts->{BoxRatios->{2,1,1},PlotRange->{0,All},ColorFunction->"ThermometerColors",Mesh->None},
 ArrayPlotOpts->{AspectRatio->1/2,ImageSize->Large,ColorFunction->"ThermometerColors",Mesh->None,FrameTicks->{All,All,False,False},PlotRange->All},
 ListLinePlot3DOpts->{BoxRatios->{2,1,1},PlotRange->{All,All,{0,All}}},
 Guild->Automatic,Trait->Automatic,Species->None,
@@ -6518,10 +6534,10 @@ Which[
 		If[Global`debug,Print[func,": j=",j]];
 		If[verbose,
 			With[{j=j/.invtraits,liu=Length[invunks],tstart=tstart,tend=tend,dt=tend-tstart,op=Sequence@@ndsolveopts},
-			PrintCall[Global`invsol=NDSolve[{Global`x'[t]==j . Global`x[t]/.Global`sol/.Global`qsssol,Global`x[tstart]==IdentityMatrix[liu]},Global`x,{t,tstart,tend},op]];
+			PrintCall[Global`invsol=NDSolve[{Global`x'[t]==j.Global`x[t]/.Global`sol/.Global`qsssol,Global`x[tstart]==IdentityMatrix[liu]},Global`x,{t,tstart,tend},op]];
 			PrintCall[Global`eval=Max@Re@Log@Chop@Sort@Eigenvalues@Evaluate[Global`x[tend]/.Global`invsol]/dt]
 		]];
-		invsol=NDSolve[{x'[t]==j . x[t]/.invtraits/.sol/.qsssol,x[tstart]==IdentityMatrix[Length[invunks]]},x,{t,tstart,tend},Evaluate[Sequence@@ndsolveopts]];
+		invsol=NDSolve[{x'[t]==j.x[t]/.invtraits/.sol/.qsssol,x[tstart]==IdentityMatrix[Length[invunks]]},x,{t,tstart,tend},Evaluate[Sequence@@ndsolveopts]];
 		eval=Max@Re@Log@Chop@Sort@Eigenvalues@Evaluate[x[tend]/.invsol]/(tend-tstart);
 		Return[{eval,"?"}];
 	]
@@ -8370,7 +8386,7 @@ If[delaydinv==True,
 	If[sol==="FindEcoAttractor",sol=BlankVariables];
 	eqns=Flatten[Table[Table[
 		Thread[Table[DT[Subscript[gtrait,sp]],{gtrait,gtraits[gu]}]==(
-		pre[gu,sp]*Replace[g[gu],var_Symbol->Subscript[var,sp],\[Infinity]] . DInv[BlankTraits,sol,Guild->gu,Species->sp,Time->time,Fixed->fixed,Evaluate[Sequence@@dinvopts],VerboseAll->verboseall]
+		pre[gu,sp]*Replace[g[gu],var_Symbol->Subscript[var,sp],\[Infinity]].DInv[BlankTraits,sol,Guild->gu,Species->sp,Time->time,Fixed->fixed,Evaluate[Sequence@@dinvopts],VerboseAll->verboseall]
 		-Table[dtrait[gu,gtrait],{gtrait,gtraits[gu]}]
 		+If[modeltype=="DiscreteTime",Table[Subscript[gtrait,sp],{gtrait,gtraits[gu]}],0]
 		/.fixed/.AddVariablets/.AddTraitts)]
@@ -8403,8 +8419,8 @@ Table[
 	(*Print["fg=",fg];*)
 	gu=LookUp[comp1][[2]];
 	<|
-	Thread[Thread[Subscript[Through[traitz[comp1]], \[FormalI]]]->-s1 g[gu] . fg],
-	Thread[Thread[Subscript[Through[traitz[comp2]], \[FormalI]]]->s2 g[gu] . fg],
+	Thread[Thread[Subscript[Through[traitz[comp1]], \[FormalI]]]->-s1 g[gu].fg],
+	Thread[Thread[Subscript[Through[traitz[comp2]], \[FormalI]]]->s2 g[gu].fg],
 	Thread[Thread[Subscript[Through[traitz[comp2]], \[FormalI]]]->s2 rate/Subscript[comp2, \[FormalI]](Thread[Subscript[Through[traitz[comp1]], \[FormalI]]]-Thread[Subscript[Through[traitz[comp2]], \[FormalI]]])]
 	|>
 ,{tr,transitions}]

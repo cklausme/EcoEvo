@@ -1,11 +1,11 @@
 (* ::Package:: *)
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*directories*)
 
 
 package="EcoEvo";
-version="1.6.0";
+version="1.6.1";
 
 
 Needs["PackageTools`"]
@@ -29,7 +29,7 @@ builddir=FileNameJoin[{rootdir,"build",package<>"-"<>version,package}]
 docdir=FileNameJoin[{builddir, "Documentation"}]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*fix docs*)
 
 
@@ -217,4 +217,7 @@ publishDocDir[pacletDir_,subdir_,prefix_,target_]:=Module[{
 PublishPacletDocs[pacletDir_String,target_CloudObject]:=KeyValueMap[publishDocDir[pacletDir,#1,#2,target]&,dirPrefixes]
 
 
-PublishPacletDocs["~/github/EcoEvo/build/EcoEvo-1.5.2/EcoEvo",CloudObject["docs"]];
+PublishPacletDocs["~/github/EcoEvo/archive/EcoEvo-1.6.0/EcoEvo",CloudObject["docs"]];
+
+
+
