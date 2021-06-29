@@ -1,10 +1,10 @@
 (* Paclet Info File *)
 
-(* created 2021/05/23*)
+(* created 2021/06/29*)
 
 Paclet[
     Name -> "EcoEvo",
-    Version -> "1.6.1",
+    Version -> "1.6.2",
     MathematicaVersion -> "10+",
     Description -> "Species- and trait-based ecological and eco-evolutionary modeling.",
     Creator -> "Christopher Klausmeier <christopher.klausmeier@gmail.com>",
