@@ -1,11 +1,15 @@
 (* ::Package:: *)
 
 (* ::Section:: *)
+(*step one: rebuild docs w/ Eclipse*)
+
+
+(* ::Section:: *)
 (*directories*)
 
 
 package="EcoEvo";
-version="1.6.2";
+version="1.6.3";
 
 
 Needs["PackageTools`"]
