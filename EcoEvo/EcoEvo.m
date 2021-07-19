@@ -77,7 +77,7 @@ PlotDynamics;PlotInterpolatingFunction;MyListLinePlot3D;RuleListPlot;
 TrackRoot;
 PartsAboveDiagonal;PrintMessage;
 GrayScale;
-DoubleDotProduct;
+DoubleDotProduct;HessianMatrix;
 
 
 Set\[ScriptCapitalN];
@@ -121,10 +121,11 @@ Trait::usage="Defines a trait in SetModel.";
 Interaction::usage="Defines an interaction in SetModel.";
 Type::usage="Defines a Component type in SetModel.";
 Guilds::usage="Guilds are used in defining Interactions in SetModel.";
-Components::usage="";
-Traits::usage="";
-Transitions::usage="";
-Parameters::usage="";
+Components::usage="A list of components in a guild in SetModel.";
+Auxs::usage="A list of Aux variables in SetModel.";
+Traits::usage="A list of traits in a guild in SetModel.";
+Transitions::usage="A list of components in SetModel.";
+Parameters::usage="A list of parameters in SetModel.";
 
 \[ScriptCapitalN]::usage="\!\(\*SubscriptBox[\(\[ScriptCapitalN]\), 
 StyleBox[\"gu\", \"TI\"]]\) is a reserved symbol that denotes the number of species in guild \!\(\*
@@ -189,6 +190,7 @@ EigenvaluesOpts::usage = "EigenvaluesOpts passes options to Eigenvalues.";
 EqStop::usage = "EqStop is an option for various EcoEvo simulation functions that stops upon reaching an equilibrium.";
 EqThreshold::usage = "EqThreshold is an option for various EcoEvo simulation functions that sets the sensitivity for EqStop.";
 EqTolerance::usage = "EqTolerance is an option for FindEcoAttractor that sets the minimum distance to consider two equilibria distinct.";
+EqualInvTraits::usage = "EqualInvTraits is an option for Inv that forces invader traits to be equal across components.";
 ESColor::usage = "ESColor is an option for PlotEvoIsoclines that sets the color of non-ES contours if ESTest\[Rule]True.";
 ESTest::usage = "ESTest is an option for PlotEvoIsoclines that colors isoclines according to (local) evolutionary stability.";
 EvoEquation::usage = "EvoEquation is an option for EcoEvoSim that sets whether to use the breeders' equation (\"QG\" -- default) or the canonical equation (\"CE\").";
@@ -242,6 +244,7 @@ NInvOpts::usage = "NInvOpts is an option for various EcoEvo functions that passe
 NMaximizeOpts::usage = "NMaximizeOpts is an option for GlobalESSQ that passes options to NMaximize.";
 NonESColor::usage = "NonESColor is an option for PlotEvoIsoclines that sets the color of non-ES contours if ESTest\[Rule]True.";
 NonFixedVars::usage = "NonFixedVars is an option for EcoEqns that lists variables that need equations.";
+NonFixedTraits::usage = "NonFixedTraits is an option for TraitEqns that lists traits that need equations.";
 NonInvStyle::usage = "NonInvStyle is an option for PlotMIP (PlotType->MIP) that defines the style for unsuccessful invasion.";
 NormalizeDistance::usage = "NormalizeDistance is an option for FunctionalDistinctiveness whether to normalize distances to one.";
 NSolveEcoEqOpts::usage = "NSolveEcoEqOpts is an option for various EcoEvo functions that passes options to NSolveEcoEq.";
@@ -316,7 +319,7 @@ ZeroDiagonal::usage =  "ZeroDiagonal is an option for PlotPIP that forces Inv=0 
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0X (June 29, 2021)";
+$EcoEvoVersion="1.7.0X (July 14, 2021)";
 
 
 modelloaded=False;
@@ -620,7 +623,7 @@ Eq::usage=
 "Eq is a replacement rule that sets time derivatives to zero and next timesteps equal to current timesteps.";
 
 
-Eq={var_[t+1]->var[t],var_'[t]->0};
+Eq={var_[t+1]->var[t],var_'(*[t]*)->0};
 
 
 ZeroLHS::usage=
@@ -2779,6 +2782,16 @@ DoubleDotProduct::usage="DoubleDotProduct[]...";
 DoubleDotProduct[A_?MatrixQ,B_?MatrixQ]:=Flatten[A] . Flatten[B];
 
 
+HessianMatrix::usage="HessianMatrix[\!\(\*
+StyleBox[\"f\", \"TI\"]\), \!\(\*
+StyleBox[\"vars\", \"TI\"]\)] calculates the Hessian matrix of \!\(\*
+StyleBox[\"f\", \"TI\"]\) with respect to \!\(\*
+StyleBox[\"vars\", \"TI\"]\).";
+
+
+HessianMatrix[f_,vars_]:=Table[D[f,var1,var2],{var1,vars},{var2,vars}]
+
+
 Set\[ScriptCapitalN][attributes:(_?AttributesQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,interxns,tnsp,pnsp,insp},
 (*Print["In Set\[ScriptCapitalN], attributes=",attributes," variables=",variables];*)
 (*Print[Table[\[ScriptCapitalN][gu]/.attributes,{gu,guilds}]];*)
@@ -3026,20 +3039,20 @@ AddUnkts:=(var_->Unk[stuff___])->(var->Unk[stuff][t]);
 
 AddVariablets:=DeleteDuplicates[Flatten[Join[
 	Table[Table[
-		{(*Subscript[gcomp,\[FormalS]_]'\[Rule]Subscript[gcomp,\[FormalS]]'[t],*)Subscript[gcomp,\[FormalS]_]->Subscript[gcomp,\[FormalS]][t],Unk[gcomp,\[FormalS]_]->Unk[gcomp,\[FormalS]][t]}
+		{Subscript[gcomp,\[FormalS]_]'->Subscript[gcomp,\[FormalS]]'[t],Subscript[gcomp,\[FormalS]_]->Subscript[gcomp,\[FormalS]][t],Unk[gcomp,\[FormalS]_]->Unk[gcomp,\[FormalS]][t]}
 	,{gcomp,gcomps[gu]}],{gu,guilds}],
 	Table[Table[
-		{pcomp->pcomp[t],Unk[pcomp]->Unk[pcomp][t]}
+		{pcomp'->pcomp'[t],pcomp->pcomp[t],Unk[pcomp]->Unk[pcomp][t]}
 	,{pcomp,pcomps[pop]}],{pop,pops}],
-	Table[{aux->aux[t],Unk[aux]->Unk[aux][t]},{aux,auxs}]
+	Table[{aux'->aux'[t],aux->aux[t],Unk[aux]->Unk[aux][t]},{aux,auxs}]
 ]]];
 
 
 AddTraitts:=Flatten[
 	Table[Table[{
-		Subscript[gtrait,\[FormalS]_]->Subscript[gtrait,\[FormalS]][t],
-		Table[Subscript[gtrait[gcomp], \[FormalS]_]->Subscript[gtrait[gcomp], \[FormalS]][t],{gcomp,gcomps[gu]}],
-		Unk[gtrait,\[FormalS]_]->Unk[gtrait,\[FormalS]][t]
+		{Subscript[gtrait,\[FormalS]_]'->Subscript[gtrait,\[FormalS]]'[t],Subscript[gtrait,\[FormalS]_]->Subscript[gtrait,\[FormalS]][t]},
+		Table[{Subscript[gtrait[gcomp], \[FormalS]_]'->Subscript[gtrait[gcomp], \[FormalS]]'[t],Subscript[gtrait[gcomp], \[FormalS]_]->Subscript[gtrait[gcomp], \[FormalS]][t]},{gcomp,gcomps[gu]}],
+		{Unk[gtrait,\[FormalS]_]'->Unk[gtrait,\[FormalS]]'[t],Unk[gtrait,\[FormalS]_]->Unk[gtrait,\[FormalS]][t]}
 		}
 	,{gtrait,gtraits[gu]}],{gu,guilds}]
 ];
@@ -3048,12 +3061,19 @@ AddTraitts:=Flatten[
 AddVarCovts:=Flatten[
 	Table[Table[{
 		Table[{
-			Subscript[Var[gtrait][gcomp],\[FormalS]_]->Subscript[Var[gtrait][gcomp],\[FormalS]][t],
-			Table[Subscript[Cov[gtrait,gtrait\[Prime]][gcomp],\[FormalS]_]->Subscript[Cov[gtrait,gtrait\[Prime]][gcomp],\[FormalS]][t],{gtrait\[Prime],gtraits[gu]}]
+			{Subscript[Var[gtrait][gcomp],\[FormalS]_]'->Subscript[Var[gtrait][gcomp],\[FormalS]]'[t],Subscript[Var[gtrait][gcomp],\[FormalS]_]->Subscript[Var[gtrait][gcomp],\[FormalS]][t]},
+			Table[
+				{Subscript[Cov[gtrait,gtrait\[Prime]][gcomp],\[FormalS]_]'->Subscript[Cov[gtrait,gtrait\[Prime]][gcomp],\[FormalS]]'[t],
+				Subscript[Cov[gtrait,gtrait\[Prime]][gcomp],\[FormalS]_]->Subscript[Cov[gtrait,gtrait\[Prime]][gcomp],\[FormalS]][t]}
+			,{gtrait\[Prime],gtraits[gu]}]
 			}
 		,{gcomp,gcomps[gu]}],
-		{Subscript[Var[gtrait],\[FormalS]_]->Subscript[Var[gtrait],\[FormalS]][t]},
-		Table[Subscript[Cov[gtrait,gtrait\[Prime]],\[FormalS]_]->Subscript[Cov[gtrait,gtrait\[Prime]],\[FormalS]][t],{gtrait\[Prime],gtraits[gu]}]}
+		{Subscript[Var[gtrait],\[FormalS]_]'->Subscript[Var[gtrait],\[FormalS]]'[t],Subscript[Var[gtrait],\[FormalS]_]->Subscript[Var[gtrait],\[FormalS]][t]},
+		Table[
+			{Subscript[Cov[gtrait,gtrait\[Prime]],\[FormalS]_]'->Subscript[Cov[gtrait,gtrait\[Prime]],\[FormalS]]'[t],
+			Subscript[Cov[gtrait,gtrait\[Prime]],\[FormalS]_]->Subscript[Cov[gtrait,gtrait\[Prime]],\[FormalS]][t]}
+		,{gtrait\[Prime],gtraits[gu]}]
+		}
 	,{gtrait,gtraits[gu]}],{gu,guilds}]
 ]
 
@@ -3100,13 +3120,15 @@ DefaultICs:=Quiet[Flatten[{
 SetAttributes[DoubleRightArrow,HoldAllComplete];
 
 
-UnpackDoubleRightArrows::usage="";
+InterpretTransitions::usage="";
 
 
-UnpackDoubleRightArrows[DoubleRightArrow[Times[c1_,var1_],Times[c2_,var2_]]]:={c1,var1,c2,var2};
-UnpackDoubleRightArrows[DoubleRightArrow[var1_,Times[c2_,var2_]]]:={1,var1,c2,var2};
-UnpackDoubleRightArrows[DoubleRightArrow[Times[c1_,var1_],var2_]]:={c1,var1,1,var2};
-UnpackDoubleRightArrows[DoubleRightArrow[var1_,var2_]]:={1,var1,1,var2};
+InterpretTransitions[DoubleRightArrow[Times[c1_,var1_],Times[c2_,var2_]]]:={c1,var1,c2,var2};
+InterpretTransitions[DoubleRightArrow[var1_,Times[c2_,var2_]]]:={1,var1,c2,var2};
+InterpretTransitions[DoubleRightArrow[Times[c1_,var1_],var2_]]:={c1,var1,1,var2};
+InterpretTransitions[DoubleRightArrow[var1_,var2_]]:={1,var1,1,var2};
+
+InterpretTransitions[Rule[var_,Plus[c_,var_]]]:={0,Global`\[EmptySet],c,var};
 
 
 DoubleRightArrowsToTrans:={
@@ -3115,6 +3137,16 @@ DoubleRightArrow[var1_,Times[c2_,var2_]]->{var1->var1-1,var2->var2+c2},
 DoubleRightArrow[Times[c1_,var1_],var2_]->{var1->var1-c1,var2->var2+1},
 DoubleRightArrow[var1_,var2_]->{var1->var1-1,var2->var2+1}
 }
+
+
+AddProceduralToSum::usage="Add Method->\"Procedural\" to Sum[\!\(\*
+StyleBox[\"stuff\", \"TI\"]\), {\!\(\*
+StyleBox[\"ind\", \"TI\"]\), \[ScriptCapitalN][\!\(\*
+StyleBox[\"gu\", \"TI\"]\)]}]'s.";
+
+
+AddProceduralToSum[expr_]:=
+Inactivate[expr,Sum]/.Inactive[Sum][stuff___,{ind_,\[ScriptCapitalN][gu_]}]->Sum[stuff,{ind,\[ScriptCapitalN][gu]},Method->"Procedural"]
 
 
 EcoEvoDocs::usage="EcoEvoDocs opens the main EcoEvo guide.";
@@ -3568,15 +3600,16 @@ stylecount=0;
 
 (* auxs *)
 
-(*Print["Auxs"];*)
 If[(Auxs/.model)===Auxs,
-	auxs=Select[model,#[[1,0]]==Aux&][[All,1,1]],
-	auxs=Auxs/.model
+	auxs=Select[model,#[[1,0]]==Aux&][[All,1,1]];
+	eqn[au_]:=Equation/.(Aux[au]/.model);
+,
+	auxs=Auxs/.model; (* transition-based *)
+	Do[eqn[au]=0,{au,auxs}];
 ];
 (*Print["auxs=",auxs];*)
 naux=Length[auxs];
 (*Print["naux=",naux];*)
-auxeqn[au_]:=Equation/.(Aux[au]/.model);
 
 Do[
 	stylecount++;
@@ -3650,6 +3683,7 @@ Do[
 	(*Print["comps[",gu,"]=",comps[gu]];*)
 	comps[Subscript[gu_,sp_]]:=Replace[comps[gu],var_->Subscript[var,sp],1];
 	ncomps[gu]=ngcomps[gu]=Length[gcomps[gu]];
+	
 	If[(Traits/.(Guild[gu]/.model))===Traits,
 		(*Print["old traits"];*)
 		gtraits[gu]=Select[Guild[gu]/.model,#[[1,0]]==Trait&][[All,1,1]],
@@ -3690,14 +3724,11 @@ Do[
 		If[transitions===Transitions,
 			eqn[Subscript[gcomp, i_]]:=Evaluate[Equation/.If[RuleListQ[Component[gcomp]/.(Guild[gu]/.model)],Component[gcomp]/.(Guild[gu]/.model),Guild[gu]/.model]/.\[FormalI]->i],
 			dndt[gcomp]=dxdt[gcomp]=dGdt[gcomp]={};
+			eqn[Subscript[gcomp, \[FormalI]]]=0;
 		];
 	,{gcomp,gcomps[gu]}];
 
-	(*If[transitions=!=Transitions,
-	Print[Flatten@Table[Subscript[gtrait[gcomp], \[FormalI]],{gcomp,gcomps[gu]},{gtrait,gtraits[gu]}]];
-		fgs[gu]=Normal[D[#,{Flatten@Table[Subscript[gtrait[gcomp], \[FormalI]],{gcomp,gcomps[gu]},{gtrait,gtraits[gu]}]}]&/@percapitaeqns];
-		Print["fgs[",gu,"]=",fgs[gu]];
-	];*)
+
 	indexcount=0;
 	Do[
 		indexcount++;
@@ -3756,45 +3787,49 @@ transitions=Transitions/.model;
 (*Print["transitions=",transitions];*)
 If[transitions=!=Transitions,
 	Do[
+	If[Global`debug,Print[process]];
 		trans=process[[1]];
-		rate=process[[2]];
+		rate=AddProceduralToSum[process[[2]]];
 		Do[
-			{sourcec,source,destc,dest}=DeleteSubscripts[UnpackDoubleRightArrows[tran]];
+			{sourcec,source,destc,dest}=DeleteSubscripts[InterpretTransitions[tran]];
 			If[Global`debug,Print["{sourcec,source,destc,dest}=",{sourcec,source,destc,dest}]];
-			gu=LookUp[source][[2]];
-			If[ngcomps[gu]==1,
-				sourcetraits=Table[UnderBar[gtrait],{gtrait,gtraits[gu]}],
-				sourcetraits=Table[UnderBar[gtrait][source],{gtrait,gtraits[gu]}]
+			If[source=!=Global`\[EmptySet],
+				gu=LookUp[source][[2]];
+				If[ngcomps[gu]==1,
+					sourcetraits=Table[UnderBar[gtrait],{gtrait,gtraits[gu]}],
+					sourcetraits=Table[UnderBar[gtrait[source]],{gtrait,gtraits[gu]}]
+				];
+				If[Global`debug,Print["sourcetraits=",sourcetraits]];
+				If[ngcomps[gu]==1,
+					sourceG=MakeGMatrix[Subscript[source, \[FormalI]]], (* what happened here?! *)
+					sourceG=MakeGMatrix[Subscript[source, \[FormalI]]]
+				];
+				If[Global`debug,Print["sourceG=",sourceG]];
+				fsource=Simplify@-sourcec*rate/Subscript[source, \[FormalI]]/.Subscript[var_, \[FormalI]]->UnderBar[var];
+				If[Global`debug,Print["fsource=",fsource]];
+				dfsource=Simplify@D[fsource,{sourcetraits,1}];
+				If[Global`debug,Print["dfsource=",dfsource]];
+				(*d2fsource=Simplify@D[fsource,{sourcetraits,2}];*)
+				d2fsource=Simplify@Table[D[fsource,var1,var2],{var1,sourcetraits},{var2,sourcetraits}];
+				If[Global`debug,Print["d2fsource=",d2fsource]];
+				fsource\[Prime]=Simplify@fsource+1/2*DoubleDotProduct[d2fsource,sourceG];
+				If[Global`debug,Print["fsource\[Prime]=",fsource\[Prime]]];
+				dfsource\[Prime]=Simplify@D[fsource\[Prime],{sourcetraits,1}];
+				If[Global`debug,Print["dfsource\[Prime]=",dfsource\[Prime]]];
+				AppendTo[dndt[source],fsource\[Prime]*Subscript[source, \[FormalI]]/.UnderBar[var_]->Subscript[var, \[FormalI]]];
+				AppendTo[dxdt[source],sourceG . dfsource\[Prime]/.UnderBar[var_]->Subscript[var, \[FormalI]]];
+				AppendTo[dGdt[source],sourceG . d2fsource . sourceG/.UnderBar[var_]->Subscript[var, \[FormalI]]]
 			];
-			If[Global`debug,Print["sourcetraits=",sourcetraits]];
-			If[ngcomps[gu]==1,
-				sourceG=
-				sourceG=MakeGMatrix[Subscript[source, \[FormalI]]];
-			];
-			If[Global`debug,Print["sourceG=",sourceG]];
-			fsource=Inactivate[-sourcec*rate/Subscript[source, \[FormalI]]/.Subscript[var_, \[FormalI]]->UnderBar[var],Sum];
-			If[Global`debug,Print["fsource=",fsource]];
-			dfsource=D[fsource,{sourcetraits,1}];
-			If[Global`debug,Print["dfsource=",dfsource]];
-			d2fsource=D[fsource,{sourcetraits,2}];
-			If[Global`debug,Print["d2fsource=",d2fsource]];
-			fsource\[Prime]=fsource+1/2*DoubleDotProduct[d2fsource,sourceG];
-			If[Global`debug,Print["fsource\[Prime]=",fsource\[Prime]]];
-			dfsource\[Prime]=D[fsource\[Prime],{sourcetraits,1}];
-			If[Global`debug,Print["dfsource\[Prime]=",dfsource\[Prime]]];
-			AppendTo[dndt[source],fsource\[Prime]*Subscript[source, \[FormalI]]/.UnderBar[var_]->Subscript[var, \[FormalI]]];
-			AppendTo[dxdt[source],sourceG . dfsource\[Prime]/.UnderBar[var_]->Subscript[var, \[FormalI]]];
-			AppendTo[dGdt[source],sourceG . d2fsource . sourceG/.UnderBar[var_]->Subscript[var, \[FormalI]]];
 			If[dest=!=Global`\[EmptySet],
-(*Print["sourceG=",sourceG];*)
+			If[LookUp[dest][[1]]=="gcomp",
 				If[ngcomps[gu]==1,
 					desttraits=sourcetraits,
-					desttraits=Table[UnderBar[gtrait][dest],{gtrait,gtraits[gu]}];
+					desttraits=Table[UnderBar[gtrait[dest]],{gtrait,gtraits[gu]}];
 				];
 				If[Global`debug,Print["desttraits=",desttraits]];
 				destG=MakeGMatrix[Subscript[dest, \[FormalI]]];
 				If[Global`debug,Print["destG=",destG]];
-				fdest=Inactivate[rate*destc/Subscript[source, \[FormalI]]/.Subscript[var_, \[FormalI]]->UnderBar[var],Sum];
+				fdest=rate*destc/Subscript[source, \[FormalI]]/.Subscript[var_, \[FormalI]]->UnderBar[var];
 				If[Global`debug,Print["fdest=",fdest]];
 				dfdest=D[fdest,{sourcetraits,1}];
 				d2fdest=D[fdest,{sourcetraits,2}];
@@ -3802,7 +3837,6 @@ If[transitions=!=Transitions,
 				If[Global`debug,Print["fdest\[Prime]=",fdest\[Prime]]];
 				dfdest\[Prime]=D[fdest\[Prime],{sourcetraits,1}];
 				If[Global`debug,Print["dfdest\[Prime]=",dfdest\[Prime]]];
-(*Print["sourcetraits-desttraits=",sourcetraits-desttraits];*)
 				If[Length[process]>2,
 					mut=process[[3]];
 					Which[
@@ -3819,17 +3853,54 @@ If[transitions=!=Transitions,
 				AppendTo[dGdt[dest],Subscript[source, \[FormalI]]/Subscript[dest, \[FormalI]](fdest\[Prime](m+sourceG-destG+(sourcetraits-desttraits)^2)+sourceG . d2fdest . sourceG
 					+dfdest\[Prime]*sourceG . Transpose[sourcetraits-desttraits]+(sourcetraits-desttraits) . Transpose[sourceG . dfdest\[Prime]])/.UnderBar[var_]->Subscript[var, \[FormalI]]];
 (*Print[dfdest\[Prime]*sourceG.Transpose[sourcetraits-desttraits]," ",(sourcetraits-desttraits).Transpose[sourceG.dfdest\[Prime]]];*)
-			];
+			,
+			(*Print["AddTo[eqn[",dest,"],",rate*destc];*)
+			agents=DeleteSubscripts[Cases[rate,Subscript[_,\[FormalI]]]];
+			If[Global`debug,Print["** agents=",agents]];
+			Which[
+				Length[agents]==0,
+				AddTo[eqn[dest],rate*destc],
+				Length[agents]==1,
+				(*f=Sum[rate*destc/.Subscript[var_, \[FormalI]]->UnderBar[var],{\[FormalI],\[ScriptCapitalN][gu]},Method->"Procedural"];*)
+				f=rate*destc/.Subscript[var_, \[FormalI]]->UnderBar[var];
+				{gu,gco}=LookUp[agents[[1]]][[2;;3]];
+				(*Print["** {gu,gco}=",{gu,gco}];*)
+				If[ngcomps[gu]==1,
+					agenttraits=Table[UnderBar[gtrait],{gtrait,gtraits[gu]}],
+					agenttraits=Table[UnderBar[gtrait[gco]],{gtrait,gtraits[gu]}]
+				];
+				(*Print["** agenttraits=",agenttraits];*)
+				If[Global`debug,Print["** f=",f]];
+				d2f=Simplify@HessianMatrix[f,agenttraits];
+				If[Global`debug,Print["** d2f=",d2f]];
+				If[ngcomps[gu]==1,
+					agentG=MakeGMatrix[Subscript[gco, \[FormalI]]], (* what happened here?! *)
+					agentG=MakeGMatrix[Subscript[gco, \[FormalI]]]
+				];
+				Print["** agentG=",agentG];
+				Print["** f-hat=",f+1/2*DoubleDotProduct[d2f,agentG]/.UnderBar[var_]->Subscript[var, \[FormalI]]];
+				AddTo[eqn[dest],Sum[f+1/2*DoubleDotProduct[d2f,agentG]/.UnderBar[var_]->Subscript[var, \[FormalI]],{\[FormalI],\[ScriptCapitalN][gu]},Method->"Procedural"]];
+			]
+		]];
 		,{tran,trans}];
 	,{process,transitions}];
 ];
 
 Do[
 	Do[
-		dndt[co]=Activate@Simplify@Total[dndt[co]];
-		dxdt[co]=Activate@Simplify@Total[dxdt[co]];
-		dGdt[co]=Activate@Simplify@Total[dGdt[co]];
-	,{co,gcomps[gu]}];
+		If[Global`debug,Print["constructing dndt[",gco,"]..."]];
+		dndt[gco]=Total[dndt[gco]];
+		eqn[Subscript[gco, i_]]:=Evaluate[dndt[gco]/.\[FormalI]->i];
+		If[Global`debug,Print["constructing dxdt[",gco,"]..."]];
+		dxdt[gco]=Total[dxdt[gco]];
+		If[ngcomps[gu]==1,
+			Do[dxdt[gtraits[gu][[i]]]=dxdt[gco][[i]],{i,Length[gtraits[gu]]}]
+		,
+			Do[dxdt[gtraits[gu][[i]][gco]]=dxdt[gco][[i]],{i,Length[gtraits[gu]]}]
+		];
+		If[Global`debug,Print["constructing dGdt[",gco,"]..."]];
+		dGdt[gco]=Total[dGdt[gco]];
+	,{gco,gcomps[gu]}];
 ,{gu,guilds}];
 
 
@@ -3837,7 +3908,7 @@ Do[
 
 $Assumptions=Flatten[assumptions/.Automatic->Join[
 	Select[parametersin,MemberQ[{Greater,GreaterEqual,Less,LessEqual},Head[#]]&],
-	Table[Region`SpecialRegionProperty[range[aux],{aux},"ImplicitDescription"],{aux,auxs}],
+	(*Table[Region`SpecialRegionProperty[range[aux],{aux},"ImplicitDescription"],{aux,auxs}],*)
 	Table[Table[Region`SpecialRegionProperty[range[pcomp],{pcomp},"ImplicitDescription"],{pcomp,pcomps[pop]}],{pop,pops}],
 	Table[Table[Table[
 		Region`SpecialRegionProperty[range[gcomp],{Subscript[gcomp,sp]},"ImplicitDescription"],{sp,0,2}],{gcomp,gcomps[gu]}],{gu,guilds}],
@@ -3848,26 +3919,11 @@ $Assumptions=Flatten[assumptions/.Automatic->Join[
 
 Which[
 	modeltype=="ContinuousTime",
-	DT[var_]:=var'[t]
+	DT[var_]:=var'(*[t]*)
 ,
 	modeltype=="DiscreteTime",
-	DT[var_]:=var[t+1]
+	DT[var_]:=var[t+1] (* gotta fix this *)
 ];
-
-eqn[var_]:=Module[{luv=LookUp[var]},
-	Which[
-		luv[[1]]=="aux",auxeqn[luv[[2]]],
-		luv[[1]]=="pcomp",pcompeqn[luv[[2]],luv[[3]]],
-		luv[[1]]=="gcomp",gcompeqn[luv[[2]],luv[[3]]][luv[[4]]]
-	]
-];
-
-(*Do[
-	Do[
-		eqn[Subscript[gcomp, i_]]=(Subscript[gcomp, i]/.eqns);
-		Print[eqn[Subscript[gcomp, 1]]];
-	,{gcomp,gcomps[gu]}]
-,{gu,guilds}]*)
 
 ]
 
@@ -3898,8 +3954,9 @@ UnsetModel:=(
 	modeltype,modelwhenevents,modelperiod,
 	pops,npops,npcomps,pcomps,pcompeqn,
 	auxs,nauxs,auxeqn,
-	guilds,nguilds,gcomps,ngcomps,gcompeqn,gtraits,ngtraits,
-	eqns];
+	guilds,nguilds,gcomps,ngcomps,gtraits,ngtraits,
+	eqns,
+	dndt,dxdt,dGdt];
 	$Assumptions={};
 );
 
@@ -4553,11 +4610,7 @@ If[nonfixedvars===Automatic,nonfixedvars=OrderedComplement[AllVariables,fixedvar
 If[Global`debug,Print["nonfixedvars=",nonfixedvars]];
 
 (* add [t] to constant fixed variables *)
-fixed2=ReplaceAll[fixed,(var_/;MemberQ[AllVariables,var])->var[t]];
-
-If[transitions===Transitions,
-
-(* equation-based *)
+(*fixed2=ReplaceAll[fixed,(var_/;MemberQ[AllVariables,var])\[Rule]var[t]];*)
 
 (*Print["making eqns"];*)
 eqns=Table[
@@ -4565,49 +4618,31 @@ eqns=Table[
 		logged===True&&comptype[var]==="Extensive",
 		Which[
 			modeltype=="DiscreteTime",
-			log[var][t+1]-log[var][t]==(RealSimplify[timescale*Log[eqn[var]/var]]/.AddVariablets),
+			log[var][t+1]-log[var][t]==RealSimplify[timescale*Log[eqn[var]/var]],
 			modeltype=="ContinuousTime",
-			log[var]'[t]==(timescale*eqn[var]/var/.AddVariablets)
+			log[var]'==timescale*eqn[var]/var
 		]
 	,
 		percapita===True&&comptype[var]==="Extensive",
 		Which[
 			modeltype=="DiscreteTime",
-			var[t+1]/var[t]==(timescale*eqn[var]/var/.AddVariablets),
+			var[t+1]/var[t]==timescale*eqn[var]/var,
 			modeltype=="ContinuousTime",
-			var'[t]==(timescale*eqn[var]/var/.AddVariablets)
+			var'==timescale*eqn[var]/var
 		]
 	,
 		Else,
 		Which[
 			modeltype=="DiscreteTime",
-			var[t+1]==(timescale*eqn[var]/.AddVariablets),
+			var[t+1]==timescale*eqn[var],
 			modeltype=="ContinuousTime",
-(*Print[eqn[var]];
-Print[AddVariablets];
-Print[eqn[var]/.AddVariablets];*)
-			var'[t]==(timescale*eqn[var]/.AddVariablets)
+			var'==timescale*eqn[var]
 		]
 	]
 ,{var,nonfixedvars}];
-(*Print["eqns made"];*)
+(*Print["eqns=",eqns];*)
 
-Return[DeleteDuplicates[eqns/.ExpRule[nonfixedvars,logged]/.Dispatch[ExpandTraits[attributes]]/.fixed2]]
-
-,
-
-(* process-based *)
-
-(*Print["nonfixedvars=",nonfixedvars];*)
-
-eqns=Table[
-	{gco,sp}=LookUp[var][[3;;4]];
-	Subscript[gco, sp]'[t]==(dndt[gco]/.\[FormalI]->sp/.AddVariablets/.Dispatch[ExpandTraits[attributes]]/.AddTraitts/.AddVarCovts)
-,{var,nonfixedvars}];
-
-Return[DeleteDuplicates[eqns/.ExpRule[nonfixedvars,logged](*/.Dispatch[ExpandTraits[attributes]]*)/.fixed2]];
-
-]
+Return[DeleteDuplicates[eqns/.ExpRule[nonfixedvars,logged]/.Dispatch[ExpandTraits[attributes]]/.fixed(*2*)]]
 
 ]];
 
@@ -4697,7 +4732,7 @@ tic=If[modelwhenevents=={},tmin,tmin-10^-15]; (* hack to ensure that events are 
 
 (* set eqns, unks and ics *)
 (*Print["calling EcoEqns..."];*)
-eqns=EcoEqns[attributes,Fixed->fixed,NonFixedVars->nonfixedvars,opts]/.RemoveVarCovts/.Gs;
+eqns=EcoEqns[attributes,Fixed->fixed,NonFixedVars->nonfixedvars,opts]/.AddVariablets/.Gs;
 unks=Table[If[logged===True&&comptype[var]==="Extensive",log[var],var],{var,nonfixedvars}];
 ics=Table[If[logged===True&&comptype[var]==="Extensive",log[var][tic]==Log[var/.init],var[tic]==(var/.init)],{var,nonfixedvars}];
 
@@ -4879,7 +4914,7 @@ nonfixedvars=OrderedComplement[AllVariables,fixedvars];
 (*Print["nonfixedvars=",nonfixedvars];*)
 
 (* set eqns, unks and ics *)
-eqns=EcoEqns[attributes,Fixed->fixed,PerCapita->percapita]/.Eq/.RemoveVariablets/.RemoveVarCovts/.t->time/.fixed/.attributes/.Gs;
+eqns=EcoEqns[attributes,Fixed->fixed,PerCapita->percapita]/.Eq(*/.RemoveVariablets/.RemoveVarCovts*)/.t->time/.fixed/.attributes/.Gs;
 
 Which[
 	MemberQ[{"Solve","NSolve"},method],
@@ -6521,22 +6556,22 @@ StyleBox[\"traitinv\", \"TI\"]\)] uses invader traits \!\(\*
 StyleBox[\"traitinv\", \"TI\"]\).";
 
 
-InvSPS[traitsandpops_?AttributesAndVariablesQ,invaderin:(_?InvaderQ):{},opts:OptionsPattern[]]:=
-InvSPS[ExtractAttributes[traitsandpops],ExtractVariables[traitsandpops],invaderin,opts];
+InvSPS[traitsandpops_?AttributesAndVariablesQ,invaderin:(_?InvaderQ):{},invaderGsin:(_?GsQ):{},opts:OptionsPattern[]]:=
+InvSPS[ExtractAttributes[traitsandpops],ExtractVariables[traitsandpops],invaderin,invaderGsin,opts];
 
 
-InvSPS[attributesin:(_?NotInvaderTraitsQ):{},solin:(_?VariablesQ):{},invaderin:(_?InvaderQ):{},opts:OptionsPattern[]]:=Module[{
+InvSPS[attributesin:(_?NotInvaderTraitsQ):{},solin:(_?VariablesQ):{},invaderin:(_?InvaderQ):{},invaderGsin:(_?GsQ):{},opts:OptionsPattern[]]:=Module[{
 func=FuncStyle["InvSPS"],
 (* options *)
 verbose,verboseall,method,
 guild,time,simplifyresult,frominv,rv,qssics,
-qssmethod,
+qssmethod,equalinvtraits,
 ndsolveopts,nintegrateopts,integrateopts,
 solveopts,nsolveopts,findrootopts,
 findecocycleopts,eigensystemopts,simplifyopts,
 (* other variables *)
 attributes,invader,invtraits,variables,
-invtype,invid,invunk,zeropcomps,sol,
+invtype,invid,invunk,zeropcomps,sol,invaderGs,
 inveqns,invunks,qsseqns,qssunks,qsssubs,mode,
 tstart,tend,removets,qsssols,qsssol,eval,evec,invsol,j,tempIF},
 
@@ -6581,6 +6616,7 @@ If[guild===Automatic,guild=Append[guilds,1][[1]]];
 frominv=OptionValue[FromInv];
 rv=OptionValue[RV];
 qssics=OptionValue[QSSICs];
+equalinvtraits=OptionValue[EqualInvTraits];
 
 (* figure out number of species in guilds *)
 variables=FixVariables[solin];
@@ -6659,6 +6695,9 @@ Print[WeightedAbundance@TemporalMean@FilterRules[sol,comps[invid]]];*)
 If[Global`debug,Print[func,": {invtype,invid}=",{invtype,invid}]];
 If[Global`debug,Print["invtraits=",invtraits]];
 
+(* process Gs *)
+invaderGs=ExpandGs[Join[invaderGsin,Thread[Flatten@MakeGMatrix[Subscript[invid, 0]]->Flatten@ConstantArray[0,{ngtraits[invid],ngtraits[invid]}]]]];
+If[verbose,Print[func,": invaderGs=",invaderGs]];
 
 (* set up inveqns, invunks, qss stuff *)
 
@@ -6887,11 +6926,14 @@ Which[
 	If[verbose,Print[func,": qsssol=",qsssol]];
 	If[Length[qsssol]!=1,Message[InvSPS::noqsssol,Length[qsssol]];Return[{$Failed}]];
 	If[Length[invunks]==1,
-		j={{Cancel[(inveqns[[1]]/invunks[[1]])]/.qsssol[[1]]/.qsssubs/.sol/.invtraits/.attributes/.t->time}}
+		j={{Cancel[(inveqns[[1]]/invunks[[1]])]/.qsssol[[1]]/.qsssubs/.sol/.invtraits/.attributes/.invaderGs/.t->time}}
 	,
 		(* make Jacobian matrix of Extensive components *)
 		(* what about 0th order terms?! *)
-		j=D[inveqns/.attributes/.qsssol[[1]]/.invtraits,{invunks}]/.sol/.t->time;
+		j=D[inveqns/.attributes/.qsssol[[1]]/.invtraits,{invunks}]/.sol/.invaderGs/.t->time;
+		(* equalize traits *)
+		(*Print["gtraits[invid]=",gtraits[invid]];*)
+		If[equalinvtraits,j=j/.Table[tr[_]->tr,{tr,gtraits[invid]}]];
 	];
 
 	If[Global`debug,Print[func,": j=",j]];
@@ -6920,7 +6962,7 @@ Which[
 			If[verbose,Print[func,": symbolic Jacobian"]];
 
 			If[Dimensions[j/.qsssubs]=={2,2},
-				eval=Simplify[Re[1/2*(j[[1,1]]+j[[2,2]]+Sqrt[j[[1,1]]^2+4j[[1,2]]j[[2,1]]-2j[[1,1]]j[[2,2]]+j[[2,2]]^2])]];
+				eval=(*Simplify@*)Re[1/2*(j[[1,1]]+j[[2,2]]+Sqrt[j[[1,1]]^2+4j[[1,2]]j[[2,1]]-2j[[1,1]]j[[2,2]]+j[[2,2]]^2])];
 				If[rv,
 					evec=Simplify[{(j[[1,1]]-j[[2,2]]+Sqrt[j[[1,1]]^2+4j[[1,2]]j[[2,1]]-2j[[1,1]]j[[2,2]]+j[[2,2]]^2])/(2j[[1,2]]),1}],
 					evec=Simplify[{(j[[1,1]]-j[[2,2]]+Sqrt[j[[1,1]]^2+4j[[1,2]]j[[2,1]]-2j[[1,1]]j[[2,2]]+j[[2,2]]^2])/(2j[[2,1]]),1}]
@@ -6935,12 +6977,12 @@ Which[
 	
 	(* add [t] to InterpolatingFunctions (but not ones with [var]) *)
 	eval=eval/.x_InterpolatingFunction->x[t]/.x_InterpolatingFunction[t][var_]->x[var];
+
 	If[verbose,Print[func,": eigenvalue=",eval]];
 	If[verbose,Print[func,": eigenvector=",evec]];
-	
-	(* return answer *)
 
-	Which[
+	(* return answer *)
+	Quiet[Which[
 		modeltype=="ContinuousTime",
 		Which[
 			simplifyresult===True,
@@ -6950,7 +6992,7 @@ Which[
 			Return[RealSimplify[{eval,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]}]]
 		,
 			simplifyresult===Full,
-			Return[FullSimplify[{eval,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]},Assumptions:>{_\[Element]Reals}]]
+			Return[FullSimplify[{eval,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]},Evaluate[Sequence@@simplifyopts]]]
 		,
 			Else,
 			Return[{eval,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]}]
@@ -6959,16 +7001,17 @@ Which[
 		modeltype=="DiscreteTime",
 		Which[
 			simplifyresult===True,
-			Return[Simplify[{Log@Max@Chop@ComplexExpand[eval]/.SimplifyLogE,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]},Assumptions:>{_\[Element]Reals}]]
+			Return[Simplify[{Log@Max@Chop@ComplexExpand[eval]/.SimplifyLogE,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]},Evaluate[Sequence@@simplifyopts]]]
 		,
 			simplifyresult===Full,
-			Return[FullSimplify[{Log@Max@Chop@ComplexExpand[eval]/.SimplifyLogE,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]},Assumptions:>{_\[Element]Reals}]]
+			Return[FullSimplify[{Log@Max@Chop@ComplexExpand[eval]/.SimplifyLogE,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]},Evaluate[Sequence@@simplifyopts]]]
 		,
 			Else,
 			Return[{(Log@Max@Chop@ComplexExpand[eval])/.SimplifyLogE,Sort[Join[Thread[Rule[invunks,evec]],qsssol[[1]]]]}]
 		]
 		(*Return[{Simplify[Log@Max@Chop@ComplexExpand[eval],Assumptions\[Rule]{_\[Element]Reals}],evec}];*)
-	];
+	],{Simplify::time,Simplify::gtime}];
+
 
 ];
 
@@ -6981,6 +7024,7 @@ NIntegrateOpts->{Method->{Automatic,"SymbolicProcessing"->0}},IntegrateOpts->{},
 QSSMethod->"NSolve",QSSICs->Automatic,
 SimplifyResult->True,SimplifyOpts->{_\[Element]Reals,TimeConstraint->{0.1,1}},
 Guild->Automatic,FromInv->False,RV->False,
+EqualInvTraits->True,
 Verbose->False,VerboseAll->False};
 
 
@@ -7599,7 +7643,7 @@ StyleBox[\"traitmin\", \"TI\"]\) to \!\(\*
 StyleBox[\"traitmax\", \"TI\"]\).";
 
 
-PlotInv[attributes:(_?AttributesQ):{},sol:(_?VariablesQ):{},{trait1_,trait1min_?NumericQ,trait1max_?NumericQ},opts___?OptionQ]:=
+PlotInv[attributes:(_?AttributesQ):{},sol:(_?VariablesQ):{},invaderGs:(_?GsQ):{},{trait1_,trait1min_?NumericQ,trait1max_?NumericQ},opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["PlotInv"],
@@ -7668,13 +7712,14 @@ If[monitor,PrintTemporary[Dynamic[ToString[TraditionalForm@trait1]<>"="<>ToStrin
 (* plot fitness function *)
 If[delayinv,
 	(* delay inv *)
-	inv[\[FormalX]_?NumberQ]:=Inv[attributes,sol,Join[{Subscript[tr,0]->\[FormalX]},fixed],Guild->gu,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall];
+	inv[\[FormalX]_?NumberQ]:=Inv[attributes,sol,Join[{Subscript[tr,0]->\[FormalX]},fixed],invaderGs,Guild->gu,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall];
 	iplot=Plot[(x=\[FormalX];Evaluate[inv[\[FormalX]]]),{\[FormalX],trait1min,trait1max},
 		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
 ,
 	(* nondelay inv *)
 	Off[NIntegrate::inumr];
-	inv=Inv[attributes,sol,Guild->gu,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall]/.fixed/.attributes;
+	inv=Inv[attributes,sol,invaderGs,Guild->gu,Evaluate[Sequence@@invopts],Time->time,VerboseAll->verboseall]/.fixed/.attributes;
+	If[verbose,Print[func,": inv=",inv]];
 	iplot=Plot[inv,{trait1,trait1min,trait1max},
 		AxesLabel->axeslabel,PlotRange->{{trait1min,trait1max},plotrange},Evaluate[Sequence@@plotopts],AxesOrigin->{trait1min,0}];
 	On[NIntegrate::inumr]
@@ -7739,8 +7784,8 @@ Return[res]
 
 
 (* split combined traitsandpops *)
-PlotInv[traitsandpops_?AttributesAndVariablesQ,{trait1_,trait1min_,trait1max_},opts___?OptionQ]:=
-PlotInv[ExtractAttributes[traitsandpops],ExtractVariables[traitsandpops],{trait1,trait1min,trait1max},opts];
+PlotInv[traitsandpops_?AttributesAndVariablesQ,invaderGs:(_?GsQ):{},{trait1_,trait1min_,trait1max_},opts___?OptionQ]:=
+PlotInv[ExtractAttributes[traitsandpops],ExtractVariables[traitsandpops],invaderGs,{trait1,trait1min,trait1max},opts];
 
 
 Options[PlotInv]={
@@ -8554,7 +8599,7 @@ func=FuncStyle["TraitEqns"],
 (* options *)
 verbose,verboseall,fixed,logged,delaydinv,dinvopts,evoeqn,traitshiftrate,nsps,ics,time,
 (* other variables *)
-fixedvars,fixedattributes,fixedvariables,nonfixedtraits,
+fixedvars,fixedattributes,fixedvariables,nonfixedtraits,alltraits,
 g,dtrait,pre,wt,sol,eqns},
 
 Block[{\[ScriptCapitalN]},
@@ -8579,6 +8624,8 @@ If[Global`debug,Print[func,": fixedattributes=",fixedattributes]];
 fixedvariables=ExtractVariables[fixed];
 If[Global`debug,Print[func,": fixedvariables=",fixedvariables]];
 
+nonfixedtraits=Evaluate[NonFixedTraits/.Flatten[{opts,Options[TraitEqns]}]];
+
 logged=Evaluate[Logged/.Flatten[{opts,Options[TraitEqns]}]];
 delaydinv=Evaluate[DelayDInv/.Flatten[{opts,Options[TraitEqns]}]];
 dinvopts=Evaluate[DInvOpts/.Flatten[{opts,Options[TraitEqns]}]];
@@ -8597,6 +8644,11 @@ If[solin==="FindEcoAttractor"&&nsps=!={},
 	Set\[ScriptCapitalN][Join[sol,fixedvariables]]
 ];
 If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
+
+alltraits=Flatten[Table[Table[Table[Table[Subscript[gtrait[gcomp], i],{gcomp,gcomps[gu]}],{gtrait,gtraits[gu]}],{i,\[ScriptCapitalN][gu]}],{gu,guilds}]];
+If[verbose,Print[func,": alltraits=",alltraits]];
+If[nonfixedtraits===Automatic,nonfixedtraits=OrderedComplement[alltraits,fixedattributes]];
+If[Global`debug,Print["nonfixedtraits=",nonfixedtraits]];
 
 (* shifting traits *)
 Do[
@@ -8650,7 +8702,7 @@ If[delaydinv==True,
 		pre[gu,sp]*Replace[g[gu],var_Symbol->Subscript[var,sp],\[Infinity]] . DInv[BlankTraits,sol,Guild->gu,Species->sp,Time->time,Fixed->fixed,Evaluate[Sequence@@dinvopts],VerboseAll->verboseall]
 		-Table[dtrait[gu,gtrait],{gtrait,gtraits[gu]}]
 		+If[modeltype=="DiscreteTime",Table[Subscript[gtrait,sp],{gtrait,gtraits[gu]}],0]
-		/.fixed/.AddVariablets/.AddTraitts)]
+		/.fixed(*/.AddVariablets/.AddTraitts*))]
 	,{sp,If[\[ScriptCapitalN][gu]==0,0,1],\[ScriptCapitalN][gu]}],{gu,guilds}]]/.FixVarCovts
 ];
 
@@ -8668,21 +8720,23 @@ Return[eqns/.ExpRule[AllVariables,logged]];
 (* process-based *)
 
 Return[
-	Flatten@Table[Table[
+	(*Flatten@Table[Table[
 		If[ngcomps[gu]==1,
-			Thread[Table[Subscript[tr, sp]'[t],{tr,gtraits[gu]}]==(dxdt[gcomps[gu][[1]]]/.\[FormalI]->sp/.fixed/.Dispatch[ExpandGs[Gs]]/.AddVariablets/.AddTraitts/.AddVarCovts)]
+			Thread[Table[Subscript[tr, sp]',{tr,gtraits[gu]}]==(dxdt[gcomps[gu][[1]]]/.\[FormalI]\[Rule]sp/.fixed/.Dispatch[ExpandGs[Gs]])]
 		,
-			Table[Thread[Table[Subscript[tr[co], sp]'[t],{tr,gtraits[gu]}]==(dxdt[co]/.\[FormalI]->sp/.fixed/.Dispatch[ExpandGs[Gs]]/.AddVariablets/.AddTraitts/.AddVarCovts)],{co,gcomps[gu]}]
+			Table[Thread[Table[Subscript[tr[co], sp]',{tr,gtraits[gu]}]==(dxdt[co]/.\[FormalI]\[Rule]sp/.fixed/.Dispatch[ExpandGs[Gs]])],{co,gcomps[gu]}]
 		]
-	,{sp,\[ScriptCapitalN][gu]}],{gu,guilds}]
-]
+	,{sp,\[ScriptCapitalN][gu]}],{gu,guilds}]*)
+Table[var'==(dxdt[var/.Subscript[x_, _]->x]/.\[FormalI]->(var/.Subscript[x_, sp_]->sp)/.fixed/.Dispatch[ExpandGs[Gs]]),{var,nonfixedtraits}]]
 
 ]
 
 ]];
 
 
-Options[TraitEqns]={Time->t,DelayDInv->False,DInvOpts->{},EvoEquation->"QG",TraitShiftRate->{},Fixed->{},\[ScriptCapitalN]s->{},Logged->False,
+Options[TraitEqns]={
+Time->t,DelayDInv->False,DInvOpts->{},EvoEquation->"QG",TraitShiftRate->{},Fixed->{},\[ScriptCapitalN]s->{},Logged->False,
+NonFixedTraits->Automatic,
 Verbose->False,VerboseAll->False};
 
 
@@ -8737,8 +8791,8 @@ Set\[ScriptCapitalN][Join[sol,fixedvariables],attributes];
 If[Global`debug,Print[func,": \[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 Return[Chop@Flatten[Table[Table[Table[
-	Thread[Flatten[Evaluate[Replace[MakeGMatrix[Subscript[gcomp, \[FormalI]]],x_->x'[t],{2}]]]==(Flatten[Total@dGdt[gcomp]]/.AddTraitts/.AddVarCovts/.AddVariablets)/.\[FormalI]->sp]
-	,{gcomp,gcomps[gu]}],{sp,\[ScriptCapitalN][gu]}],{gu,guilds}]
+	Thread[Flatten[Evaluate[Replace[MakeGMatrix[Subscript[gcomp, \[FormalI]]],x_->x'(*[t]*),{2}]]]==Flatten[Total@dGdt[gcomp]](*/.AddTraitts/.AddVarCovts/.AddVariablets)*)/.\[FormalI]->sp]
+,{gcomp,gcomps[gu]}],{sp,\[ScriptCapitalN][gu]}],{gu,guilds}]
 ]
 
 ]
@@ -9359,7 +9413,7 @@ StyleBox[\"tmax\", \"TI\"]\)] uses trait variances/covariances in \!\(\*
 StyleBox[\"varcovars\", \"TI\"]\).";
 
 
-EcoEvoSim[traits_?AttributesQ,variables_?VariablesQ,Gsin:(_?GsQ):{},tmax_?NumericQ,opts___?OptionQ]:=
+EcoEvoSim[traitsin_?AttributesQ,variables_?VariablesQ,Gsin:(_?GsQ):{},tmax_?NumericQ,opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["EcoEvoSim"],
@@ -9368,7 +9422,7 @@ verbose,verboseall,
 logged,boundarydetection,ndsolveopts,wheneventopts,delaydinv,fixed,tmin,outputtmin,output,freezetraits,
 (* other variables *)
 fixedvars,fixedattributes,fixedvariables,nonfixedvars,
-Gs,tic,ecoeqns,evoeqns,eqns,ics,unks,discretevars,bdwhens,res,sol},
+Gs,traits,tic,ecoeqns,evoeqns,eqns,ics,unks,discretevars,bdwhens,res,sol},
 
 Block[{\[ScriptCapitalN]},
 
@@ -9395,11 +9449,18 @@ outputtmin=Evaluate[OutputTMin/.Flatten[{opts,Options[EcoEvoSim]}]];
 output=Evaluate[Output/.Flatten[{opts,Options[EcoEvoSim]}]];
 freezetraits=Evaluate[FreezeTraits/.Flatten[{opts,Options[EcoEvoSim]}]];
 
+(* expand traits *)
+traits=ExpandTraits[traitsin];
+
 fixedvars=fixed[[All,1]];
 fixedattributes=ExtractAttributes[fixed];
 fixedvariables=ExtractVariables[fixed];
-nonfixedvars=Join[traits[[All,1]],variables[[All,1]]];
+nonfixedvariables=variables[[All,1]];
+nonfixedtraits=traits[[All,1]];
+nonfixedvars=Join[nonfixedvariables,nonfixedtraits];
+(*nonfixedvars=Join[traits\[LeftDoubleBracket]All,1\[RightDoubleBracket],variables\[LeftDoubleBracket]All,1\[RightDoubleBracket]];*)
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
+(*Print["nonfixedvars=",nonfixedvars];*)
 
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][Join[traits,fixedattributes],Join[variables,fixedvariables]];
@@ -9419,15 +9480,15 @@ ics=Table[
 If[delaydinv,ics=ics/.ToUnks];
 
 (* expand Gs *)
-Gs=Join[ExpandGs[Gsin],Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]];
+Gs=ExpandGs[Join[Gsin,Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]]];
 (*Print["Gs=",Gs];*)
 
 (* set up ecoeqns & evoeqns *)
 (*ecoeqns=EcoEqns[Join[BlankTraits,ExtractInteractions[traits]],opts]/.AddTraitts;*)
 (*ecoeqns=EcoEqns[Join[BlankTraits,fixedattributes],opts]/.AddTraitts;*)
-ecoeqns=EcoEqns[Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}],Fixed->fixed,opts]/.RemoveVarCovts/.Gs(*/.AddTraitts*);
+ecoeqns=EcoEqns[Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}],Fixed->fixed,NonFixedVars->nonfixedvariables,opts](*/.RemoveVarCovts*)/.Gs(*/.AddTraitts*);
 (*evoeqns=TraitEqns[ExtractInteractions[traits],BlankVariables,Gs,opts];*)
-evoeqns=TraitEqns[BlankVariables,Gs,opts];
+evoeqns=TraitEqns[BlankVariables,Gs,NonFixedTraits->nonfixedtraits,opts];
 If[Global`debug,Print["ecoeqns=",ecoeqns];Print["evoeqns=",evoeqns]];
 
 (* insert Unks[] for delaydinv *)
@@ -9468,7 +9529,7 @@ If[freezetraits,
 	evoeqns=ReplaceRHS[evoeqns,{RemoveTraitts,traits}];
 ];
 
-eqns=Join[ecoeqns,evoeqns];
+eqns=Join[ecoeqns,evoeqns]/.AddVariablets/.AddTraitts;
 
 (* set up unks *)
 unks=eqns/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
@@ -9546,14 +9607,14 @@ StyleBox[\"traits\", \"TI\"]\) and \!\(\*
 StyleBox[\"variables\", \"TI\"]\).";
 
 
-FindEcoEvoEq[traits_?AttributesQ,variables_?VariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=
+FindEcoEvoEq[traitsin_?AttributesQ,variables_?VariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["FindEcoEvoEq"],
 (* options *)
 verbose,verboseall,method,boundarydetection,percapita,delaydinv,fixed,findrootopts,chop,
 (* other variables *)
-Gs,fixedvars,fixedattributes,fixedvariables,ecoeqns,evoeqns,eqns,unks,newunk,unksics,sol},
+traits,Gs,fixedvars,fixedattributes,fixedvariables,ecoeqns,evoeqns,eqns,unks,newunk,unksics,sol},
 
 Block[{\[ScriptCapitalN]},
 
@@ -9574,6 +9635,9 @@ fixed=Evaluate[Fixed/.Flatten[{opts,Options[FindEcoEvoEq]}]];
 findrootopts=Evaluate[FindRootOpts/.Flatten[{opts,Options[FindEcoEvoEq]}]];
 chop=Evaluate[Chop/.Flatten[{opts,Options[FindEcoEvoEq]}]];
 
+(* expand traits *)
+traits=ExpandTraits[traitsin];
+
 fixedvars=fixed[[All,1]];
 fixedattributes=ExtractAttributes[fixed];
 fixedvariables=ExtractVariables[fixed];
@@ -9584,7 +9648,7 @@ Set\[ScriptCapitalN][Join[traits,fixedattributes],Join[variables,fixedvariables]
 (*Print["\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];*)
 
 (* expand Gs *)
-Gs=Join[ExpandGs[Gsin],Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]];
+Gs=ExpandGs[Join[Gsin,Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]]];
 (*Print["Gs=",Gs];*)
 
 (* set up eqns *)
@@ -9594,12 +9658,12 @@ ecoeqns=EcoEqns[Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}],
 evoeqns=TraitEqns[BlankVariables,Gs,opts];
 (*Print["evoeqns=",evoeqns];*)
 eqns=If[delaydinv,
-	Join[ecoeqns/.Eq/.RemoveVariablets/.RemoveTraitts/.ToUnks,evoeqns/.Eq/.RemoveVariablets/.RemoveTraitts/.ToUnkRules],
-	Join[ecoeqns,evoeqns]/.Eq/.RemoveTraitts/.RemoveVariablets/.RemoveVarCovts/.Gs
+	Join[ecoeqns/.Eq(*/.RemoveVariablets/.RemoveTraitts*)/.ToUnks,evoeqns/.Eq(*/.RemoveVariablets/.RemoveTraitts*)/.ToUnkRules],
+	Join[ecoeqns,evoeqns]/.Eq(*/.RemoveTraitts/.RemoveVariablets/.RemoveVarCovts*)/.Gs
 ];
 
 (* set up unksics *)
-unks=Join[ecoeqns,evoeqns]/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]-var_[t]->var,var_[t+1]->var};
+unks=Join[ecoeqns,evoeqns]/.LHS/.{var_'(*[t]*)->var,var_[t+1]/var_[t]->var,var_[t+1]-var_[t]->var,var_[t+1]->var};
 unksics={};
 Do[
 	newunk=If[delaydinv,{var/.ToUnks,var/.traits/.variables},{var,var/.traits/.variables}];
@@ -10219,19 +10283,19 @@ interactions=ExtractInteractions[attributes];
 Set\[ScriptCapitalN][Join[attributes,fixedattributes],Join[variables,fixedvariables]];
 
 (* expand Gs *)
-Gs=Join[ExpandGs[Gsin],Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]];
+Gs=ExpandGs[Join[Gsin,Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]]];
 (*Print["Gs=",Gs];*)
 
 (* set up eqns & unks *)
-ecoeqns=EcoEqns[Join[Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}],interactions,fixedattributes],opts]/.RemoveVarCovts/.Gs;
+ecoeqns=EcoEqns[Join[Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}],interactions,fixedattributes],opts]/.Gs;
 evoeqns=TraitEqns[BlankVariables,Gs,opts,Fixed->interactions];
 If[verbose,
 	Print[func,": ecoeqns="];Print[ecoeqns];
 	Print[func,": evoeqns="];Print[evoeqns];
 ];
 eqns=Join[ecoeqns,evoeqns];
-unks=eqns/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
-eqns=eqns/.RHS/.RemoveTraitts/.RemoveVariablets;
+unks=eqns/.LHS/.{var_'(*[t]*)->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
+eqns=eqns/.RHS(*/.RemoveTraitts/.RemoveVariablets*);
 
 If[verbose,
 	Print[func,": eqns="];Print[eqns];
@@ -10434,7 +10498,7 @@ StyleBox[\"tmax\", \"TI\"]\)] uses trait variances/covariances in \!\(\*
 StyleBox[\"varcovars\", \"TI\"]\).";
 
 
-EcoEvoVarSim[traits_?AttributesQ,variables_?VariablesQ,Gsin_?GsQ,tmax_?NumericQ,opts___?OptionQ]:=
+EcoEvoVarSim[traitsin_?AttributesQ,variables_?VariablesQ,Gsin_?GsQ,tmax_?NumericQ,opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["EcoEvoVarSim"],
@@ -10443,7 +10507,8 @@ verbose,verboseall,
 logged,boundarydetection,ndsolveopts,wheneventopts,delaydinv,fixed,tmin,outputtmin,output,freezetraits,
 (* other variables *)
 fixedvars,fixedattributes,fixedvariables,nonfixedvars,
-Gs,tic,ecoeqns,evoeqns,vareqns,eqns,ics,unks,discretevars,bdwhens,res,sol},
+traits,Gs,
+tic,ecoeqns,evoeqns,vareqns,eqns,ics,unks,discretevars,bdwhens,res,sol},
 
 Block[{\[ScriptCapitalN]},
 
@@ -10467,23 +10532,29 @@ outputtmin=Evaluate[OutputTMin/.Flatten[{opts,Options[EcoEvoVarSim]}]];
 output=Evaluate[Output/.Flatten[{opts,Options[EcoEvoVarSim]}]];
 freezetraits=Evaluate[FreezeTraits/.Flatten[{opts,Options[EcoEvoVarSim]}]];
 
+(* expand traits *)
+traits=ExpandTraits[traitsin];
+
 fixedvars=fixed[[All,1]];
 If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 fixedattributes=ExtractAttributes[fixed];
 fixedvariables=ExtractVariables[fixed];
-nonfixedvars=Join[traits[[All,1]],variables[[All,1]],Gsin[[All,1]]];
-If[Global`debug,Print[func,": nonfixedvars=",nonfixedvars]];
 
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][Join[traits,fixedattributes],Join[variables,fixedvariables]];
 If[Global`debug,Print["\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
+(* expand Gs *)
+Gs=Thread[Flatten@Table[Table[Table[MakeGMatrix[Subscript[gco, i]],{gco,gcomps[gu]}],{i,\[ScriptCapitalN][gu]}],{gu,guilds}]->
+	(Flatten@Table[Table[Table[MakeGMatrix[Subscript[gco, i]],{gco,gcomps[gu]}],{i,\[ScriptCapitalN][gu]}],{gu,guilds}]/.ExpandGs[Gsin])];
+If[Global`debug,Print[func,": Gs=",Gs]];
+
+nonfixedvars=Join[traits[[All,1]],variables[[All,1]],Gs[[All,1]]];
+If[Global`debug,Print[func,": nonfixedvars=",nonfixedvars]];
+
 (* find time for ICs *)
 tic=If[modelwhenevents=={},tmin,tmin-$MachineEpsilon]; (* hack to ensure that events are triggered at t=tmin *)
 
-(* expand Gs *)
-Gs=Join[ExpandGs[Gsin],Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]];
-(*Print["Gs=",Gs];*)
 
 (* set up ics *)
 ics=Table[
@@ -10537,7 +10608,7 @@ If[freezetraits,
 	evoeqns=ReplaceRHS[evoeqns,{RemoveTraitts,traits}];
 ];
 
-eqns=Join[ecoeqns,evoeqns,vareqns];
+eqns=Join[ecoeqns,evoeqns,vareqns]/.AddVariablets/.AddTraitts/.AddVarCovts;
 
 (* set up unks *)
 unks=eqns/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
@@ -10609,14 +10680,14 @@ StyleBox[\"variables\", \"TI\"]\), and \!\(\*
 StyleBox[\"varscovs\", \"TI\"]\).";
 
 
-FindEcoEvoVarEq[traits_?AttributesQ,variables_?VariablesQ,Gsin_?GsQ,opts___?OptionQ]:=
+FindEcoEvoVarEq[traitsin_?AttributesQ,variables_?VariablesQ,Gsin_?GsQ,opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["FindEcoEvoVarEq"],
 (* options *)
 verbose,verboseall,method,boundarydetection,percapita,fixed,findrootopts,chop,
 (* other variables *)
-Gs,fixedvars,fixedattributes,fixedvariables,ecoeqns,evoeqns,vareqns,eqns,unks,newunk,unksics,sol},
+Gs,traits,fixedvars,fixedattributes,fixedvariables,ecoeqns,evoeqns,vareqns,eqns,unks,newunk,unksics,sol},
 
 Block[{\[ScriptCapitalN]},
 
@@ -10637,19 +10708,25 @@ fixed=Evaluate[Fixed/.Flatten[{opts,Options[FindEcoEvoVarEq]}]];
 findrootopts=Evaluate[FindRootOpts/.Flatten[{opts,Options[FindEcoEvoVarEq]}]];
 chop=Evaluate[Chop/.Flatten[{opts,Options[FindEcoEvoVarEq]}]];
 
+(* expand traits *)
+traits=ExpandTraits[traitsin];
+
 fixedvars=fixed[[All,1]];
+If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 fixedattributes=ExtractAttributes[fixed];
 fixedvariables=ExtractVariables[fixed];
-If[Global`debug,Print[func,": fixedvars=",fixedvars]];
-
 
 (* figure out number of species in guilds *)
 Set\[ScriptCapitalN][Join[traits,fixedattributes],Join[variables,fixedvariables]];
 If[Global`debug,Print["\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 (* expand Gs *)
-Gs=Join[ExpandGs[Gsin],Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]];
-(*Print["Gs=",Gs];*)
+Gs=Thread[Flatten@Table[Table[Table[MakeGMatrix[Subscript[gco, i]],{gco,gcomps[gu]}],{i,\[ScriptCapitalN][gu]}],{gu,guilds}]->
+	(Flatten@Table[Table[Table[MakeGMatrix[Subscript[gco, i]],{gco,gcomps[gu]}],{i,\[ScriptCapitalN][gu]}],{gu,guilds}]/.ExpandGs[Gsin])];
+If[Global`debug,Print[func,": Gs=",Gs]];
+
+nonfixedvars=Join[traits[[All,1]],variables[[All,1]],Gs[[All,1]]];
+If[Global`debug,Print[func,": nonfixedvars=",nonfixedvars]];
 
 (* set up eqns *)
 ecoeqns=EcoEqns[Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}],Fixed->fixed,opts,PerCapita->percapita];
@@ -10661,10 +10738,10 @@ If[Global`debug,
 	Print["vareqns="];Print[vareqns];
 ];
 
-eqns=Join[ecoeqns,evoeqns,vareqns]/.Eq/.RemoveTraitts/.RemoveVariablets/.RemoveVarCovts;
+eqns=Join[ecoeqns,evoeqns,vareqns]/.Eq;
 
 (* set up unks *)
-unks=Join[ecoeqns,evoeqns,vareqns]/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
+unks=Join[ecoeqns,evoeqns,vareqns]/.LHS/.{var_'->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
 unksics={};
 Do[
 	newunk={var,var/.traits/.variables/.Gs};
@@ -10718,7 +10795,7 @@ StyleBox[\"variables\", \"TI\"]\), trait variances/covariances in \!\(\*
 StyleBox[\"varcovars\", \"TI\"]\).";
 
 
-EcoEvoVarJacobian[attributesin:(_?AttributesQ):{},variablesin:(_?VariablesQ):{},Gsin:(_?GsQ):{},opts___?OptionQ]:=
+EcoEvoVarJacobian[traitsin_?AttributesQ,variables_?VariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["EcoEvoVarJacobian"],
@@ -10729,7 +10806,7 @@ removets,
 (* fixed *)
 fixedvars,fixedattributes,fixedvariables,
 (* other variables *)
-Gs,attributes,variables,interactions,ecoeqns,evoeqns,vareqns,eqns,unks,jmat},
+Gs,traits,interactions,ecoeqns,evoeqns,vareqns,eqns,unks,jmat},
 
 Block[{\[ScriptCapitalN]},
 
@@ -10744,26 +10821,24 @@ verboseall=Evaluate[VerboseAll/.Flatten[{opts,Options[EcoEvoJacobian]}]];
 If[verboseall,verbose=True];
 
 chop=Evaluate[Chop/.Flatten[{opts,Options[EcoEvoJacobian]}]];
+fixed=Evaluate[Fixed/.Flatten[{opts,Options[FindEcoEvoVarEq]}]];
 
-fixed=Evaluate[Fixed/.Flatten[{opts,Options[EcoEvoJacobian]}]];
+(* expand traits *)
+traits=ExpandTraits[traitsin];
+
 fixedvars=fixed[[All,1]];
+If[Global`debug,Print[func,": fixedvars=",fixedvars]];
 fixedattributes=ExtractAttributes[fixed];
 fixedvariables=ExtractVariables[fixed];
-If[Global`debug,Print[func,": fixedvars=",fixedvars]];
-
-(* handle blanks & figure out number of species in guilds *)
-attributes=FixAttributes[attributesin];
-variables=FixVariables[variablesin];
-
-(*interactions=ExtractInteractions[attributesin];*)
-interactions=ExtractInteractions[attributes];
 
 (* figure out number of species in guilds *)
-Set\[ScriptCapitalN][Join[attributes,fixedattributes],Join[variables,fixedvariables]];
+Set\[ScriptCapitalN][Join[traits,fixedattributes],Join[variables,fixedvariables]];
+If[Global`debug,Print["\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]]];
 
 (* expand Gs *)
-Gs=Join[ExpandGs[Gsin],Flatten@Table[Thread[Flatten@MakeGMatrix[gu]->Flatten@IdentityMatrix[ngtraits[gu]]],{gu,guilds}]];
-(*Print["Gs=",Gs];*)
+Gs=Thread[Flatten@Table[Table[Table[MakeGMatrix[Subscript[gco, i]],{gco,gcomps[gu]}],{i,\[ScriptCapitalN][gu]}],{gu,guilds}]->
+	(Flatten@Table[Table[Table[MakeGMatrix[Subscript[gco, i]],{gco,gcomps[gu]}],{i,\[ScriptCapitalN][gu]}],{gu,guilds}]/.ExpandGs[Gsin])];
+If[Global`debug,Print[func,": Gs=",Gs]];
 
 (* set up eqns *)
 ecoeqns=EcoEqns[Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}],Fixed->fixed,opts,PerCapita->percapita];
@@ -10775,8 +10850,8 @@ If[Global`debug,
 	Print["vareqns="];Print[vareqns];
 ];
 
-eqns=Join[ecoeqns,evoeqns,vareqns]/.RHS/.RemoveTraitts/.RemoveVariablets/.RemoveVarCovts;
-unks=Join[ecoeqns,evoeqns,vareqns]/.LHS/.{var_'[t]->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
+eqns=Join[ecoeqns,evoeqns,vareqns]/.RHS;
+unks=Join[ecoeqns,evoeqns,vareqns]/.LHS/.{var_'->var,var_[t+1]/var_[t]->var,var_[t+1]->var};
 
 If[verbose,
 	Print[func,": eqns="];Print[eqns];
@@ -10786,10 +10861,15 @@ If[verbose,
 (* set up jacobian *)
 jmat=D[eqns,{unks}]; 
 If[verbose,Print[func,": jmat=",jmat]];
+If[Global`debug,
+	Print["variables=",variables];
+	Print["traits=",traits];
+	Print["Gs=",Gs];
+];
 
 If[chop,
-	Return[Chop[jmat/.variables/.attributes/.Gs]],
-	Return[jmat/.variables/.attributes/.Gs]
+	Return[Chop[jmat/.variables/.traits/.Gs]],
+	Return[jmat/.variables/.traits/.Gs]
 ];
 
 ]];
@@ -10841,9 +10921,8 @@ EcoEvoVarEigenvalues[sol_?AttributesVariablesAndGsQ,opts___?OptionQ]:=
 
 
 (* Protect all package symbols *)
-With[{syms = Names["EcoEvo`*"]},
-  SetAttributes[syms,Protected]
-];
+With[{syms=Names["EcoEvo`*"]},SetAttributes[syms,Protected]];
+(* with a few exceptions... *)
 Unprotect[Unk,t,LookUp,$FindEcoCycleSteps,$InvCount,$FindEcoEvoCycleSteps];
 
 
