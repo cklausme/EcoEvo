@@ -9,7 +9,7 @@
 
 
 package="EcoEvo";
-version="1.6.3";
+version="1.6.4";
 
 
 Needs["PackageTools`"]
@@ -121,7 +121,7 @@ paclet=PackPaclet[FileNameJoin[{rootdir,"build","EcoEvo-"<>version}]]
 PacletInstall[paclet]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*update pacletsite (run after moving paclet from build to Paclets, then commit & push)*)
 
 
