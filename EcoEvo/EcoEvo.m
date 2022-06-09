@@ -157,6 +157,7 @@ EcoJacobian;EcoEigenvalues;EcoStableQ;SelectEcoStable;FindEcoAttractor;
 PlotEcoIsoclines;PlotEcoStreams;PlotEcoPhasePlane;
 PrestonPlot;WhittakerPlot;PlotGuild;
 ImpactVector;PlotImpactVector;
+PlotEcoEq;
 
 
 InvSPS;Inv;StablePopulationStructure;ReproductiveValues;
@@ -308,6 +309,7 @@ SolveOpts::usage = "SolveOpts is an option for various EcoEvo functions that pas
 Species::usage = "Species is an option for various EcoEvo functions that sets which species to use.";
 SpeciesColors::usage = "SpeciesColors is an option for PlotMIP (PlotType->Outcome) that defines colors for each species.";
 StableMarker::usage = "StableMarker is an option for RuleListPlot that defines the marker style for stable equilibria.";
+StableStyle::usage = "StableStyle is an option for PlotEcoEq that defines the plot style for stable equilibria.";
 SubtractDiagonal::usage = "SubtractDiagonal is an option for PlotPIP that subtracts the diagonal from all invasion rates.";
 Switches::usage = "Switches is an option for EcoSimSSD that says when external mode switches occur.";
 TADVerticalScale::usage = "TADVerticalScale is an option for PlotInv that sets the vertical extent of the TAD. Should be between zero and one.";
@@ -326,6 +328,7 @@ TraitRange::usage = "TraitRange is an option for PlotGuild that sets the range o
 TraitShiftRate::usage = "TraitShiftRate is an option for various evolutionary EcoEvo functions that changes into a moving frame of reference for an constantly changing environment.";
 TriggerVariable::usage = "TriggerVariable is an option for FindEcoCycle that sets which variable to focus on.";
 UnstableMarker::usage = "UnstableMarker is an option for RuleListPlot that defines the marker style for unstable equilibria.";
+UnstableStyle::usage = "UnstableStyle is an option for PlotEcoEq that defines the plot style for unstable equilibria.";
 UseSymmetry::usage = "UseSymmetry is an option for PlotEvoStreams & PlotEvoIsoclines that assumes fitness gradients are symmetric.";
 V::usage = "V is an option to set genetic variance in various EcoEvo functions.";
 Verbosity::usage = "Verbosity is an option for various EcoEvo functions that sets level of verbosity (0\[Dash]3).";
@@ -343,7 +346,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0X (April 24, 2022)";
+$EcoEvoVersion="1.7.0X (June 8, 2022)";
 
 
 modelloaded=False;
@@ -2538,11 +2541,11 @@ PlotInterpolatingFunction[sol_,plotvarsin___,opts___?OptionQ]:=PlotDynamics[sol,
 
 
 Options[PlotDynamics]=
-{Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotVariance->True,
+{Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotVariance->True,PlotRangePadding->Scaled[0.02],
 Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6};
 
 Options[PlotInterpolatingFunction]=
-{Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,
+{Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotRangePadding->Scaled[0.02],
 Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6};
 
 
@@ -2753,7 +2756,13 @@ Which[
 	method=="Direct",
 	subrule=Table[unk->unk[par],{unk,unks}];
 	ics=Table[unk[ipar]==(unk/.isol),{unk,unks}];
-	deqns=Map[#==0&,D[eqns/.subrule,par]];	
+	deqns=Map[#==0&,D[eqns/.subrule,par]];
+	maxev[param_?NumericQ]:=Module[{jac},jac=D[eqns,{unks}]/.subrule;Print[jac];Max[Re[Eigenvalues[jac]]]];
+	whenevents=Join[whenevents,{
+		WhenEvent[Evaluate[Max[Re[Eigenvalues[j]]]==0],"StopIntegration"](*,
+		WhenEvent[maxev[par]==0,"StopIntegration"]*)
+	}];
+	Print["whenevents="];Print[whenevents];
 	(* track root with NDSolve *)
 	sol=NDSolve[Join[deqns,ics,whenevents],unks,{par,parmin,parmax},Evaluate[Sequence@@ndsolveopts]][[1]];
 	Return[sol]
@@ -2764,7 +2773,8 @@ Which[
 	whenevents=Join[whenevents,{
 		WhenEvent[par'[s]==0,AppendTo[breaks,s]],
 		WhenEvent[par[s]==parmax,"StopIntegration"],
-		WhenEvent[par[s]==parmin,"StopIntegration"]
+		WhenEvent[par[s]==parmin,"StopIntegration"](*,
+		WhenEvent[Evaluate[Max[Re[Eigenvalues[j]]]==0],"StopIntegration"]*)
 	}];
 	(*Print["whenevents="];Print[whenevents];*)
 	deqns=Join[
@@ -5087,7 +5097,6 @@ attributes,nonfixedvars,Gs,luv,sp,eqns,unks,ics,tic,exprule,sol,res,fixedres},
 Block[{\[ScriptCapitalN],verbosity,func="EcoSim"},
 
 If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
-If[Global`debug,Print["In ",func]];
 
 (* set verbosity *)
 
@@ -5517,7 +5526,13 @@ VPrint[3,"vars=",vars];
 If[method==="EcoSim",
 
 	If[!(modeltype=="ContinuousTime"&&modelperiod==0),Message[FindEcoCycle::noecosim];Return[$Failed]];
-	If[triggervar===Automatic,triggervar=nonfixedvars[[1]]];
+	If[triggervar===Automatic,
+		If[Length[Select[variables,#[[2]]!=0&]]!=0,
+			triggervar=SelectFirst[variables,#[[2]]!=0&][[1]],
+			Message[FindEcoCycle::notriggervar];Return[$Failed]
+		];
+		VPrint[1,"triggervar=",triggervar];
+	];
 	triggerpos=Position[nonfixedvars,triggervar][[1,1]];
 
 	(* warmup #1 to get on limit cycle *)
@@ -5657,6 +5672,9 @@ FindEcoCycle::badmtd=
 
 FindEcoCycle::noecosim=
 "\"EcoSim\" Method only applicable to unforced ContinuousTime models.";
+
+FindEcoCycle::notriggervar=
+"Found no non-zero variable to set as trigger variable. Give one manually with option \"TriggerVar\".";
 
 
 $FindEcoCycleSteps::usage="Counts the number of EcoSim calls in FindEcoCycle.";
@@ -7130,6 +7148,106 @@ Graphics[Join[Flatten[{plotstyle}],{Arrow[{{var1,var2},{var1,var2}+scale*Normali
 Options[PlotImpactVector]={Scale->1,PlotStyle->Automatic};
 
 
+PlotEcoEq::usage=
+"PlotEcoEq[\!\(\*
+StyleBox[\"sol\", \"TI\"]\), {\!\(\*
+StyleBox[\"par\", \"TI\"]\), \!\(\*
+StyleBox[\"parmin\", \"TI\"]\), \!\(\*
+StyleBox[\"parmax\", \"TI\"]\)}] plots ecological equilibria \!\(\*
+StyleBox[\"sol\", \"TI\"]\) as function of \!\(\*
+StyleBox[\"par\", \"TI\"]\).
+PlotEcoEq[\!\(\*
+StyleBox[\"sol\", \"TI\"]\), \!\(\*
+StyleBox[\"vars\", \"TI\"]\), {\!\(\*
+StyleBox[\"par\", \"TI\"]\), \!\(\*
+StyleBox[\"parmin\", \"TI\"]\), \!\(\*
+StyleBox[\"parmax\", \"TI\"]\)}] plots only \!\(\*
+StyleBox[\"vars\", \"TI\"]\).";
+
+
+PlotEcoEq[eq_?RuleListQ,var_?(Not@*ListQ),{par_,parmin_?NumericQ,parmax_?NumericQ},opts___?OptionQ]:=
+
+Module[{
+(* options *)
+verbose,
+teststability,stablestyle,unstablestyle,
+plotopts,plotrange,axeslabel,
+(* other variables *)
+yaxislabel,\[Lambda]
+},
+
+Block[{\[ScriptCapitalN],verbosity,func="PlotEcoEq"},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+
+(* set verbosity *)
+
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[PlotEcoEq]}]];
+If[verbose,
+	verbosity=Max[1,Evaluate[Verbosity/.Flatten[{opts,Options[PlotEcoEq]}]]],
+	verbosity=Evaluate[Verbosity/.Flatten[{opts,Options[PlotEcoEq]}]]
+];
+If[IntegerQ[Global`$verbosity],verbosity=Max[Global`$verbosity,verbosity]];
+
+(* handle options *)
+
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[PlotEcoEq]}]];
+teststability=Evaluate[TestStability/.Flatten[{opts,Options[PlotEcoEq]}]];
+stablestyle=Flatten[{Evaluate[StableStyle/.Flatten[{opts,Options[PlotEcoEq]}]]}];
+unstablestyle=Flatten[{Evaluate[UnstableStyle/.Flatten[{opts,Options[PlotEcoEq]}]]}];
+plotopts=FilterRules[Flatten[{opts,Options[PlotEcoEq]}],Options[Plot]];
+plotrange=Evaluate[PlotRange/.Flatten[{opts,Options[PlotEcoEq]}]];
+If[plotrange===Automatic,
+	If[comptype[var]=="Extensive",plotrange={0,All}]
+];
+axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[PlotEcoEq]}]];
+If[axeslabel===Automatic,axeslabel={par,var}];
+
+(*Print["var=",var];*)
+
+If[teststability,
+	plotopts=Join[plotopts,
+		{MeshStyle->Opacity[0],MeshFunctions->{\[Lambda][#1,eq]&},Mesh->{{0}},
+		MeshShading->{Directive[Evaluate[Sequence@@stablestyle],color[var]],Directive[Evaluate[Sequence@@unstablestyle],color[var]]}}]
+];
+
+\[Lambda][parval_?NumericQ,pt_]:=Which[
+	modeltype=="ContinuousTime",Max[Re[EcoEigenvalues[pt]/. par->parval]],
+	modeltype=="DiscreteTime",Max[Abs[Re[EcoEigenvalues[pt]/. par->parval]]]-1
+];
+
+Return[Plot[var/.eq,{par,parmin,parmax},PlotRange->plotrange,AxesLabel->axeslabel,Evaluate[Sequence@@plotopts]]];
+
+]];
+
+
+Options[PlotEcoEq]={
+	TestStability->True,StableStyle->{},UnstableStyle->{Dashed},
+	PlotRange->Automatic,AxesLabel->Automatic,PlotRangePadding->Scaled[0.02]
+};
+
+
+(* no vars given = All *)
+PlotEcoEq[eqs_?ListOfVariablesQ,{par_,parmin_?NumericQ,parmax_?NumericQ},opts___?OptionQ]:=Module[{axeslabel,vars},
+	axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[PlotEcoEq]}]];
+	vars=Keys[eqs[[1]]];
+	
+	If[axeslabel===Automatic,axeslabel={par,Row[Sort[Union[vars]],","]}];
+	Show[Table[Table[PlotEcoEq[eq,var,{par,parmin,parmax},opts],{eq,eqs}],{var,vars}],AxesLabel->axeslabel]
+];
+	
+(* thread over vars *)
+PlotEcoEq[eq_,vars_List,{par_,parmin_?NumericQ,parmax_?NumericQ},opts___?OptionQ]:=Module[{axeslabel},
+	axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[PlotEcoEq]}]];
+	If[axeslabel===Automatic,axeslabel={par,Row[Sort[Union[vars]],","]}];
+	Show[Table[PlotEcoEq[eq,var,{par,parmin,parmax},opts],{var,vars}],AxesLabel->axeslabel]
+];
+
+(* thread over eqs *)
+PlotEcoEq[eqs_?ListOfVariablesQ,var_?(Not@*ListQ),{par_,parmin_?NumericQ,parmax_?NumericQ},opts___?OptionQ]:=
+	Show[Table[PlotEcoEq[eq,var,{par,parmin,parmax},opts],{eq,eqs}]];
+
+
 Inv::usage=
 "Inv[\!\(\*
 StyleBox[\"sol\", \"TI\"]\), \!\(\*
@@ -7281,24 +7399,11 @@ VPrint[3,"\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];
 
 If[modelwhenevents!={},Message[InvSPS::whenevents]];
 
-(* assemble sol [resident state] *)
-
-(* in case any extensive pops weren't given, assume they're 0 *)
-zeropcomps=Flatten[Table[Table[
-	If[comptype[pcomp]=="Extensive",pcomp->0,pcomp->pcomp]
-,{pcomp,pcomps[pop]}],{pop,pops}]];
-sol=JoinFirst[variables,zeropcomps];
-(*Print[sol];*)
-
-(* if a time given, evaluate sol there *)
-If[time=!=t&&!NumericRuleListQ[sol],sol=Slice[sol,time]];
-
-VPrint[3,"sol=",sol];
+(* what kind of invader do we have? *)
 
 invader=Flatten[{invaderin}];
 VPrint[3,"invader=",invader];
 
-(* what kind of invader do we have? *)
 invtraits={};
 Which[
 	(* no invader given *)
@@ -7330,18 +7435,19 @@ Which[
 	LookUp[invader[[1]]][[1]]=="guild"||LookUp[invader[[1]]][[1]]=="gcomp",
 	VPrint[3,"guild member invader"];
 	{invtype,invid}={"guild member",invader[[1]]};
-	VPrint[3,invid," -- ",invid/.WeightedAbundance[sol]];
-	If[(invid/.WeightedAbundance[sol])>0,Message[InvSPS::nonzero](*;Abort[]*)],
+	VPrint[3,invid," -- ",invid/.WeightedAbundance[variables]];
+	If[(invid/.WeightedAbundance[variables])>0,Message[InvSPS::nonzero](*;Abort[]*)]
+,
 	(* pop invader *)
 	LookUp[invader[[1]]][[1]]=="pop"||LookUp[invader[[1]]][[1]]=="pcomp",
 	VPrint[3,"pop invader"];
 	{invtype,invid}={"pop",LookUp[invader[[1]]][[2]]};
-	VPrint[3,invid," -- ",invid/.WeightedAbundance[sol]];
+	VPrint[3,invid," -- ",invid/.WeightedAbundance[variables]];
 (*Print[comps[invid]];
 Print[FilterRules[sol,comps[invid]]];
 Print[TemporalMean@FilterRules[sol,comps[invid]]];
 Print[WeightedAbundance@TemporalMean@FilterRules[sol,comps[invid]]];*)
-	If[(invid/.WeightedAbundance@TemporalMean@FilterRules[sol,comps[invid]])>0,Message[InvSPS::nonzero](*;Abort[]*)]
+	If[(invid/.WeightedAbundance@TemporalMean@FilterRules[variables,comps[invid]])>0,Message[InvSPS::nonzero](*;Abort[]*)]
 ,
 	Else,
 	Message[InvSPS::unkinv];Return[$Failed]
@@ -7349,6 +7455,21 @@ Print[WeightedAbundance@TemporalMean@FilterRules[sol,comps[invid]]];*)
 
 VPrint[3,"{invtype,invid}=",{invtype,invid}];
 VPrint[3,"invtraits=",invtraits];
+
+(* assemble sol [resident state] *)
+
+(* in case any extensive pops weren't given, assume they're 0 *)
+zeropcomps=Flatten[Table[Table[
+	If[comptype[pcomp]=="Extensive"&&invtype=="pop",pcomp->0,pcomp->pcomp] (* maybe make it pop-specific?? *)
+,{pcomp,pcomps[pop]}],{pop,pops}]];
+sol=JoinFirst[variables,zeropcomps];
+(*Print[sol];*)
+
+(* if a time given, evaluate sol there *)
+If[time=!=t&&!NumericRuleListQ[sol],sol=Slice[sol,time]];
+
+VPrint[3,"sol=",sol];
+
 
 (* process Gs *)
 If[moments,
@@ -7583,6 +7704,7 @@ Which[
 	VPrint[1,"qsssol=",qsssol];
 	If[Length[qsssol]!=1,Message[InvSPS::noqsssol,Length[qsssol]];Return[{$Failed}]];
 	If[Length[invunks]==1,
+		VPrint[3,"Cancel[(inveqns\[LeftDoubleBracket]1\[RightDoubleBracket]/invunks\[LeftDoubleBracket]1\[RightDoubleBracket])]=",Cancel[(inveqns[[1]]/invunks[[1]])]];
 		j={{Cancel[(inveqns[[1]]/invunks[[1]])]/.qsssol[[1]]/.qsssubs/.sol/.invtraits/.attributes/.invaderGs/.t->time}}
 	,
 		(* make Jacobian matrix of Extensive components *)
