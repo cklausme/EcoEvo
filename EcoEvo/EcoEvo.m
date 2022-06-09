@@ -346,7 +346,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0X (June 8, 2022)";
+$EcoEvoVersion="1.7.0X (June 9, 2022)";
 
 
 modelloaded=False;
@@ -828,6 +828,16 @@ AppendTo[DataPaclets`ColorDataDump`colorSchemes,
 	{Gray,Gray}
 	,""}];
 AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"Gray"];
+
+AppendTo[DataPaclets`ColorDataDump`colorSchemes,
+	{{"DarkerRainbow","darkerrainbow",{}},{"Gradients"},1,{0,1},{RGBColor[0.3142746666666667, 0.07251066666666667, 0.35134400000000005`],RGBColor[0.20737333333333335`, 0.07838666666666667, 0.44297933333333334`],RGBColor[0.16715200000000002`, 0.15025733333333335`, 0.512768],RGBColor[0.16272, 0.24082800000000001`, 0.5440560000000001],RGBColor[0.1774146666666667, 0.32444266666666666`, 0.5350193333333334],RGBColor[0.20394600000000002`, 0.3903833333333333, 0.4931106666666667],RGBColor[0.24032000000000003`, 0.43717266666666665`, 0.43046133333333336`],RGBColor[0.28656133333333333`, 0.46789933333333333`, 0.36021400000000003`],RGBColor[0.342278, 0.48661333333333334`, 0.29378800000000005`],RGBColor[0.4051006666666667, 0.49581200000000003`, 0.2390586666666667],RGBColor[0.4700253333333334, 0.4950606666666667, 0.1994446666666667],RGBColor[0.5296993333333333, 0.480772, 0.17388599999999999`],RGBColor[0.5756746666666667, 0.44718066666666667`, 0.15770933333333334`],RGBColor[0.600676, 0.38855066666666666`, 0.14436133333333334`],RGBColor[0.601902, 0.30264266666666667`, 0.12800933333333334`],RGBColor[0.5854046666666667, 0.19547200000000003`, 0.10698733333333335`],RGBColor[0.5715726666666667, 0.08740400000000001, 0.08808533333333333]},""}
+];
+AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"DarkerRainbow"];
+
+AppendTo[DataPaclets`ColorDataDump`colorSchemes,
+	{{"LighterRainbow","lighterrainbow",{}},{"Gradients"},1,{0,1},{RGBColor[0.647608, 0.405844, 0.6846773333333334],RGBColor[0.5407066666666667, 0.41172, 0.7763126666666667],RGBColor[0.5004853333333333, 0.4835906666666666, 0.8461013333333333],RGBColor[0.49605333333333335`, 0.5741613333333333, 0.8773893333333334],RGBColor[0.510748, 0.6577759999999999, 0.8683526666666667],RGBColor[0.5372793333333333, 0.7237166666666666, 0.8264440000000001],RGBColor[0.5736533333333333, 0.770506, 0.7637946666666667],RGBColor[0.6198946666666667, 0.8012326666666666, 0.6935473333333333],RGBColor[0.6756113333333333, 0.8199466666666667, 0.6271213333333333],RGBColor[0.738434, 0.8291453333333333, 0.572392],RGBColor[0.8033586666666667, 0.828394, 0.532778],RGBColor[0.8630326666666667, 0.8141053333333333, 0.5072193333333332],RGBColor[0.9090079999999999, 0.780514, 0.4910426666666666],RGBColor[0.9340093333333334, 0.721884, 0.47769466666666666`],RGBColor[0.9352353333333333, 0.635976, 0.4613426666666667],RGBColor[0.9187379999999999, 0.5288053333333333, 0.4403206666666667],RGBColor[0.904906, 0.42073733333333335`, 0.4214186666666666]},""}
+];
+AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"LighterRainbow"];
 
 GrayScale[x_]:=GrayLevel[1-x];
 
@@ -3806,7 +3816,7 @@ StyleBox[\"dtraits\", \"TI\"]\)] uses distance \!\(\*
 StyleBox[\"dtraits\", \"TI\"]\).";
 
 
-SplitSpecies[sol_(*?AttributesAndVariablesQ*),target_,dtraitsin_:Automatic]:=Module[{
+SplitSpecies[sol_(*?AttributesAndVariablesQ*),target_,dtraitsin_:Automatic,opts___?OptionQ]:=Module[{
 func=FuncStyle["SplitSpecies"],
 (* options *)
 (* other variables *)
@@ -3886,6 +3896,9 @@ If[NumericQ[Subscript[gtraits[gu][[1]], sp]/.tmp],
 
 Return[Sort[tmp]];
 ]];
+
+
+Options[SplitSpecies]={Verbose->False,Verbosity->0};
 
 
 SetModel::usage=
@@ -4045,8 +4058,8 @@ Do[
 	ngtraits[gu]=Length[gtraits[gu]];
 	VPrint[3,"{gcomps[",gu,"], gtraits[",gu,"]}=",{gcomps[gu],gtraits[gu]}];
 
-	If[nguilds==1&&ngcomps[guilds[[1]]]==1&&ngtraits[guilds[[1]]]==1,
-		gradients={"Rainbow"},
+	If[nguilds==1(*&&ngcomps[guilds\[LeftDoubleBracket]1\[RightDoubleBracket]]\[Equal]1&&ngtraits[guilds\[LeftDoubleBracket]1\[RightDoubleBracket]]\[Equal]1*),
+		gradients={"Rainbow","DarkerRainbow","LighterRainbow"},
 		gradients={"EEGreens","EEReds","EEBlues"}
 	];
 	indexcount=0;
@@ -4087,13 +4100,14 @@ Do[
 		];
 		gradient=Color/.Join[in,Guild[gu]/.model,{Color->ModPart[gradients,stylecount]}];
 		color[Subscript[gtrait,_]]=color[_[Subscript[gtrait,_]]]=With[{cd=ColorData[gradient]},cd[#]&];
-		color[Subscript[gtrait[gcomp_],sp_]]=color[Subscript[_[gtrait][gcomp_],sp_]]=color[Subscript[gcomp, sp]];
+		(*color[Subscript[gtrait[gcomp_],sp_]]=color[Subscript[_[gtrait][gcomp_],sp_]]=color[Subscript[gcomp, sp]];*)
 		color[gtrait]=color[_[gtrait]]=With[{cd=ColorData[gradient]},cd[0.5]];
 		linestyle[Subscript[gtrait,_]]=linestyle[gtrait]=linestyle[_[gtrait]]=LineStyle/.Join[in,Guild[gu]/.model,{LineStyle->ModPart[linestyles,stylecount]}];
 		plotmarker[Subscript[gtrait,_]]=plotmarker[gtrait]=PlotMarker/.Join[in,Guild[gu]/.model,{PlotMarker->ModPart[plotmarkers,stylecount]}];
 		LookUp[gtrait]=LookUp[_[gtrait]]={"gtrait",gu,gtrait};
 		LookUp[Subscript[gtrait,sp_]]=LookUp[_[Subscript[gtrait,sp_]]]={"gtrait",gu,gtrait,sp};
 		Do[
+			color[Subscript[gtrait[gcomp],sp_]]=color[Subscript[_[gtrait][gcomp],sp_]]=color[Subscript[gcomp, sp]];
 			LookUp[Subscript[gtrait[gcomp],sp_]]=LookUp[_[Subscript[gtrait[gcomp],sp_]]]={"gtrait",gu,gtrait[gcomp],sp};
 			LookUp[Subscript[Var[gtrait][gcomp],sp_]]=LookUp[_[Subscript[Var[gtrait][gcomp],sp_]]]={"var",gu,gtrait[gcomp],sp};
 		,{gcomp,gcomps[gu]}];
@@ -4197,7 +4211,8 @@ Do[Do[
 			VPrint[3,"adding contributions from ",source];
 			sourcetraits=MakeTraitVector[Subscript[source, \[FormalI]]];
 			VPrint[3,"sourcetraits=",sourcetraits];
-			sourceG=MakeGMatrix[Subscript[gcomp, \[FormalI]]];
+			(*sourceG=MakeGMatrix[Subscript[gcomp, \[FormalI]]];*)
+			sourceG=MakeGMatrix[Subscript[source, \[FormalI]]];
 			VPrint[3,"sourceG=",sourceG];
 			f=AddProceduralToSum[Coefficient[(raweqn/.Mutated[Subscript[source, \[FormalI]] stuff___,M_]:>Subscript[source, \[FormalI]] Mutated[stuff,M]),Subscript[source, \[FormalI]],1]];
 			VPrint[3,"f=",f];
