@@ -76,7 +76,8 @@ PartsAboveDiagonal;PrintMessage;
 GrayScale;
 DoubleDotProduct;HessianMatrix;
 UnfactorSums;GaussianIntegral;GaussianIntegralApproximation;
-VPrint
+VPrint;
+CreateBlock;
 
 
 Set\[ScriptCapitalN];
@@ -346,7 +347,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0X (June 9, 2022)";
+$EcoEvoVersion="1.7.0X (June 11, 2022)";
 
 
 modelloaded=False;
@@ -2937,6 +2938,19 @@ StyleBox[\"lvl\", \"TI\"]\).";
 
 VPrint[lvl_Integer:1,msg___]:=
 	If[lvl<=verbosity,If[StringQ[func],Print[FuncStyle[func],": ",msg],Print[msg]]];
+
+
+CreateBlock::usage="CreateBlock[lvals, rvals, expr] makes a Block with lvals equal to rvals.";
+
+
+(* by Daniel Huber <http://forums.wolfram.com/mathgroup/archive/2010/Nov/msg00217.html> *)
+SetAttributes[CreateBlock, HoldAll];
+CreateBlock[lvals_, rvals_, expr_] :=
+Module[{v, myBlock, mySet, vals},
+    v = Thread[mySet[lvals, rvals]];
+    SetAttributes[myBlock, HoldAll];
+    myBlock[vals, expr] /. vals -> v /. mySet -> Set /. myBlock -> Block
+];
 
 
 Set\[ScriptCapitalN][attributes:(_?AttributesQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,interxns,tnsp,pnsp,insp},
@@ -7226,9 +7240,10 @@ If[teststability,
 		MeshShading->{Directive[Evaluate[Sequence@@stablestyle],color[var]],Directive[Evaluate[Sequence@@unstablestyle],color[var]]}}]
 ];
 
+
 \[Lambda][parval_?NumericQ,pt_]:=Which[
-	modeltype=="ContinuousTime",Max[Re[EcoEigenvalues[pt]/. par->parval]],
-	modeltype=="DiscreteTime",Max[Abs[Re[EcoEigenvalues[pt]/. par->parval]]]-1
+	modeltype=="ContinuousTime",CreateBlock[{par},{parval},Max[Re[EcoEigenvalues[pt]]]],
+	modeltype=="DiscreteTime",CreateBlock[{par},{parval},Max[Abs[Re[EcoEigenvalues[pt]]]]]-1
 ];
 
 Return[Plot[var/.eq,{par,parmin,parmax},PlotRange->plotrange,AxesLabel->axeslabel,Evaluate[Sequence@@plotopts]]];
