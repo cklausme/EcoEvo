@@ -43,7 +43,7 @@ Var::usage="Var indicates Variance in output of TemporalVariance and TraitVarian
 Cov::usage="Cov indicates Covariance in output of TemporalCovariance and TraitCovariance.";
 
 
-DeleteNulls;RuleListSet;InequalityToInterval;
+CheckAssumptions;DeleteNulls;RuleListSet;InequalityToInterval;
 SymmetrizeMatrix;
 NMin;NMax;
 Reinterpolation;MakeInterpolatingFunctionPeriodic;
@@ -90,7 +90,7 @@ ExpandTraits;ExpandGs;
 TraitsQ;InteractionsQ;AttributesQ;VariablesQ;ListOfVariablesQ;AttributesAndVariablesQ;AttributesVariablesAndGsQ;AttributesAndGsQ;
 InvaderQ;NotInvaderTraitsQ;GsQ;
 ExtractInvaders;DeleteInvaders;
-SelectValid;
+ValidQ;SelectValid;
 SplitSpecies;
 
 
@@ -347,7 +347,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0X (June 11, 2022)";
+$EcoEvoVersion="1.7.0X (June 30, 2022)";
 
 
 modelloaded=False;
@@ -394,6 +394,17 @@ Options[NewFunction]={
 
 SetOptions[NDSolve,MaxSteps->Infinity];
 (*SetOptions[NIntegrate,MaxRecursion\[Rule]30];*)
+
+
+CheckAssumptions::usage="CheckAssumptions checks if any $Assumptions are False.";
+
+
+(* see <https://mathematica.stackexchange.com/questions/270045/simplify-with-false-assumptions-gives-wrong-answers> *)
+CheckAssumptions:=If[Cases[$Assumptions,False]!={},
+	Message[CheckAssumptions::fas,Extract[assumptionstrings,Position[$Assumptions,False]]]];
+
+
+CheckAssumptions::fas="Warning: one or more $Assumptions evaluated to False. Check `1` in SetModel Parameters to avoid problems with Simplify.";
 
 
 DeleteNulls::usage="DeleteNulls[\!\(\*
@@ -1672,7 +1683,8 @@ StyleBox[\"expression\", \"TI\"]\) assuming everything is Real.";
 
 
 (*RealSimplify[foo_]:=Simplify[foo,_\[Element]Reals];*)
-RealSimplify[foo_,opts___]:=Simplify[foo,Join[{_\[Element]Reals},opts]];
+(*RealSimplify[foo_,opts___]:=Simplify[foo,Evaluate[Sequence@@Flatten[Join[{_\[Element]Reals},{opts}]]]];*)
+RealSimplify[foo_,opts___]:=Simplify[foo,Flatten[Join[{_\[Element]Reals},{opts}]]];
 
 
 CompoundAnd::usage="CompoundAnd[\!\(\*
@@ -3790,32 +3802,90 @@ ExtractInvaders[list_?RuleListQ]:=FilterRules[list,Subscript[_, 0]->_];
 DeleteInvaders[list_?RuleListQ]:=DeleteCases[list,Subscript[_,0,___]->_];
 
 
+ValidQ::usage="ValidQ[sol] returns True if sol is within the allowed range of variables.";
+
+
+ValidQ[eq_?RuleListQ,opts___?OptionQ]:=Module[{
+(* options *)
+verbose,simplifyresult,simplifyopts,
+(* other variables *)
+res},
+
+If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
+
+Block[{verbosity},
+
+(* set verbosity *)
+
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[EcoStableQ]}]];
+If[verbose,
+	verbosity=Max[1,Evaluate[Verbosity/.Flatten[{opts,Options[ValidQ]}]]],
+	verbosity=Evaluate[Verbosity/.Flatten[{opts,Options[ValidQ]}]]
+];
+If[IntegerQ[Global`$verbosity],verbosity=Max[Global`$verbosity,verbosity]];
+
+(* handle options *)
+
+simplifyresult=Evaluate[SimplifyResult/.Flatten[{opts,Options[ValidQ]}]];
+simplifyopts=Evaluate[SimplifyOpts/.Flatten[{opts,Options[ValidQ]}]];
+
+(*Print["simplifyresult=",simplifyresult];
+Print["simplifyopts=",simplifyopts];*)
+
+res=CompoundAnd[Flatten@Table[
+	Which[
+		Head[el[[2]]]===TemporalData,
+		Map[IntervalMemberQ[range[el[[1]]],#]&,Normal[el[[2]]][[All,2]]],
+		Else,
+		If[Im[el[[2]]]==0&&Min[range[el[[1]]]]<=el[[2]]<=Max[range[el[[1]]]],True,False]
+	]
+,{el,eq}]];
+
+VPrint[3,"res",res];
+
+Which[
+	simplifyresult===True,
+	CheckAssumptions;
+	Return[Simplify[res,Evaluate[Sequence@@simplifyopts]]],
+	simplifyresult===Full,
+	CheckAssumptions;
+	Return[FullSimplify[res,Evaluate[Sequence@@simplifyopts]]],
+	simplifyresult===Real,
+	CheckAssumptions;
+	Return[RealSimplify[res,Evaluate[Sequence@@simplifyopts]]],
+	Else,
+	Return[res]
+];
+
+]];
+
+
+(* make listable across variables *)
+ValidQ[eqs_?ListOfVariablesQ,opts___?OptionQ]:=(ValidQ[#,opts]&/@eqs);
+
+
+Options[ValidQ]={Verbose->False,Verbosity->0,
+SimplifyResult->Real,SimplifyOpts->{Assumptions:>DeleteCases[$Assumptions,False]}};
+
+
 SelectValid::usage=
 "SelectValid[\!\(\*
 StyleBox[\"sol\", \"TI\"]\)] selects valid solutions in list of rule lists \!\(\*
 StyleBox[\"sol\", \"TI\"]\).";
 
 
-SelectValid[sol:(_?RuleListListQ):{}]:=Module[{res},
+SelectValid[sol:(_?RuleListListQ):{},opts___?OptionQ]:=Module[{validqopts},
 
 If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
 
-res={};
-Do[
-	If[CompoundAnd[Flatten@Table[
-		Which[
-			Head[el[[2]]]===TemporalData,
-			Map[IntervalMemberQ[range[el[[1]]],#]&,Normal[el[[2]]][[All,2]]],
-			Else,
-			IntervalMemberQ[range[el[[1]]],el[[2]]]
-			(*Min[range[el\[LeftDoubleBracket]1\[RightDoubleBracket]]]\[LessEqual]el\[LeftDoubleBracket]2\[RightDoubleBracket]\[LessEqual]Max[range[el\[LeftDoubleBracket]1\[RightDoubleBracket]]]*)
-		]
-	,{el,eq}]],AppendTo[res,eq]]
-,{eq,sol}];
+validqopts=FilterRules[Flatten[{opts,Options[SelectValid]}],Options[ValidQ]];
 
-Return[res]
+Return[Select[sol,ValidQ[#,Evaluate[Sequence@@validqopts]]&]]
 
 ];
+
+
+Options[SelectValid]={};
 
 
 SplitSpecies::usage=
@@ -3972,9 +4042,10 @@ VPrint[3,"tmp2=",tmp2];
 FullSimplify[tmp2/.gi->momentmethod/.RemoveBars]
 ];
 
-AddBars:=Subscript[var_, sp_]->Subscript[OverBar[var], sp];
-RemoveBars:=Subscript[OverBar[var_], sp_]->Subscript[var, sp];
+AddBars:=Subscript[var_, sp_]->Subscript[mean[var], sp];
+RemoveBars:=Subscript[mean[var_], sp_]->Subscript[var, sp];
 
+Unprotect[Color];
 
 ClearParameters;UnsetModel;
 
@@ -4088,7 +4159,9 @@ Do[
 		comptype[Subscript[gcomp,_]]=comptype[gcomp]=Type/.Append[in,Type->"Extensive"];
 		range[Subscript[gcomp,_]]=range[gcomp]=Range/.Append[in,Range->Interval[{0,\[Infinity]}]];
 		gradient=Color/.Append[in,Color->ModPart[gradients,stylecount]];
+		Color[Subscript[gcomp,_]]=Color[_[Subscript[gcomp,_]]]=
 		color[Subscript[gcomp,_]]=color[_[Subscript[gcomp,_]]]=With[{cd=ColorData[gradient]},cd[#]&];
+		Color[gcomp]=Color[_[gcomp]]=
 		color[gcomp]=color[_[gcomp]]=With[{cd=ColorData[gradient]},cd[0.5]];
 		linestyle[Subscript[gcomp,_]]=linestyle[gcomp]=linestyle[_[gcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
 		plotmarker[Subscript[gcomp,_]]=plotmarker[gcomp]=plotmarker[_[gcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
@@ -4113,14 +4186,17 @@ Do[
 			range[Subscript[gtrait,_]]=range[gtrait]=Range/.Append[in,Range->Interval[{-\[Infinity],\[Infinity]}]]
 		];
 		gradient=Color/.Join[in,Guild[gu]/.model,{Color->ModPart[gradients,stylecount]}];
+		Color[Subscript[gtrait,_]]=Color[_[Subscript[gtrait,_]]]=
 		color[Subscript[gtrait,_]]=color[_[Subscript[gtrait,_]]]=With[{cd=ColorData[gradient]},cd[#]&];
 		(*color[Subscript[gtrait[gcomp_],sp_]]=color[Subscript[_[gtrait][gcomp_],sp_]]=color[Subscript[gcomp, sp]];*)
+		Color[gtrait]=Color[_[gtrait]]=
 		color[gtrait]=color[_[gtrait]]=With[{cd=ColorData[gradient]},cd[0.5]];
 		linestyle[Subscript[gtrait,_]]=linestyle[gtrait]=linestyle[_[gtrait]]=LineStyle/.Join[in,Guild[gu]/.model,{LineStyle->ModPart[linestyles,stylecount]}];
 		plotmarker[Subscript[gtrait,_]]=plotmarker[gtrait]=PlotMarker/.Join[in,Guild[gu]/.model,{PlotMarker->ModPart[plotmarkers,stylecount]}];
 		LookUp[gtrait]=LookUp[_[gtrait]]={"gtrait",gu,gtrait};
 		LookUp[Subscript[gtrait,sp_]]=LookUp[_[Subscript[gtrait,sp_]]]={"gtrait",gu,gtrait,sp};
 		Do[
+			Color[Subscript[gtrait[gcomp],sp_]]=Color[Subscript[_[gtrait][gcomp],sp_]]=
 			color[Subscript[gtrait[gcomp],sp_]]=color[Subscript[_[gtrait][gcomp],sp_]]=color[Subscript[gcomp, sp]];
 			LookUp[Subscript[gtrait[gcomp],sp_]]=LookUp[_[Subscript[gtrait[gcomp],sp_]]]={"gtrait",gu,gtrait[gcomp],sp};
 			LookUp[Subscript[Var[gtrait][gcomp],sp_]]=LookUp[_[Subscript[Var[gtrait][gcomp],sp_]]]={"var",gu,gtrait[gcomp],sp};
@@ -4156,6 +4232,7 @@ If[nauxs!=0,
 		type[aux]="aux";
 		in=Aux[aux]/.model;
 		range[aux]=Range/.Append[in,Range->Interval[{-\[Infinity],\[Infinity]}]];
+		Color[aux]=Color[_[aux]]=
 		color[aux]=color[_[aux]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
 		linestyle[aux]=linestyle[_[aux]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
 		plotmarker[aux]=plotmarker[_[aux]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
@@ -4198,7 +4275,7 @@ Do[
 		type[pcomp]="pcomp";
 		comptype[pcomp]=Type/.Append[in,Type->"Extensive"];
 		range[pcomp]=Range/.Append[in,Range->Interval[{0,\[Infinity]}]];
-		color[pcomp]=color[_[pcomp]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
+		Color[pcomp]=Color[_[pcomp]]=color[pcomp]=color[_[pcomp]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
 		linestyle[pcomp]=linestyle[_[pcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
 		plotmarker[pcomp]=plotmarker[_[pcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
 		LookUp[pcomp]=LookUp[_[pcomp]]={"pcomp",pop,pcomp};
@@ -4325,6 +4402,8 @@ $Assumptions=Flatten[assumptions/.Automatic->Join[
 ]];
 VPrint[2,"$Assumptions=",$Assumptions];
 
+assumptionstrings=ToString/@$Assumptions;
+
 (* get rid of this? *)
 Which[
 	modeltype=="ContinuousTime",
@@ -4333,6 +4412,8 @@ Which[
 	modeltype=="DiscreteTime",
 	DT[var_]:=var'
 ];
+
+Protect[Color];
 
 ]]
 
@@ -4368,7 +4449,7 @@ UnsetModel:=(
 	auxs,nauxs,auxeqn,
 	guilds,nguilds,gcomps,ngcomps,gtraits,ngtraits,
 	eqns,
-	dndt,dxdt,dGdt];
+	dndt,dxdt,dGdt,assumptionstrings];
 	$Assumptions={};
 );
 
@@ -5903,7 +5984,7 @@ EcoStableQ[attributesin:(_?AttributesQ):{},variables:(_?VariablesQ):{},Gsin:(_?G
 
 Module[{
 (* options *)
-method,verbose,time,ecoeigenvaluesopts,tolerance,simplifyresult,fixed,ignorevar,
+method,verbose,time,ecoeigenvaluesopts,tolerance,simplifyresult,simplifyopts,fixed,ignorevar,
 (* other variables *)
 attributes,j,evs,res},
 
@@ -5927,6 +6008,7 @@ time=Evaluate[Time/.Flatten[{opts,Options[EcoStableQ]}]];
 ecoeigenvaluesopts=Evaluate[EcoEigenvaluesOpts/.Flatten[{opts,Options[EcoStableQ]}]];
 tolerance=Evaluate[Tolerance/.Flatten[{opts,Options[EcoStableQ]}]];
 simplifyresult=Evaluate[SimplifyResult/.Flatten[{opts,Options[EcoStableQ]}]];
+simplifyopts=Evaluate[SimplifyOpts/.Flatten[{opts,Options[EcoStableQ]}]];
 fixed=Evaluate[Fixed/.Flatten[{opts,Options[EcoStableQ]}]];
 ignorevar=Evaluate[IgnoreVar/.Flatten[{opts,Options[EcoStableQ]}]];
 
@@ -5945,57 +6027,54 @@ Which[
 	method=="RouthHurwitz",
 	j=EcoJacobian[attributes,variables,Gsin,Time->time,Fixed->fixed,IgnoreVar->ignorevar];
 	res=RouthHurwitzCriteria[j];
-	Which[
-		simplifyresult===True,
-		Return[Simplify[res]],
-		simplifyresult===Full,
-		Return[FullSimplify[res]],
-		simplifyresult===Real,
-		Return[RealSimplify[res]],
-		Else,
-		Return[res]
-	]
 ,
 	method=="Eigenvalues",
 	evs=EcoEigenvalues[attributes,variables,Gsin,Time->time,Fixed->fixed,IgnoreVar->ignorevar,Evaluate[Sequence@@ecoeigenvaluesopts]];
-	Which[
-		simplifyresult===True,
-		evs=Simplify[evs]],
-		simplifyresult===Full,
-		evs=FullSimplify[evs],
-		simplifyresult===Real,
-		evs=RealSimplify[res]
-	];
 	VPrint[1,"evs=",evs];
+	If[tolerance===Automatic,If[NumericQ[Max[Re[evs]]],tolerance=10^-8,tolerance=0]];
+	(*Print["tolerance=",tolerance];*)
 	Which[
 		modeltype=="DiscreteTime",
-		res=Which[
-			Evaluate[Max[Re[evs]]===Indeterminate],Indeterminate,
-			Evaluate[Max[Abs[evs]]<=1.+tolerance],True,
-			Evaluate[Max[Abs[evs]]>1.+tolerance],False,
-			Else,Indeterminate
-		],
+		res=Piecewise[{
+			{True,Max[Abs[evs]]<1+tolerance},
+			{False,Max[Abs[evs]]>1+tolerance}
+		},Indeterminate],
 		modeltype=="ContinuousTime",
-		res=Which[
-			Evaluate[Max[Re[evs]]===Indeterminate],Indeterminate,
-			Evaluate[Max[Re[evs]]>tolerance],False,
-			Evaluate[Max[Re[evs]]<=tolerance],True, 
-			Else,Indeterminate		
-		]
+		res=Piecewise[{
+			{True,Max[Re[evs]]<tolerance},
+			{False,Max[Re[evs]]>tolerance}
+		},Indeterminate];
 	];
+];
 
-Return[res];
+VPrint[3,"res=",res];
+
+Which[
+	simplifyresult===True,
+	CheckAssumptions;
+	Return[Simplify[res,Evaluate[Sequence@@simplifyopts]]],
+	simplifyresult===Full,
+	CheckAssumptions;
+	Return[FullSimplify[res,Evaluate[Sequence@@simplifyopts]]],
+	simplifyresult===Real,
+	CheckAssumptions;
+	Return[RealSimplify[res,Evaluate[Sequence@@simplifyopts]]],
+	Else,
+	Return[res]
+];
+
 
 ]];
 
 
-(* break up combned traitsandpops *)
+(* break up combined traitsandpops *)
 EcoStableQ[traitsandpops_?AttributesAndVariablesQ,opts___?OptionQ]:=
 EcoStableQ[ExtractTraits[traitsandpops],ExtractVariables[traitsandpops],opts];
 
 
 Options[EcoStableQ]={Verbose->False,Verbosity->0,
-Method->Automatic,SimplifyResult->Real,Time->t,EcoEigenvaluesOpts->{},Assumptions->{},Tolerance->10^-8,Fixed->{},IgnoreVar->False};
+Method->Automatic,SimplifyResult->Real,SimplifyOpts->{Assumptions:>DeleteCases[$Assumptions,False]},
+Time->t,EcoEigenvaluesOpts->{},Tolerance->Automatic,Fixed->{},IgnoreVar->False};
 
 
 SelectEcoStable::usage=
@@ -6009,15 +6088,14 @@ StyleBox[\"attributes\", \"TI\"]\).";
 
 
 SelectEcoStable[attributes:(_?AttributesQ):{},sol_?ListOfVariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=
-Module[{stableqopts,stable},
+Module[{stableqopts},
 
 If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 stableqopts=FilterRules[Flatten[{opts,Options[SelectEcoStable]}],Options[EcoStableQ]];
 
-stable=EcoStableQ[attributes,#,Gsin,Evaluate[Sequence@@stableqopts]]&/@sol;
+Return[Select[sol,EcoStableQ[attributes,#,Gsin,Evaluate[Sequence@@stableqopts]]&]]
 
-Return[Part[sol,Flatten[Position[stable,True]]]]
 ];
 
 
@@ -6726,24 +6804,28 @@ If[time===t,
 ];
 
 data=Select[abunds[[All,2]],#>minpop&];
+If[plotmin===Automatic,plotmin=Min[data]];
 If[coresatellite>0,
-	points={Select[data,#>=coresatellite&&#>=plotmin&],Select[data,plotmin<=#<coresatellite&]},
-	points=data
+	Global`points=points={Select[data,#>=coresatellite&&#>=plotmin&],Select[data,plotmin<=#<coresatellite&]};
+	\[ScriptCapitalD]1=SmoothKernelDistribution[Log[points[[1]]],0.01,{"Bounded",{Min[Log[data]],Max[Log[data]]},kernel}];
+	\[ScriptCapitalD]2=SmoothKernelDistribution[Log[points[[2]]],bandwidth,{"Bounded",{Min[Log[data]],Max[Log[data]]},kernel}];
+	\[ScriptCapitalD]=MixtureDistribution[{Length[points[[1]]],Length[points[[2]]]}/Length[Flatten@points],{\[ScriptCapitalD]1,\[ScriptCapitalD]2}];
+,
+	points=data;
+	\[ScriptCapitalD]=SmoothKernelDistribution[Log[data],bandwidth,{"Bounded",{Min[Log[data]],Max[Log[data]]},kernel}];
 ];
-data=Log[data];
 
 If[scaled==True,f=1,f=Length[data]];
 
 Which[
-	axesorigin=="Left",axesorigin={E^Min[data],0},
-	axesorigin=="Right",axesorigin={E^Max[data],0}
+	axesorigin=="Left",axesorigin={Min[data],0},
+	axesorigin=="Right",axesorigin={Max[data],0}
 ];
 (*Print["axesorigin=",axesorigin];
 Print["plotrange=",plotrange];*)
 
-\[ScriptCapitalD]=SmoothKernelDistribution[data,bandwidth,{"Bounded",{Min[data],Max[data]},kernel}];
-If[plotmin===Automatic,plotmin=E^Min[data]];
-hist=LogLinearPlot[f*PDF[\[ScriptCapitalD],Log[x]],{x,plotmin,E^Max[data]},PlotStyle->plotstyle,PlotRange->plotrange,AxesOrigin->axesorigin];
+(*\[ScriptCapitalD]=SmoothKernelDistribution[data,bandwidth,{"Bounded",{Min[data],Max[data]},kernel}];*)
+hist=LogLinearPlot[f*PDF[\[ScriptCapitalD],Log[x]],{x,plotmin,Max[data]},PlotStyle->plotstyle,PlotRange->plotrange,AxesOrigin->axesorigin];
 (*Print[hist];*)
 If[showspecies,
 	stix=ListLogLinearPlot[
