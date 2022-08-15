@@ -77,7 +77,7 @@ GrayScale;
 DoubleDotProduct;HessianMatrix;
 UnfactorSums;GaussianIntegral;GaussianIntegralApproximation;
 VPrint;
-CreateBlock;
+CreateBlock;NEqual;(*MaxEigenvalue;MaxEigenvector;MaxEigensystem;*)
 
 
 Set\[ScriptCapitalN];
@@ -347,7 +347,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0X (June 30, 2022)";
+$EcoEvoVersion="1.7.0X (July 8, 2022)";
 
 
 modelloaded=False;
@@ -393,6 +393,7 @@ Options[NewFunction]={
 
 
 SetOptions[NDSolve,MaxSteps->Infinity];
+SetOptions[Solve,Assumptions->{}]; (* <https://mathematica.stackexchange.com/questions/270045> *)
 (*SetOptions[NIntegrate,MaxRecursion\[Rule]30];*)
 
 
@@ -2426,17 +2427,17 @@ If[plotstyle==={},
 	i=0;
 	Do[
 		i++;
-		If[linestyles==={},ls=linestyle[var],ls=ModPart[linestyles,i]];
+		If[linestyles==={},ls=LineStyle[var],ls=ModPart[linestyles,i]];
 		lookup=LookUp[var];
 		Which[
 			(lookup[[1]]==="gcomp"||lookup[[1]]==="gtrait"||lookup[[1]]==="var")&&Length[lookup]==4,
-			plotcolor[var]=color[var][SpFrac[lookup[[4]],\[ScriptCapitalN][lookup[[2]]]]]
+			plotcolor[var]=Color[var][SpFrac[lookup[[4]],\[ScriptCapitalN][lookup[[2]]]]]
 		,
 			(lookup[[1]]==="gcomp"||lookup[[1]]==="gtrait")&&Length[lookup]==3,
-			plotcolor[var]=color[var]
+			plotcolor[var]=Color[var]
 		,
 			lookup[[1]]==="pcomp"||lookup[[1]]==="aux",
-			plotcolor[var]=color[var]
+			plotcolor[var]=Color[var]
 		,
 			Else,
 			plotcolor[var]=ColorData[97][i];
@@ -2498,7 +2499,7 @@ If[ifvars!={},
 
 If[tdvars!={},
 	If[plotmarkers==={}&&(Joined/.{opts})===False,
-		plotmarkers=Table[plotmarker[var],{var,tdvars}]
+		plotmarkers=Table[PlotMarker[var],{var,tdvars}]
 	];
 
 	If[plotmarkers=={},plotmarkers=None];
@@ -2963,6 +2964,30 @@ Module[{v, myBlock, mySet, vals},
     SetAttributes[myBlock, HoldAll];
     myBlock[vals, expr] /. vals -> v /. mySet -> Set /. myBlock -> Block
 ];
+
+
+NEqual::usage="NEqual[\!\(\*
+StyleBox[\"x1\", \"TI\"]\), \!\(\*
+StyleBox[\"x2\", \"TI\"]\)] tests is \!\(\*
+StyleBox[\"x1\", \"TI\"]\) approximately equals \!\(\*
+StyleBox[\"x2\", \"TI\"]\).";
+
+
+NEqual[x1_,x2_,opts___?OptionQ]:=Module[{samethreshold},
+	samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[NEqual]}]];
+	If[
+		Dimensions[x1,AllowedHeads->"ListLike"]==Dimensions[x2,AllowedHeads->"ListLike"],
+		Return[If[Norm[x1-x2]<samethreshold,True,False,False]],
+		Message[NEqual::nedd];
+		Return[False]
+	];
+];
+
+
+Options[NEqual]={SameThreshold->10^-8};
+
+
+NEqual::nedd="Arguments of NEqual have different dimensions.";
 
 
 Set\[ScriptCapitalN][attributes:(_?AttributesQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,interxns,tnsp,pnsp,insp},
@@ -3996,8 +4021,8 @@ SetModel[model_?RuleListQ,opts___?OptionQ]:=Module[{
 colors,linestyles,plotmarkers,assumptions,parametersin,momentmethod,gaussianintegralopts,
 (* other *)
 parameterstmp,parintervals,stylecount,basestyle,indexcount,in,gradients,gradient,
-sourcec,source,destc,dest,
-(* func *)
+sourcec,source,destc,dest,protectedfuncs,
+(* funcs *)
 FixEqn,FixGuildEqn,AddBars,RemoveBars},
 
 Block[{verbosity,func="SetModel"},
@@ -4045,7 +4070,8 @@ FullSimplify[tmp2/.gi->momentmethod/.RemoveBars]
 AddBars:=Subscript[var_, sp_]->Subscript[mean[var], sp];
 RemoveBars:=Subscript[mean[var_], sp_]->Subscript[var, sp];
 
-Unprotect[Color];
+protectedfuncs={"Color","LineStyle","PlotMarker"};
+Unprotect[Evaluate[protectedfuncs]];
 
 ClearParameters;UnsetModel;
 
@@ -4057,7 +4083,7 @@ If[momentmethod===None||momentmethod==="None",moments=False,moments=True];
 modelname=ModelName/.Append[model,ModelName->"UnnamedModel"];
 
 (* model type - default="ContinuousTime" *)
-modeltype=ModelType/.Append[model,ModelType->"ContinuousTime"];
+modeltype=(ModelType/.Append[model,ModelType->"ContinuousTime"]);
 If[!MemberQ[{"ContinuousTime","DiscreteTime"},modeltype],Message[SetModel::unktype]];
 
 (* model whenevents - default={} *)
@@ -4159,17 +4185,15 @@ Do[
 		comptype[Subscript[gcomp,_]]=comptype[gcomp]=Type/.Append[in,Type->"Extensive"];
 		range[Subscript[gcomp,_]]=range[gcomp]=Range/.Append[in,Range->Interval[{0,\[Infinity]}]];
 		gradient=Color/.Append[in,Color->ModPart[gradients,stylecount]];
-		Color[Subscript[gcomp,_]]=Color[_[Subscript[gcomp,_]]]=
-		color[Subscript[gcomp,_]]=color[_[Subscript[gcomp,_]]]=With[{cd=ColorData[gradient]},cd[#]&];
-		Color[gcomp]=Color[_[gcomp]]=
-		color[gcomp]=color[_[gcomp]]=With[{cd=ColorData[gradient]},cd[0.5]];
-		linestyle[Subscript[gcomp,_]]=linestyle[gcomp]=linestyle[_[gcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
-		plotmarker[Subscript[gcomp,_]]=plotmarker[gcomp]=plotmarker[_[gcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
+		Color[Subscript[gcomp,_]]=Color[_[Subscript[gcomp,_]]]=With[{cd=ColorData[gradient]},cd[#]&];
+		Color[gcomp]=Color[_[gcomp]]=With[{cd=ColorData[gradient]},cd[0.5]];
+		LineStyle[Subscript[gcomp,_]]=LineStyle[gcomp]=LineStyle[_[gcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
+		PlotMarker[Subscript[gcomp,_]]=PlotMarker[gcomp]=PlotMarker[_[gcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
 		LookUp[gcomp]=LookUp[_[gcomp]]={"gcomp",gu,gcomp};
 		LookUp[Subscript[gcomp,sp_]]=LookUp[_[Subscript[gcomp,sp_]]]={"gcomp",gu,gcomp,sp};
 	,{gcomp,gcomps[gu]}];
 	
-	color[gu]=color[_[gu]]=With[{cd=ColorData[gradient]},cd[0.5]];
+	Color[gu]=Color[_[gu]]=With[{cd=ColorData[gradient]},cd[0.5]];
 
 	indexcount=0;
 	Do[
@@ -4186,18 +4210,15 @@ Do[
 			range[Subscript[gtrait,_]]=range[gtrait]=Range/.Append[in,Range->Interval[{-\[Infinity],\[Infinity]}]]
 		];
 		gradient=Color/.Join[in,Guild[gu]/.model,{Color->ModPart[gradients,stylecount]}];
-		Color[Subscript[gtrait,_]]=Color[_[Subscript[gtrait,_]]]=
-		color[Subscript[gtrait,_]]=color[_[Subscript[gtrait,_]]]=With[{cd=ColorData[gradient]},cd[#]&];
-		(*color[Subscript[gtrait[gcomp_],sp_]]=color[Subscript[_[gtrait][gcomp_],sp_]]=color[Subscript[gcomp, sp]];*)
-		Color[gtrait]=Color[_[gtrait]]=
-		color[gtrait]=color[_[gtrait]]=With[{cd=ColorData[gradient]},cd[0.5]];
-		linestyle[Subscript[gtrait,_]]=linestyle[gtrait]=linestyle[_[gtrait]]=LineStyle/.Join[in,Guild[gu]/.model,{LineStyle->ModPart[linestyles,stylecount]}];
-		plotmarker[Subscript[gtrait,_]]=plotmarker[gtrait]=PlotMarker/.Join[in,Guild[gu]/.model,{PlotMarker->ModPart[plotmarkers,stylecount]}];
+		Color[Subscript[gtrait,_]]=Color[_[Subscript[gtrait,_]]]=With[{cd=ColorData[gradient]},cd[#]&];
+		(*Color[Subscript[gtrait[gcomp_],sp_]]=Color[Subscript[_[gtrait][gcomp_],sp_]]=Color[Subscript[gcomp, sp]];*)
+		Color[gtrait]=Color[_[gtrait]]=With[{cd=ColorData[gradient]},cd[0.5]];
+		LineStyle[Subscript[gtrait,_]]=LineStyle[gtrait]=LineStyle[_[gtrait]]=LineStyle/.Join[in,Guild[gu]/.model,{LineStyle->ModPart[linestyles,stylecount]}];
+		PlotMarker[Subscript[gtrait,_]]=PlotMarker[gtrait]=PlotMarker/.Join[in,Guild[gu]/.model,{PlotMarker->ModPart[plotmarkers,stylecount]}];
 		LookUp[gtrait]=LookUp[_[gtrait]]={"gtrait",gu,gtrait};
 		LookUp[Subscript[gtrait,sp_]]=LookUp[_[Subscript[gtrait,sp_]]]={"gtrait",gu,gtrait,sp};
 		Do[
-			Color[Subscript[gtrait[gcomp],sp_]]=Color[Subscript[_[gtrait][gcomp],sp_]]=
-			color[Subscript[gtrait[gcomp],sp_]]=color[Subscript[_[gtrait][gcomp],sp_]]=color[Subscript[gcomp, sp]];
+			Color[Subscript[gtrait[gcomp],sp_]]=Color[Subscript[_[gtrait][gcomp],sp_]]=Color[Subscript[gcomp, sp]];
 			LookUp[Subscript[gtrait[gcomp],sp_]]=LookUp[_[Subscript[gtrait[gcomp],sp_]]]={"gtrait",gu,gtrait[gcomp],sp};
 			LookUp[Subscript[Var[gtrait][gcomp],sp_]]=LookUp[_[Subscript[Var[gtrait][gcomp],sp_]]]={"var",gu,gtrait[gcomp],sp};
 		,{gcomp,gcomps[gu]}];
@@ -4232,10 +4253,9 @@ If[nauxs!=0,
 		type[aux]="aux";
 		in=Aux[aux]/.model;
 		range[aux]=Range/.Append[in,Range->Interval[{-\[Infinity],\[Infinity]}]];
-		Color[aux]=Color[_[aux]]=
-		color[aux]=color[_[aux]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
-		linestyle[aux]=linestyle[_[aux]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
-		plotmarker[aux]=plotmarker[_[aux]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
+		Color[aux]=Color[_[aux]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
+		LineStyle[aux]=LineStyle[_[aux]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
+		PlotMarker[aux]=PlotMarker[_[aux]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
 		LookUp[aux]=LookUp[_[aux]]={"aux",aux};
 	,{aux,auxs}];
 ];
@@ -4275,9 +4295,9 @@ Do[
 		type[pcomp]="pcomp";
 		comptype[pcomp]=Type/.Append[in,Type->"Extensive"];
 		range[pcomp]=Range/.Append[in,Range->Interval[{0,\[Infinity]}]];
-		Color[pcomp]=Color[_[pcomp]]=color[pcomp]=color[_[pcomp]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
-		linestyle[pcomp]=linestyle[_[pcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
-		plotmarker[pcomp]=plotmarker[_[pcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
+		Color[pcomp]=Color[_[pcomp]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
+		LineStyle[pcomp]=LineStyle[_[pcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
+		PlotMarker[pcomp]=PlotMarker[_[pcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
 		LookUp[pcomp]=LookUp[_[pcomp]]={"pcomp",pop,pcomp};
 	,{pcomp,pcomps[pop]}];
 ,{pop,pops}];
@@ -4413,7 +4433,7 @@ Which[
 	DT[var_]:=var'
 ];
 
-Protect[Color];
+Protect[Evaluate[protectedfuncs]];
 
 ]]
 
@@ -4441,17 +4461,21 @@ UnsetModel::usage=
 "UnsetModel clears the currently set EcoEvo model.";
 
 
-UnsetModel:=(
+UnsetModel:=Module[{dvs},
 	modelloaded=False;
-	Clear[LookUp,type,range,comptype,color,linestyle,plotmarker,DT,
+	Clear[LookUp,type,range,comptype,DT,
 	modeltype,modelwhenevents,modelperiod,moments,
 	pops,npops,npcomps,pcomps,pcompeqn,
 	auxs,nauxs,auxeqn,
 	guilds,nguilds,gcomps,ngcomps,gtraits,ngtraits,
 	eqns,
 	dndt,dxdt,dGdt,assumptionstrings];
+	dvs={Color,LineStyle,PlotMarker};
+	Unprotect[dvs];
+	Do[DownValues[func]={},{func,dvs}];
+	Protect[dvs];
 	$Assumptions={};
-);
+];
 
 
 ModelInfo::usage=
@@ -6559,16 +6583,16 @@ lookup2=LookUp[var2];
 (* set up isocline styles *)
 Which[
 	lookup1[[1]]=="gcomp",
-	style1=If[isoclinestyle===Automatic,Join[Flatten[{linestyle[var1]}],{Thickness[0.005],color[var1][0]}],isoclinestyle[[1]]],
+	style1=If[isoclinestyle===Automatic,Join[Flatten[{LineStyle[var1]}],{Thickness[0.005],Color[var1][0]}],isoclinestyle[[1]]],
 	lookup1[[1]]=="pcomp"||lookup1[[1]]=="aux",
-	style1=If[isoclinestyle===Automatic,Join[Flatten[{linestyle[var1]}],{Thickness[0.005],color[var1]}],isoclinestyle[[1]]]
+	style1=If[isoclinestyle===Automatic,Join[Flatten[{LineStyle[var1]}],{Thickness[0.005],Color[var1]}],isoclinestyle[[1]]]
 ];
 
 Which[
 	lookup2[[1]]=="gcomp",
-	style2=If[isoclinestyle===Automatic,Join[Flatten[{linestyle[var2]}],{Thickness[0.005],color[var2][1]}],isoclinestyle[[2]]],
+	style2=If[isoclinestyle===Automatic,Join[Flatten[{LineStyle[var2]}],{Thickness[0.005],Color[var2][1]}],isoclinestyle[[2]]],
 	lookup2[[1]]=="pcomp"||lookup2[[1]]=="aux",
-	style2=If[isoclinestyle===Automatic,Join[Flatten[{linestyle[var2]}],{Thickness[0.005],color[var2]}],isoclinestyle[[2]]]
+	style2=If[isoclinestyle===Automatic,Join[Flatten[{LineStyle[var2]}],{Thickness[0.005],Color[var2]}],isoclinestyle[[2]]]
 ];
 
 (*Print[{style1,style2}];*)
@@ -7027,7 +7051,7 @@ If[TemporalRuleListQ[sol]&&time===t, (* temporal dynamics *)
 		res=ListPlot3D[dat,Evaluate[Sequence@@listplot3dopts],AxesLabel->{"t",tr,gu}]
 	,
 		plottype=="LinePlot3D",
-		If[plotstyle===Automatic,plotstyle=Table[color[Subscript[tr,1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}]];
+		If[plotstyle===Automatic,plotstyle=Table[Color[Subscript[tr,1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}]];
 		If[InterpolatingFunctionFunctionQ[sol],
 			res=ParametricPlot3D[Evaluate[Table[{t,Subscript[tr, sp]/.attributesin,Subscript[gu, sp][t]/.sol},{sp,Subscript[\[ScriptCapitalN], gu]}]],{t,tmin,tmax},
 				PlotStyle->plotstyle,Evaluate[Sequence@@listlineplot3dopts],AxesLabel->{"t",tr,gu}]
@@ -7055,10 +7079,10 @@ If[plotstyle===Automatic,
 	,
 		If[species=!=None,
 			plotstyle=Table[If[i==species,
-				Directive[Thick,color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]]],
-				Directive[Thin,color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]]]
+				Directive[Thick,Color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]]],
+				Directive[Thin,Color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]]]
 			],{i,Subscript[\[ScriptCapitalN], gu]}],
-			plotstyle=Table[color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}]
+			plotstyle=Table[Color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}]
 		];
 	];
 ];
@@ -7096,11 +7120,11 @@ If[Gsin!={},  (* moment-based *)
 				Table[{x,j+0.002*i,Subscript[gcomp, i]PDF[NormalDistribution[Subscript[tr[gcomp], i],Sqrt[Subscript[Var[tr][gcomp], i]]]][x]}/.sol/.traits/.Gs,{x,xmin,xmax,(xmax-xmin)/plotpoints}]
 			,{i,Subscript[\[ScriptCapitalN], gu]}],{j,ngcomps[gu]}],1],
 			PlotRange->{{xmin,xmax},{0.9,Subscript[\[ScriptCapitalN], gu]+0.1},zrange},Evaluate[Sequence@@ridgelineplot3dopts],AxesOrigin->{xmin,0.9,0},Ticks->{Automatic,Table[{i,gcomps[gu][[i]]},{i,ngcomps[gu]}],Automatic},
-			PlotStyle->Table[{EcoEvo`Private`color[Subscript[gcomp, 1]][SpFrac[i,\[ScriptCapitalN][gu]]]},{i,\[ScriptCapitalN][gu]}],AxesLabel->{tr,None,None}];
+			PlotStyle->Table[{Color[Subscript[gcomp, 1]][SpFrac[i,\[ScriptCapitalN][gu]]]},{i,\[ScriptCapitalN][gu]}],AxesLabel->{tr,None,None}];
 			Return[res]
 		];
 		res=Table[
-			plotstyle=Table[color[Subscript[gcomp, 1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}];
+			plotstyle=Table[Color[Subscript[gcomp, 1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}];
 			Plot[Evaluate[Table[Subscript[gcomp, i]PDF[NormalDistribution[Subscript[tr[gcomp], i],Sqrt[Subscript[Var[tr][gcomp], i]]]][x],{i,Subscript[\[ScriptCapitalN], gu]}]/.sol/.traits/.Gs],{x,xmin,xmax},
 				PlotStyle->plotstyle,Evaluate[Sequence@@plotopts],PlotRange->All,AxesLabel->{tr,gcomp}]
 		,{gcomp,gcomps[gu]}];
@@ -7250,7 +7274,7 @@ PlotImpactVector[{var1_,var2_},sp_,point_?RuleListQ,opts___?OptionQ]:=Module[{sc
 (* handle options *)
 scale=Evaluate[Scale/.Flatten[{opts,Options[PlotImpactVector]}]];
 plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotImpactVector]}]];
-If[plotstyle===Automatic,plotstyle={color[sp],linestyle[sp]}];
+If[plotstyle===Automatic,plotstyle={Color[sp],LineStyle[sp]}];
 
 Graphics[Join[Flatten[{plotstyle}],{Arrow[{{var1,var2},{var1,var2}+scale*Normalize@ImpactVector[{var1,var2},sp]}/.point]}]]
 ];
@@ -7319,7 +7343,7 @@ If[axeslabel===Automatic,axeslabel={par,var}];
 If[teststability,
 	plotopts=Join[plotopts,
 		{MeshStyle->Opacity[0],MeshFunctions->{\[Lambda][#1,eq]&},Mesh->{{0}},
-		MeshShading->{Directive[Evaluate[Sequence@@stablestyle],color[var]],Directive[Evaluate[Sequence@@unstablestyle],color[var]]}}]
+		MeshShading->{Directive[Evaluate[Sequence@@stablestyle],Color[var]],Directive[Evaluate[Sequence@@unstablestyle],Color[var]]}}]
 ];
 
 
@@ -8625,7 +8649,7 @@ If[Subscript[\[ScriptCapitalN], gu]==0,plotspecies="None"];
 Which[
 	plotspecies==="Axis",
 	If[markerstyle===Automatic,
-		epilog=Table[{PointSize[0.015],color[Subscript[tr,sp]][SpFrac[sp,\[ScriptCapitalN][gu]]],Point[{Subscript[tr,sp]/.attributes,0}]},{sp,\[ScriptCapitalN][gu]}],
+		epilog=Table[{PointSize[0.015],Color[Subscript[tr,sp]][SpFrac[sp,\[ScriptCapitalN][gu]]],Point[{Subscript[tr,sp]/.attributes,0}]},{sp,\[ScriptCapitalN][gu]}],
 		epilog=MapThread[Append,{PadRight[{},\[ScriptCapitalN][gu],
 			Map[Flatten[{#}]&,markerstyle]],Table[Point[{Subscript[tr,sp]/.attributes,0}],{sp,\[ScriptCapitalN][gu]}]}]
 	];
@@ -8794,7 +8818,7 @@ If[
 
 If[boundarystyle===Automatic,
 	If[LookUp[invader][[1]]=="pcomp",
-		boundarystyle={color[invader],Opacity[1]},
+		boundarystyle={Color[invader],Opacity[1]},
 		boundarystyle={Black,Opacity[1]}]
 ];
 
@@ -8970,7 +8994,7 @@ VPrint[3,"\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];
 
 Return[Show[Table[Table[
 	If[plotstyle===Automatic,
-		boundarystyle={color[Subscript[gcomps[gu][[1]],0]][SpFrac[sp,\[ScriptCapitalN][gu]]],Opacity[1]},
+		boundarystyle={Color[Subscript[gcomps[gu][[1]],0]][SpFrac[sp,\[ScriptCapitalN][gu]]],Opacity[1]},
 		boundarystyle=Flatten[{plotstyle,Opacity[1]}]
 	];
 	PlotZIP[{},{var1,var1min,var1max},{var2,var2min,var2max},Table[Subscript[gtrait, 0]->Subscript[gtrait, sp]/.invaders,{gtrait,gtraits[gu]}],
@@ -9961,8 +9985,8 @@ excludediagonal=Evaluate[ExcludeDiagonal/.Flatten[{opts,Options[PlotEvoIsoclines
 If[excludediagonal&&{gu1,tr1}=={gu2,tr2},AppendTo[plotopts,Exclusions->{\[FormalX]==\[FormalY]}]];
 
 If[isoclinestyle===Automatic,
-	color1es=color1nes=color1=color[trait1][0];
-	color2es=color2nes=color2=color[trait2][1];
+	color1es=color1nes=color1=Color[trait1][0];
+	color2es=color2nes=color2=Color[trait2][1];
 	style1es=Thick;style1nes=Thin;style1=Thickness[Medium];
 	style2es=Thick;style2nes=Thin;style2=Thickness[Medium];
 ,
