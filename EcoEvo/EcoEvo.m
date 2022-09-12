@@ -398,7 +398,7 @@ Options[NewFunction]={
 
 
 SetOptions[NDSolve,MaxSteps->Infinity];
-SetOptions[Solve,Assumptions->{}]; (* <https://mathematica.stackexchange.com/questions/270045> *)
+If[$VersionNumber>=12.2,SetOptions[Solve,Assumptions->{}]]; (* <https://mathematica.stackexchange.com/questions/270045> *)
 (*SetOptions[NIntegrate,MaxRecursion\[Rule]30];*)
 
 
