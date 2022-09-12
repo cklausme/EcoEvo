@@ -78,6 +78,8 @@ DoubleDotProduct;HessianMatrix;
 UnfactorSums;GaussianIntegral;GaussianIntegralApproximation;
 VPrint;
 CreateBlock;NEqual;(*MaxEigenvalue;MaxEigenvector;MaxEigensystem;*)
+FindRoots;
+VectorPlot1D;
 
 
 Set\[ScriptCapitalN];
@@ -198,6 +200,7 @@ EcoAttractorNumber::usage = "EcoAttractorNumber specifies which EcoAttractor to 
 EcoEigenvaluesOpts::usage = "EcoEigenvaluesOpts is an option for various EcoEvo functions that passes options to EcoEigenvalues.";
 EcoEvoSimOpts::usage = "EcoEvoSimOpts is an option for various EcoEvo functions that passes options to EcoEvoSim.";
 EcoSimOpts::usage = "EcoSimOpts is an option for various EcoEvo functions that passes options to EcoSim.";
+EcoStableQOpts::usage = "EcoStableQOpts is an option for various EcoEvo functions that passes options to EcoStableQ.";
 EigensystemOpts::usage = "EigenvaluesOpts is an option for various EcoEvo functions that passes options to Eigenvalues.";
 EigenvaluesOpts::usage = "EigenvaluesOpts passes options to Eigenvalues.";
 EqStop::usage = "EqStop is an option for various EcoEvo simulation functions that stops upon reaching an equilibrium.";
@@ -216,6 +219,7 @@ FindEcoEqOpts::usage = "FindEcoEqOpts is an option for various EcoEvo functions 
 FindEcoEvoEqOpts::usage = "FindEcoEvoEqOpts is an option for TrackEcoEvoEq that passes options to FindEcoEvoEq.";
 FindInstanceOpts::usage = "FindInstanceOpts in an option for various EcoEvo functions that passes options to FindInstance.";
 FindRootOpts::usage = "FindRootOpts is an option for various EcoEvo functions that passes options to FindRoot.";
+FindRootsOpts::usage = "FindRootsOpts is an option for various EcoEvo functions that passes options to FindRoots.";
 FitnessGradient::usage = "FitnessGradient is an option for various EcoEvo functions that chooses which method to use to calculate fitness gradients.";
 Fixed::usage = "Fixed is an option for various EcoEvo functions that find equilibria, that fixes the values of certain species/traits.";
 FreezeTraits::usage = "FreezeTraits is an option for EcoEvoSim that freezes traits at their initial conditions.";
@@ -297,6 +301,7 @@ QSSMethod::usage = "QSSMethod is an option for Inv that selects how to solve for
 RelativeStepSize::usage = "RelativeStepSize is an option for NDInv that sets the relative step size.";
 RidgelinePlot3DOpts::usage = "RidgelinePlot3DOpts is an option for PlotGuild that passes options for a 3D ridgeline plot.";
 RuleListDistanceOpts::usage = "RuleListDistanceOpts is an option for various EcoEvo functions that passes options to RuleListDistance.";
+RuleListOpts::usage = "RuleListOpts is an option for various EcoEvo functions that passes options to RuleListPlot.";
 RV::usage = "RV is an option for InvSPS when called from ReproductiveValues.";
 SameThreshold::usage = "SameThreshold is an option for various EcoEvo functions that is the threshold to consider two numbers the same.";
 ShowSpecies::usage = "ShowSpecies is an option for various EcoEvo functions that specifies how to show species markers.";
@@ -347,7 +352,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0X (July 8, 2022)";
+$EcoEvoVersion="1.7.0X (September 11, 2022)";
 
 
 modelloaded=False;
@@ -430,15 +435,28 @@ InequalityToInterval::usage="InequalityToInterval converts an inequality to an I
 
 
 (* based on <https://mathematica.stackexchange.com/a/32473/> by Kuba *)
-InequalityToInterval[ineq_]:=
+(*InequalityToInterval[ineq_]:=
 Replace[
 	Fold[
 		ReplaceAll[#,#2]&,
 		ineq//LogicalExpand,
-		{i_[s_?NumericQ,f_]:>Reduce[i[s,f]],{i_[s_,f_?NumericQ]:>Which[MemberQ[{Greater,GreaterEqual},i],Interval[{f,Infinity}],MemberQ[{Less,LessEqual},i],Interval[{-Infinity,f}]]},{Or->IntervalUnion,And->IntervalIntersection}}
+		{i_[s_?NumericQ,f_]\[RuleDelayed]Reduce[i[s,f]],{i_[s_,f_?NumericQ]\[RuleDelayed]Which[MemberQ[{Greater,GreaterEqual},i],Interval[{f,Infinity}],MemberQ[{Less,LessEqual},i],Interval[{-Infinity,f}]]},{Or\[Rule]IntervalUnion,And\[Rule]IntervalIntersection}}
 	],
-	{var_Symbol->Interval[{-\[Infinity],\[Infinity]}]}
-];
+	{var:Except[_Interval]\[Rule]Interval[{-\[Infinity],\[Infinity]}]}
+];*)
+
+
+(* based on <https://mathematica.stackexchange.com/a/271537/> by Somnium *)
+InequalityToInterval[ineq_]:=ineq/.{
+	Greater[max_:\[Infinity],var:Except[_?NumericQ],min_:-\[Infinity]]->var\[Element]Interval[{min,max}],
+	GreaterEqual[max_:\[Infinity],var:Except[_?NumericQ],min_:-\[Infinity]]->var\[Element]Interval[{min,max}],
+	Less[min_:-\[Infinity],var:Except[_?NumericQ],max_:\[Infinity]]->var\[Element]Interval[{min,max}],
+	LessEqual[min_:-\[Infinity],var:Except[_?NumericQ],max_:\[Infinity]]->var\[Element]Interval[{min,max}],
+	var_->var\[Element]Interval[{-\[Infinity],\[Infinity]}]
+};
+
+
+SetAttributes[InequalityToInterval,Listable];
 
 
 SymmetrizeMatrix::usage="";
@@ -1293,12 +1311,19 @@ StyleBox[\"list\", \"TI\"]\) like Part, but wraps around.";
 ModPart[list_List,part_Integer]:=Part[list,Mod[part,Length[list],1]];
 
 
-NumberedGridForm::usage="NumberedGridForm[\!\(\*
-StyleBox[\"list\", \"TI\",\nFontSlant->\"Italic\"]\)] formats \!\(\*
-StyleBox[\"list\", \"TI\",\nFontSlant->\"Italic\"]\) in a table with numbers";
+NumberedGridForm::usage="NumberedGridForm[\!\(\*SubscriptBox[
+StyleBox[\"list\", \"TI\",\nFontSlant->\"Italic\"], \(1\)]\), \!\(\*
+StyleBox[SubscriptBox[\"list\", \"2\"], \"TI\"]\), \[Ellipsis]] formats \!\(\*SubscriptBox[
+StyleBox[\"list\", \"TI\",\nFontSlant->\"Italic\"], \(1\)]\), \!\(\*
+StyleBox[SubscriptBox[\"list\", \"2\"], \"TI\"]\), \[Ellipsis] in a table with numbers.";
 
 
-NumberedGridForm[list_List]:=Grid[Transpose[{Range[Length[list]],list}],Alignment->Left];
+(*NumberedGridForm[list_List]:=Grid[Transpose[{Range[Length[list]],list}],Alignment\[Rule]Left];*)
+NumberedGridForm[lists__List,opts___?OptionQ]:=
+	Grid[Transpose[{Range[Length[{lists}[[1]]]],lists}],Sequence@@Flatten[Join[{opts},Options[NumberedGridForm]]]];
+
+
+Options[NumberedGridForm]={Alignment->Left};
 
 
 FindMinima::usage=
@@ -2479,7 +2504,7 @@ If[ifvars!={},
 			ifplot=ListPlot[ifvars/.sol,Evaluate[Sequence@@plotopts],PlotRange->plotrange],
 			Else,
 			plotopts=FilterRules[Flatten[{opts,AxesLabel->axeslabel,PlotStyle->plotstyle,Options[PlotDynamics]}],Options[Plot]];
-			ifplot=Plot[Evaluate[Table[var[x],{var,ifvars}]/.sol],{x,xinit,xfinal},Evaluate[Sequence@@plotopts],PlotRange->plotrange];
+			ifplot=Plot[Evaluate[Table[Tooltip[var[x],ToString[var]],{var,ifvars}]/.sol],{x,xinit,xfinal},Evaluate[Sequence@@plotopts],PlotRange->plotrange];
 			If[plotvariance==True,
 				varplots=DeleteNulls@Table[
 					varvar=var/.{Subscript[x_, i_]->Subscript[Var[x], i],Subscript[x_[n_], i_]->Subscript[Var[x][n], i],x_->Var[x],x_[n_]->Var[x][n]};
@@ -2719,10 +2744,10 @@ RuleListPlot[sol_?RuleListQ,rest___]:=RuleListPlot[{sol},rest];
 
 Options[RuleListPlot]={
 	PlotStyle->Automatic,AxesLabel->Automatic,PlotRange->Automatic,
-	PlotMarkers->{Graphics[{Disk[]},ImageSize->6.5,AlignmentPoint->{0,0}]},
-	StableMarker->{Graphics[{Black,Disk[]},ImageSize->6.5,AlignmentPoint->{0,0}]},
-	UnstableMarker->{Graphics[{EdgeForm[{Black}],FaceForm[White],Disk[]},ImageSize->6.5,AlignmentPoint->{0,0}]},
-	IndeterminateMarker->{Graphics[{EdgeForm[{Black}],FaceForm[Gray],Disk[]},ImageSize->6.5,AlignmentPoint->{0,0}]},
+	PlotMarkers->{Graphics[{Disk[]},ImageSize->8,AlignmentPoint->{0,0},ImagePadding->1]},
+	StableMarker->{Graphics[{Black,Disk[]},ImageSize->8,AlignmentPoint->{0,0},ImagePadding->1]},
+	UnstableMarker->{Graphics[{EdgeForm[{Black}],FaceForm[White],Disk[]},ImageSize->8,AlignmentPoint->{0,0},ImagePadding->1]},
+	IndeterminateMarker->{Graphics[{EdgeForm[{Black}],FaceForm[Gray],Disk[]},ImageSize->8,AlignmentPoint->{0,0},ImagePadding->1]},
 	PlotRangeClipping->False,BoxRatios->1,AspectRatio->1/GoldenRatio
 };
 
@@ -2988,6 +3013,140 @@ Options[NEqual]={SameThreshold->10^-8};
 
 
 NEqual::nedd="Arguments of NEqual have different dimensions.";
+
+
+FindRoots::usage="FindRoots[{f1, f2}, {x, \!\(\*SubscriptBox[\(x\), \(min\)]\), \!\(\*SubscriptBox[\(x\), \(max\)]\)}, {y, \!\(\*SubscriptBox[\(y\), \(min\)]\), \!\(\*SubscriptBox[\(y\), \(max\)]\)}] finds all roots of {f1, f2} in a given range.";
+
+
+(* wrappers for 1D, 2D, 3D functions from mathematica.stackexchange *)
+FindRoots[f_,{x_,xmin_,xmax_},opts___?OptionQ]:=Thread[{x->#}]&/@findAllRoots[f/.(lhs_==rhs_)->rhs-lhs,{x,xmin,xmax},opts];
+FindRoots[{f1_,f2_},{x_,a_,b_},{y_,c_,d_},opts___?OptionQ]:=Thread[{x,y}->#]&/@FindRoots2D[{f1,f2}/.(lhs_==rhs_)->rhs-lhs,{x,a,b},{y,c,d},opts];
+FindRoots[{f1_,f2_,f3_},{x_,a_,b_},{y_,c_,d_},{z_,e_,f_},opts___?OptionQ]:=Thread[{x,y,z}->#]&/@
+	FindAllCrossings3D[{f1,f2,f3}/.(lhs_==rhs_)->rhs-lhs,{x,a,b},{y,c,d},{z,e,f},opts];
+
+
+(* "findAllRoots" by Jens <https://mathematica.stackexchange.com/a/16444/6358> *)
+
+SyntaxInformation[findAllRoots] = {"LocalVariables" -> {"Plot", {2, 2}}, "ArgumentsPattern" -> {_, _, OptionsPattern[]}};
+SetAttributes[findAllRoots, HoldAll];
+
+Options[findAllRoots] = 
+  Join[{"ShowPlot" -> False, PlotRange -> All}, 
+   FilterRules[Options[Plot], Except[PlotRange]]];
+
+findAllRoots[fn_, {l_, lmin_, lmax_}, opts : OptionsPattern[]] := 
+ Module[
+  {pl, p, x, localFunction, brackets},
+  localFunction = ReleaseHold[Hold[fn] /. HoldPattern[l] :> x];
+  If[
+   lmin != lmax,
+   pl = Plot[localFunction, {x, lmin - 2$MachineEpsilon, lmax + 2$MachineEpsilon},
+     Evaluate@
+      FilterRules[Join[{opts}, Options[findAllRoots]], Options[Plot]]
+     ];
+   p = Cases[pl, Line[{x__}] :> x, Infinity];
+   If[OptionValue["ShowPlot"], 
+    Print[Show[pl, PlotLabel -> "Finding roots for this function", 
+      ImageSize -> 200, BaseStyle -> {FontSize -> 8}]]],
+   p = {}
+   ];
+  brackets = Map[
+    First,
+    Select[
+     (* This Split trick pretends that two points on the curve are "equal" if the function values 
+     have _opposite _ sign. Pairs of such sign-changes form the brackets for the subsequent FindRoot *)
+     Split[p, Sign[Last[#2]] == -Sign[Last[#1]] &],
+     Length[#1] == 2 &
+     ],
+    {2}
+    ];
+  Select[Chop[x /. Apply[FindRoot[localFunction == 0, {x, ##1}] &, brackets, {1}] /. x -> {}], lmin-$MachineEpsilon<=#<=lmax+$MachineEpsilon &]
+  ]
+
+
+(* (modified) "FindRoots2D" by Mr. Wizard <https://mathematica.stackexchange.com/a/770/>, based on "FindAllCrossings2D" by Stan Wagon *)
+
+FindRoots2D::usage="FindRoots2D[funcs,{x,a,b},{y,c,d}] finds all nontangential solutions to {f=0, g=0} in the given rectangle.";
+
+Options[FindRoots2D]={PlotPoints->Automatic,MaxRecursion->Automatic};
+
+FindRoots2D[funcs:{f1_,f2_},{x_,a_,b_},{y_,c_,d_},opts:OptionsPattern[]]:=Module[{fZero,seeds,fy=Compile[{x,y},f2]},
+	fZero=ExtractPlotPoints[ContourPlot[f1==0,{x,a-0.8 10^-5(b-a),b+1.1 10^-5(b-a)},{y,c-0.9 10^-5(d-c),d+1.2 10^-5(d-c)},
+		Evaluate@FilterRules[{opts},Options@ContourPlot]]];
+	(*Print[fZero];*)
+	seeds=Pick[Rest@#,Rest[#]Most[#]&@Sign@Apply[fy,#,2],-1]&/@fZero;
+	(*Print[seeds];*)
+	(*Print[{x,y}/. FindRoot[funcs,{x,#},{y,#2}]&@@@Join@@seeds];*)
+	With[{seq=FilterRules[{opts},Options@FindRoot]},
+		Select[Chop@Union[{x,y}/.FindRoot[funcs,{x,#},{y,#2},seq]&@@@Join@@seeds,SameTest->(Norm[#-#2]<1*^-6&)],
+			a-$MachineEpsilon<=#[[1]]<=b+$MachineEpsilon&&c-$MachineEpsilon<=#[[2]]<=d+$MachineEpsilon&]
+	]
+];
+
+
+(* "FindAllCrossings3D" by J.M. <https://mathematica.stackexchange.com/a/11365/> *)
+
+Options[FindAllCrossings3D]=Sort[Join[Options[FindRoot],
+	{MaxRecursion->Automatic,PerformanceGoal:>$PerformanceGoal,PlotPoints->Automatic}
+]];
+
+FindAllCrossings3D[funcs_?VectorQ,{x_,xmin_,xmax_},{y_,ymin_,ymax_},{z_,zmin_,zmax_},opts___]:= Module[{
+	contourData,seeds,roots,tt,fz=Compile[{x,y,z},Evaluate[funcs[[3]]]]}, 
+
+	contourData=ExtractPlotPoints[ContourPlot3D[Evaluate[Most[funcs]],
+		{x,xmin-2$MachineEpsilon,xmax+2$MachineEpsilon},{y,ymin-2$MachineEpsilon,ymax+2$MachineEpsilon},{z,zmin-2$MachineEpsilon,zmax+2$MachineEpsilon},
+		BoundaryStyle->{1->None,2->None,{1,2}->{}},ContourStyle->None,Mesh->None,Method->Automatic,
+		Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[ContourPlot3D]]]]];
+	seeds=Flatten[Pick[Rest[#],Most[#] Rest[#]&@Sign[Apply[fz,#,2]],-1]&/@contourData,1];
+	Return[If[seeds==={},seeds,
+		roots=Union[Map[{x,y,z}/.
+			FindRoot[funcs,Transpose[{{x,y,z},#}],Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[FindRoot]]]]&,seeds]];
+(*Print[roots];*)
+		Select[Chop@roots,
+			(xmin-$MachineEpsilon<=#[[1]]<=xmax+$MachineEpsilon&&ymin-$MachineEpsilon<=#[[2]]<=ymax+$MachineEpsilon&&zmin-$MachineEpsilon<=#[[3]]<=zmax+$MachineEpsilon)&]
+	]];
+];
+
+
+VectorPlot1D::usage="VectorPlot1D[\!\(\*
+StyleBox[\"f\", \"TI\"]\), {\!\(\*
+StyleBox[\"x\", \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\)}] plots arrows in the direction of \!\(\*
+StyleBox[\"f\", \"TI\"]\) from \!\(\*
+StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\) to \!\(\*
+StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\).";
+
+
+VectorPlot1D[func_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{
+vectorpoints,markerwidth,markeraspectratio,markerspacing,
+rt,lt,varrange,w,h},
+
+vectorpoints=Evaluate[VectorPoints/.Flatten[{opts,Options[VectorPlot1D]}]];
+markerwidth=Evaluate[MarkerWidth/.Flatten[{opts,Options[VectorPlot1D]}]];
+If[markerwidth==Automatic,markerwidth=varrange/vectorpoints];
+markeraspectratio=Evaluate[MarkerAspectRatio/.Flatten[{opts,Options[VectorPlot1D]}]];
+markerspacing=Evaluate[MarkerSpacing/.Flatten[{opts,Options[VectorPlot1D]}]];
+
+varrange=varmax-varmin;
+w=(1-markerspacing)markerwidth;
+h=w*markeraspectratio;
+
+(*Print[{w,h}];*)
+
+rt[x_]:=Triangle[{{x+w/2,0},{x-w/2,(h/2)Sqrt[3]/2},{x-w/2,-(h/2)Sqrt[3]/2}}];
+lt[x_]:=Triangle[{{x-w/2,0},{x+w/2,(h/2)Sqrt[3]/2},{x+w/2,-(h/2)Sqrt[3]/2}}];
+	
+Show[Graphics[Table[
+	Which[
+		(func/.var->x)<0&&(func/.var->x-w/2)<0&&(func/.var->x+w/2)<0,lt[x],
+		(func/.var->x)>0&&(func/.var->x-w/2)>0&&(func/.var->x+w/2)>0,rt[x]
+	]
+	,{x,varmin,varmax,varrange/vectorpoints}]],Axes->{True,False}]
+];
+
+
+Options[VectorPlot1D]={VectorPoints->21,MarkerWidth->Automatic,MarkerAspectRatio->0.5,MarkerSpacing->0.5};
 
 
 Set\[ScriptCapitalN][attributes:(_?AttributesQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,interxns,tnsp,pnsp,insp},
@@ -3771,13 +3930,12 @@ StyleBox[\"x\", \"TI\"]\)] returns True if \!\(\*
 StyleBox[\"x\", \"TI\"]\) is a list of G matrices or V variances.";
 
 
-GsQ[list_]:=VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&(
-	MemberQ[{G,V},#[[1,0]]]||
-	MemberQ[{G,V},#[[1,1,0]]]||
-	MemberQ[{Var,Cov},#[[1,1,0,0]]]||
-	MemberQ[{Var,Cov},#[[1,1,0]]]||
-	MemberQ[{Var,Cov},#[[1,0]]]
-)&];
+GsQ[list_]:=Quiet[
+	VectorQ[list,(#[[0]]===Rule||#[[0]]===RuleDelayed)&&(
+		MemberQ[{G,V},#[[1,0]]]||MemberQ[{G,V},#[[1,1,0]]]||
+		MemberQ[{Var,Cov},#[[1,1,0,0]]]||MemberQ[{Var,Cov},#[[1,1,0]]]||MemberQ[{Var,Cov},#[[1,0]]])&]
+	,{Part::partd}
+];
 
 
 InvaderQ::usage=
@@ -4108,19 +4266,17 @@ If[transitionbased,
 
 VPrint[2,"Processing Parameters..."];
 parametersin=Evaluate[Parameters/.Flatten[{model,Options[SetModel]}]];
-parameterstmp=Cases[parametersin,_Symbol|_Symbol[_],\[Infinity]];
-(*Print["parameterstmp=",parameterstmp];*)
-parintervals=InequalityToInterval/@parametersin;
-(*Print["parintervals=",parintervals];*)
-If[Length[parameterstmp]!=Length[parintervals]||MemberQ[parameterstmp,_?BooleanQ],Message[SetModel::badpar];Return[$Failed]];
+(*Print["parametersin=",parametersin];*)
+If[parametersin=!={},
+	{parameters,parintervals}=Transpose[InequalityToInterval[parametersin]/.Element->List]
+];
+(*Print["parameters=",parameters];
+Print["parintervals=",parintervals];*)
 
 (* parameter assumptions *)
 $Assumptions=Select[parametersin,MemberQ[{Greater,GreaterEqual,Less,LessEqual},Head[#]]&];
-parameters=parameterstmp;
 parnames=ToString/@parameters;
-Do[
-	range[parameters[[i]]]=parintervals[[i]]
-,{i,Length[parameters]}];
+Do[range[parameters[[i]]]=parintervals[[i]],{i,Length[parameters]}];
 VPrint[2,"paramaters=",parameters];
 
 (* Guilds *)
@@ -4159,7 +4315,7 @@ Do[
 		(*Print["new traits"];*)
 		gtraits[gu]=Cases[(Traits/.(Guild[gu]/.model)),_Symbol,\[Infinity]];
 		(*Print["gtraits[gu]=",gtraits[gu]];*)
-		ranges=InequalityToInterval/@(Traits/.(Guild[gu]/.model));
+		ranges=(InequalityToInterval/@(Traits/.(Guild[gu]/.model)))[[All,2]];
 		(*Print["ranges=",ranges];*)
 		Do[
 			range[gtraits[gu][[i]]]=ranges[[i]];
@@ -4463,13 +4619,14 @@ UnsetModel::usage=
 
 UnsetModel:=Module[{dvs},
 	modelloaded=False;
-	Clear[LookUp,type,range,comptype,DT,
+	Quiet[Clear[LookUp,type,range,comptype,DT,
 	modeltype,modelwhenevents,modelperiod,moments,
 	pops,npops,npcomps,pcomps,pcompeqn,
 	auxs,nauxs,auxeqn,
 	guilds,nguilds,gcomps,ngcomps,gtraits,ngtraits,
 	eqns,
-	dndt,dxdt,dGdt,assumptionstrings];
+	dndt,dxdt,dGdt,assumptionstrings,
+	parameters],{Clear::wrsym}];
 	dvs={Color,LineStyle,PlotMarker};
 	Unprotect[dvs];
 	Do[DownValues[func]={},{func,dvs}];
@@ -5036,7 +5193,7 @@ Subscript[\[FormalCapitalN], gu_]:=\[FormalCapitalN][gu];
 ClearParameters::usage="ClearParameters clears all model parameters.";
 
 
-ClearParameters:=Clear[Evaluate[Sequence@@EcoEvo`Private`parnames]];
+ClearParameters:=Quiet[Clear[Evaluate[Sequence@@EcoEvo`Private`parnames]],{Clear::wrsym}];
 
 
 ParameterValues::usage="ParameterValues returns a rulelist of current definitions of model parameters.";
@@ -5218,7 +5375,7 @@ StyleBox[\"tmax\", \"TI\"]\)] uses trait values/interaction coefficients \!\(\*
 StyleBox[\"attributes\", \"TI\"]\).";
 
 
-EcoSim[attributesin:(_?AttributesQ):{},init:(_?VariablesQ):{},Gsin:(_?GsQ):{},tmax_?NumericQ,opts___?OptionQ]:=
+EcoSim[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},init:(_?VariablesQ):{},tmax_?NumericQ,opts___?OptionQ]:=
 
 Module[{
 (* options *)
@@ -5305,7 +5462,7 @@ VPrint[3,"ics=",ics];
 Which[
 	modeltype=="ContinuousTime",
 	Off[NDSolve::wenset]; (* in case a modelwhenevent involves a fixed variable *)
-	If[verbose,
+	If[verbosity>=1,
 		With[{ndsolveeqns=Join[eqns,ics,modelwhenevents,whenevents],unks=unks,outputtmin=outputtmin,options=Sequence@@ndsolveopts},
 			PrintCall[Global`sol=NDSolve[ndsolveeqns,unks,{t,outputtmin,tmax},options][[1]]]
 	]];
@@ -5323,7 +5480,7 @@ Which[
 	res=Join[res,Table[fixedvar->Interpolation[{{tmin,fixedvar/.fixed},{tmax,fixedvar/.fixed}},InterpolationOrder->0],{fixedvar,fixedvars}]];
 	,
 	modeltype=="DiscreteTime",
-	If[verbose,
+	If[verbosity>=1,
 		With[{rteqns=Join[eqns,ics],unks=unks,tmin=tmin},
 			PrintCall[Global`res=RecurrenceTable[rteqns,unks,{t,tmin,tmax}]]
 	]];
@@ -5350,7 +5507,7 @@ EqStop->False,EqThreshold->10^-8,TimeScale->1,TMin->0,OutputTMin->Automatic,Outp
 
 (* split traitsandvariables *)
 EcoSim[sol_?AttributesVariablesAndGsQ,tmax_?NumericQ,opts___?OptionQ]:=
-EcoSim[ExtractTraits[sol],ExtractVariables[sol],ExtractVarCovs[sol],tmax,opts];
+EcoSim[ExtractTraits[sol],ExtractVarCovs[sol],ExtractVariables[sol],tmax,opts];
 EcoSim[sol_?AttributesAndVariablesQ,tmax_?NumericQ,opts___?OptionQ]:=
 EcoSim[ExtractTraits[sol],ExtractVariables[sol],tmax,opts];
 
@@ -5408,11 +5565,12 @@ StyleBox[\"attributes\", \"TI\"]\) and initial guess \!\(\*
 StyleBox[\"init\", \"TI\"]\).";
 
 
-EcoEq[attributesin:(_?AttributesQ):{},init:(_?VariablesQ):{},Gsin:(_?GsQ):{},vars:(_List|All):All,opts___?OptionQ]:=
+EcoEq[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},init:(_?VariablesQ):{},vars:(__List|All):All,opts___?OptionQ]:=
 
 Module[{
 (* options *)
-method,solveopts,nsolveopts,findrootopts,boundarydetection,time,fixed,chop,qss,percapita,verbose,ignorevar,
+method,solveopts,nsolveopts,findrootopts,findrootsopts,
+boundarydetection,time,fixed,chop,qss,percapita,verbose,ignorevar,
 (* other variables *)
 attributes,nonvars,nonfixedvars,fixedvars,Gs,removets,eqns,unks,newunk,sol,res},
 
@@ -5436,9 +5594,10 @@ If[method===Automatic,If[init!={},method="FindRoot",method="Solve"]];
 VPrint[3,"method=",method];
 
 solveopts=Evaluate[SolveOpts/.Flatten[{opts,Options[EcoEq]}]];
-If[(*13.0>*)$VersionNumber>=12.2,AppendTo[solveopts,Assumptions->{}]]; (* need to check these versions *)
 nsolveopts=Evaluate[NSolveOpts/.Flatten[{opts,Options[EcoEq]}]];
 findrootopts=Evaluate[FindRootOpts/.Flatten[{opts,Options[EcoEq]}]];
+findrootsopts=Evaluate[FindRootsOpts/.Flatten[{opts,Options[EcoEq]}]];
+
 boundarydetection=Evaluate[BoundaryDetection/.Flatten[{opts,Options[EcoEq]}]];
 time=Evaluate[Time/.Flatten[{opts,Options[EcoEq]}]];
 chop=Evaluate[Chop/.Flatten[{opts,Options[EcoEq]}]];
@@ -5459,7 +5618,7 @@ VPrint[3,"\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];
 
 (* expand Gs *)
 VPrint[3,"Gsin=",Gsin];
-If[method=="FindRoot",
+If[method=="FindRoot"||method=="FindRoots",
 	If[moments,
 		If[Gsin==={},Gs=ZeroGs,Gs=ExpandGs[Gsin,Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}]]],
 		Gs={}]
@@ -5484,38 +5643,42 @@ fixedvars=fixed[[All,1]];
 nonfixedvars=OrderedComplement[AllVariables,fixedvars];
 VPrint[3,"nonfixedvars=",nonfixedvars];
 
-(* set eqns, unks and ics *)
+(* set eqns *)
 eqns=EcoEqns[attributes,Fixed->fixed,PerCapita->percapita,IgnoreVar->ignorevar]/.Eq/.t->time/.fixed/.attributes/.Gs;
+VPrint[3,"eqns=",eqns];
 
+(* solve it *)
 Which[
-	MemberQ[{"Solve","NSolve"},method],
-	unks=nonfixedvars
-,
+	method=="Solve",
+	unks=nonfixedvars;
+	VPrint[3,"unks=",unks];
+	If[verbosity>=1,
+		With[{eqns=eqns,unks=unks,options=Sequence@@solveopts},PrintCall[Global`sol=Solve[eqns,unks,options]]]];
+	sol=Solve[eqns,unks,Evaluate[Sequence@@solveopts]],
+
+	method=="NSolve",
+	unks=nonfixedvars;
+	VPrint[3,"unks=",unks];
+	If[verbosity>=1,
+		With[{eqns=eqns,unks=unks,options=Sequence@@nsolveopts},PrintCall[Global`sol=NSolve[eqns,unks,options]]]];
+	sol=NSolve[eqns,unks,Evaluate[Sequence@@nsolveopts]],
+
 	method=="FindRoot",
 	unks=Table[
 		newunk={var,(var/.Append[init,var->0])};
 		If[boundarydetection,newunk=Join[newunk,{Min[range[var]],Max[range[var]]}]];
-		newunk,{var,nonfixedvars}]
-];
-
-VPrint[3,"eqns=",eqns];
-VPrint[3,"unks=",unks];
-
-(* solve it *)
-
-Which[
-	method=="Solve",
-	If[verbosity>=1,
-		With[{eqns=eqns,unks=unks,options=Sequence@@solveopts},PrintCall[Global`sol=Solve[eqns,unks,options]]]];
-	sol=Solve[eqns,unks,Evaluate[Sequence@@solveopts]],
-	method=="NSolve",
-	If[verbosity>=1,
-		With[{eqns=eqns,unks=unks,options=Sequence@@nsolveopts},PrintCall[Global`sol=NSolve[eqns,unks,options]]]];
-	sol=NSolve[eqns,unks,Evaluate[Sequence@@nsolveopts]],
-	method=="FindRoot",
+		newunk,{var,nonfixedvars}];
+	VPrint[3,"unks=",unks];
 	If[verbosity>=1,
 		With[{eqns=eqns,unks=unks,options=Sequence@@findrootopts},PrintCall[Global`sol=FindRoot[eqns,unks,options]]]];
 	sol=FindRoot[eqns,unks,Evaluate[Sequence@@findrootopts]],
+
+	method=="FindRoots",
+	unks=vars;
+	VPrint[3,"unks=",unks];
+	If[verbosity>=1,
+		With[{eqns=eqns,unks=unks,options=Sequence@@findrootsopts},PrintCall[Global`sol=FindRoots[eqns,unks,options]]]];
+	sol=FindRoots[eqns,unks,Evaluate[Sequence@@findrootsopts]],
 	Else,
 	Message[EcoEq::badmtd];Return[$Failed];
 ];
@@ -5525,7 +5688,7 @@ If[MemberQ[{Solve,NSolve},Head[sol]],Message[EcoEq::nosol,Head[sol]];Return[$Fai
 
 (* add in Fixed variables *)
 Which[
-	MemberQ[{"Solve","NSolve"},method],
+	MemberQ[{"Solve","NSolve","FindRoots"},method],
 	res=Join[DeleteCases[fixed,var_->var_],#]& /@ sol,
 	method=="FindRoot",
 	res=Join[DeleteCases[fixed,var_->var_],sol]
@@ -5539,27 +5702,30 @@ If[chop,
 ]];
 
 
-Options[EcoEq]={Method->Automatic,SolveOpts->{(*Reals,*)},NSolveOpts->{(*Reals,*)Method->"EndomorphismMatrix"},FindRootOpts->{},
+Options[EcoEq]={Method->Automatic,
+SolveOpts->{},NSolveOpts->{Method->"EndomorphismMatrix"},FindRootOpts->{},FindRootsOpts->{},
 PerCapita->False,Fixed->{},Chop->True,QSS->False,Time->t,Verbose->False,Verbosity->0,IgnoreVar->False};
-
-
-SolveEcoEq[args___]:=EcoEq[args,Method->"Solve"];
-NSolveEcoEq[args___]:=EcoEq[args,Method->"NSolve"];
-FindEcoEq[args___]:=EcoEq[args,Method->"FindRoot"];
 
 
 (* break up combined traitsandpops *)
 SolveEcoEq[sol_?AttributesAndGsQ,opts___?OptionQ]:=SolveEcoEq[ExtractAttributes[sol],ExtractVarCovs[sol],opts];
 NSolveEcoEq[sol_?AttributesAndGsQ,opts___?OptionQ]:=NSolveEcoEq[ExtractAttributes[sol],ExtractVarCovs[sol],opts];
-FindEcoEq[sol_?AttributesVariablesAndGsQ,opts___?OptionQ]:=
-FindEcoEq[ExtractAttributes[sol],ExtractVariables[sol],ExtractVarCovs[sol],opts];
-FindEcoEq[sol_?AttributesAndVariablesQ,opts___?OptionQ]:=
-FindEcoEq[ExtractAttributes[sol],ExtractVariables[sol],opts];
+FindEcoEq[sol_?AttributesVariablesAndGsQ,opts___?OptionQ]:=((*Print["breaking AVG"];*)FindEcoEq[ExtractAttributes[sol],ExtractVarCovs[sol],ExtractVariables[sol],opts]);
+FindEcoEq[sol_?AttributesAndVariablesQ,opts___?OptionQ]:=FindEcoEq[ExtractAttributes[sol],ExtractVariables[sol],opts];
+
+
+SolveEcoEq[args___]:=EcoEq[args,Method->"Solve"];
+NSolveEcoEq[args___]:=EcoEq[args,Method->"NSolve"];
+FindEcoEq[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},init:(_?VariablesQ):{},opts___?OptionQ]:=
+	EcoEq[attributesin,Gsin,init,opts,Method->"FindRoot"];
+FindEcoEq[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},vars__List,opts___?OptionQ]:=
+	EcoEq[attributesin,Gsin,vars,opts,Method->"FindRoots"];
 
 
 EcoEq::noneq=
 "Can't find equilibrium of periodically forced model with FindRoot.  Give Time option or try FindEcoCycle instead.";
 EcoEq::nosol="`1` couldn't find a solution.  Try FindEcoEq instead.";
+EcoEq::badmtd="Method is not known (\"Solve\",\"NSolve\",\"FindRoot\",\"FindRoots\").";
 
 
 FindEcoCycle::usage = 
@@ -5671,13 +5837,13 @@ If[method==="EcoSim",
 
 	(* warmup #1 to get on limit cycle *)
 	ics2=If[warmup1>0,
-		FinalSlice[EcoSim[attributes,variables,Gs,warmup1,Fixed->fixed,Evaluate[Sequence@@ecosimopts]]],
+		FinalSlice[EcoSim[attributes,Gs,variables,warmup1,Fixed->fixed,Evaluate[Sequence@@ecosimopts]]],
 		variables];
 	VPrint[1,"ics2=",ics2];
 	
 	(* warmup #2 to find maxima *)
 	extrema={};
-	EcoSim[attributes,ics2,Gs,warmup2,WhenEvents->{
+	EcoSim[attributes,Gs,ics2,warmup2,WhenEvents->{
 		WhenEvent[event,AppendTo[extrema,Table[var[t],{var,nonfixedvars}]],Evaluate[Sequence@@wheneventopts]]
 		/.event->(triggervar'[t]==0)},Fixed->fixed,Evaluate[Sequence@@ecosimopts]];
 
@@ -5688,13 +5854,13 @@ If[method==="EcoSim",
 	VPrint[1,"ics3=",ics3];
 	
 	(* warmup #3 to move a wee bit beyond the maximum *)
-	ics4=FinalSlice[EcoSim[attributes,ics3,Gs,warmup3,Fixed->fixed,Evaluate[Sequence@@ecosimopts]]];
+	ics4=FinalSlice[EcoSim[attributes,Gs,ics3,warmup3,Fixed->fixed,Evaluate[Sequence@@ecosimopts]]];
 
 	VPrint[1,"ics4=",ics4];
 
 	Do[
 		triggerval=triggervar/.ics4;
-		sol=EcoSim[attributes,ics4,Gs,tmax,WhenEvents->{
+		sol=EcoSim[attributes,Gs,ics4,tmax,WhenEvents->{
 			WhenEvent[event,"StopIntegration",Evaluate[Sequence@@wheneventopts]]
 			/.event->(triggervar[t]<triggerval)},Fixed->fixed,Evaluate[Sequence@@ecosimopts]];
 
@@ -5743,7 +5909,7 @@ thing[ps_?NumericListQ]:=Module[{popz,rez},
 	$FindEcoCycleSteps++;
 	If[(modeltype=="ContinuousTime"&&modelperiod==0),tmax=ps[[-1]],tmax=per];
 	popz=Table[If[logd[[i]],nonfixedvars[[i]]->E^ps[[i]],nonfixedvars[[i]]->ps[[i]]],{i,Length[nonfixedvars]}];
-	sol=EcoSim[attributes,popz,Gs,tmax,Fixed->fixed,Evaluate[Sequence@@ecosimopts],Logged->logged];
+	sol=EcoSim[attributes,Gs,popz,tmax,Fixed->fixed,Evaluate[Sequence@@ecosimopts],Logged->logged];
 	rez=vars/.FinalSlice[sol];
 	If[(modeltype=="ContinuousTime"&&modelperiod==0),AppendTo[rez,ps[[-1]]]];
 	If[printtrace,Print[$FindEcoCycleSteps,": ",FinalSlice[sol]]];
@@ -5825,10 +5991,10 @@ StyleBox[\"attributes\", \"TI\"]\).";
 
 
 (* make listable across pops *)
-EcoJacobian[attributes:(_?AttributesQ):{},variables_?ListOfVariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=(EcoJacobian[attributes,#,Gsin,opts]&/@variables);
+EcoJacobian[attributes:(_?AttributesQ):{},Gsin:(_?GsQ):{},variables_?ListOfVariablesQ,opts___?OptionQ]:=(EcoJacobian[attributes,Gsin,#,opts]&/@variables);
 
 
-EcoJacobian[attributesin:(_?AttributesQ):{},variables:(_?VariablesQ):{},Gsin:(_?GsQ):{},opts___?OptionQ]:=
+EcoJacobian[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},variables:(_?VariablesQ):{},opts___?OptionQ]:=
 
 Module[{
 (* options *)
@@ -5866,7 +6032,12 @@ VPrint[3,"\[ScriptCapitalN]=",Table[\[ScriptCapitalN][gu],{gu,guilds}]];
 
 (* expand Gs *)
 VPrint[3,"Gsin=",Gsin];
-Gs=ExpandGs[Gsin,Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}]];
+If[moments,
+	If[Join[Gsin,ExtractVarCovs[attributesin]]==={},Gs=ZeroGs,Gs=ExpandGs[Gsin,Table[\[FormalCapitalN][gu]->\[ScriptCapitalN][gu],{gu,guilds}]]],
+	Gs={}
+];
+
+(*Gs=ExpandGs[Gsin,Table[\[FormalCapitalN][gu]\[Rule]\[ScriptCapitalN][gu],{gu,guilds}]];*)
 VPrint[3,"Gs=",Gs];
 
 eqns=EcoEqns[attributes,opts]/.RHS/.Gs/.t->time;
@@ -5919,10 +6090,10 @@ StyleBox[\"attributes\", \"TI\"]\).";
 
 
 (* make listable across pops *)
-EcoEigenvalues[attributes:(_?AttributesQ):{},variables_?ListOfVariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=(EcoEigenvalues[attributes,#,Gsin,opts]&/@variables);
+EcoEigenvalues[attributes:(_?AttributesQ):{},Gsin:(_?GsQ):{},variables_?ListOfVariablesQ,opts___?OptionQ]:=(EcoEigenvalues[attributes,Gsin,#,opts]&/@variables);
 
 
-EcoEigenvalues[attributesin:(_?AttributesQ):{},variables:(_?VariablesQ):{},Gsin:(_?GsQ):{},opts___?OptionQ]:=
+EcoEigenvalues[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},variables:(_?VariablesQ):{},opts___?OptionQ]:=
 
 Module[{
 (* options *)
@@ -5954,7 +6125,7 @@ ignorevar=Evaluate[IgnoreVar/.Flatten[{opts,Options[EcoEigenvalues]}]];
 
 attributes=FixAttributes[attributesin];
 
-j=EcoJacobian[attributes,variables,Gsin,Time->time,Fixed->fixed,IgnoreVar->ignorevar];
+j=EcoJacobian[attributes,Gsin,variables,Time->time,Fixed->fixed,IgnoreVar->ignorevar];
 VPrint[1,"j=",j];
 
 Which[
@@ -6001,10 +6172,10 @@ StyleBox[\"attributes\", \"TI\"]\).";
 
 
 (* make listable across variables *)
-EcoStableQ[attributes:(_?AttributesQ):{},variables_?ListOfVariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=(EcoStableQ[attributes,#,Gsin,opts]&/@variables);
+EcoStableQ[attributes:(_?AttributesQ):{},Gsin:(_?GsQ):{},variables_?ListOfVariablesQ,opts___?OptionQ]:=(EcoStableQ[attributes,Gsin,#,opts]&/@variables);
 
 
-EcoStableQ[attributesin:(_?AttributesQ):{},variables:(_?VariablesQ):{},Gsin:(_?GsQ):{},opts___?OptionQ]:=
+EcoStableQ[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},variables:(_?VariablesQ):{},opts___?OptionQ]:=
 
 Module[{
 (* options *)
@@ -6049,11 +6220,11 @@ If[method===Automatic,
 
 Which[
 	method=="RouthHurwitz",
-	j=EcoJacobian[attributes,variables,Gsin,Time->time,Fixed->fixed,IgnoreVar->ignorevar];
+	j=EcoJacobian[attributes,Gsin,variables,Time->time,Fixed->fixed,IgnoreVar->ignorevar];
 	res=RouthHurwitzCriteria[j];
 ,
 	method=="Eigenvalues",
-	evs=EcoEigenvalues[attributes,variables,Gsin,Time->time,Fixed->fixed,IgnoreVar->ignorevar,Evaluate[Sequence@@ecoeigenvaluesopts]];
+	evs=EcoEigenvalues[attributes,Gsin,variables,Time->time,Fixed->fixed,IgnoreVar->ignorevar,Evaluate[Sequence@@ecoeigenvaluesopts]];
 	VPrint[1,"evs=",evs];
 	If[tolerance===Automatic,If[NumericQ[Max[Re[evs]]],tolerance=10^-8,tolerance=0]];
 	(*Print["tolerance=",tolerance];*)
@@ -6111,14 +6282,14 @@ StyleBox[\"sol\", \"TI\"]\)] uses trait values/interaction coefficients \!\(\*
 StyleBox[\"attributes\", \"TI\"]\).";
 
 
-SelectEcoStable[attributes:(_?AttributesQ):{},sol_?ListOfVariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=
+SelectEcoStable[attributes:(_?AttributesQ):{},Gsin:(_?GsQ):{},sol_?ListOfVariablesQ,opts___?OptionQ]:=
 Module[{stableqopts},
 
 If[modelloaded!=True,Message[EcoEvoGeneral::nomodel];Return[$Failed]];
 
 stableqopts=FilterRules[Flatten[{opts,Options[SelectEcoStable]}],Options[EcoStableQ]];
 
-Return[Select[sol,EcoStableQ[attributes,#,Gsin,Evaluate[Sequence@@stableqopts]]&]]
+Return[Select[sol,EcoStableQ[attributes,Gsin,#,Evaluate[Sequence@@stableqopts]]&]]
 
 ];
 
@@ -6144,7 +6315,7 @@ StyleBox[\"attributes\", \"TI\"]\) and \!\(\*
 StyleBox[\"init\", \"TI\"]\).";
 
 
-FindEcoAttractor[attributesin:(_?AttributesQ):{},variables:(_?VariablesQ):{},Gsin:(_?GsQ):{},vars:(_List|All):All,opts___?OptionQ]:=
+FindEcoAttractor[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},variables:(_?VariablesQ):{},vars:(_List|All):All,opts___?OptionQ]:=
 
 Module[{
 (*options*)
@@ -6260,17 +6431,17 @@ If[method=="FindEcoEq",
 		VPrint[1,"Warming Up..."];
 		If[verbosity>=1,
 			With[{warmup=warmup,time=time,attributes=attributes,Gs=Gs,options=Sequence@@ecosimopts},
-				PrintCall[Global`ics=FinalSlice[EcoSim[attributes,variables,Gs,warmup,Time->time,options]]]]
+				PrintCall[Global`ics=FinalSlice[EcoSim[attributes,Gs,variables,warmup,Time->time,options]]]]
 		];
-		ics=FinalSlice[EcoSim[attributes,variables,Gs,warmup,Time->time,Evaluate[Sequence@@ecosimopts]]];
+		ics=FinalSlice[EcoSim[attributes,Gs,variables,warmup,Time->time,Evaluate[Sequence@@ecosimopts]]];
 	, (* else *)
 		ics=variables;
 	];
 	If[verbosity>=1,
 		With[{ics=ics,time=time,attributes=attributes,Gs=Gs,options=Sequence@@findecoeqopts},
-			PrintCall[Global`eq=FindEcoEq[attributes,ics,Gs,Time->time,options]]]
+			PrintCall[Global`eq=FindEcoEq[attributes,Gs,ics,Time->time,options]]]
 	];
-	eq={FindEcoEq[attributes,ics,Gs,Time->time,Evaluate[Sequence@@findecoeqopts]]};
+	eq={FindEcoEq[attributes,Gs,ics,Time->time,Evaluate[Sequence@@findecoeqopts]]};
 
 	(* try more initial conditions if required *)
 
@@ -6280,9 +6451,9 @@ If[method=="FindEcoEq",
 			ics=ReplacePart[#,2->#[[2]]*10^RandomReal[{-1,1}]]& /@ variables;
 			If[verbosity>=1,
 				With[{ics=ics,time=time,attributes=attributes,Gs=Gs,options=Sequence@@findecoeqopts},
-					PrintCall[Global`tmp=FindEcoEq[attributes,ics,Gs,Time->time,options]]]
+					PrintCall[Global`tmp=FindEcoEq[attributes,Gs,ics,Time->time,options]]]
 			];
-			tmp=FindEcoEq[attributes,ics,Gs,Time->time,Evaluate[Sequence@@findecoeqopts]];
+			tmp=FindEcoEq[attributes,Gs,ics,Time->time,Evaluate[Sequence@@findecoeqopts]];
 			(* if distinct eq, add to tmp *)
 			If[tmp!={},
 				If[CompoundAnd[Table[RuleListDistance[tmp,bar,DistanceFunction->ChessboardDistance]>eqtolerance,{bar,eq}]],AppendTo[eq,tmp]];
@@ -6340,9 +6511,9 @@ If[method=="FindEcoCycle",
 			VPrint[1,"Warming up..."];
 			If[verbosity>=1,
 				With[{warmup=warmup,per=per,time=time,attributes=attributes,Gs=Gs,options=Sequence@@ecosimopts},
-					PrintCall[Global`ics=FinalSlice[EcoSim[attributes,variables,Gs,Floor[warmup,per],Time->time,options]]]]
+					PrintCall[Global`ics=FinalSlice[EcoSim[attributes,Gs,variables,Floor[warmup,per],Time->time,options]]]]
 			];
-			ics=FinalSlice[EcoSim[attributes,variables,Gs,Floor[warmup,per],Time->time,Evaluate[Sequence@@ecosimopts]]];
+			ics=FinalSlice[EcoSim[attributes,Gs,variables,Floor[warmup,per],Time->time,Evaluate[Sequence@@ecosimopts]]];
 		, (* else *)
 			ics=variables;
 		],
@@ -6393,7 +6564,7 @@ If[teststability,
 	If[!ListQ[eq]||eq=={}||eq==={$Failed}, (* in case of Solve/NSolve or FindEcoCycle failure *)
 		stableeq={}
 	,
-		stableeq=SelectEcoStable[attributes,valideq,Gs,Time->time,Fixed->fixed,IgnoreVar->ignorevar];
+		stableeq=SelectEcoStable[attributes,Gs,valideq,Time->time,Fixed->fixed,IgnoreVar->ignorevar];
 		VPrint[1,"stableeq=",stableeq];
 	]
 ,
@@ -6406,7 +6577,7 @@ If[Length[stableeq]==0, (* no stable eq, try EcoSim once *)
 		method="EcoSim"
 	,
 		Message[FindEcoAttractor::giveup];
-		Return[EcoSim[attributes,FinalSlice[essol],Gs,finaltmax,Time->time,Evaluate[Sequence@@ecosimopts]]]
+		Return[EcoSim[attributes,Gs,FinalSlice[essol],finaltmax,Time->time,Evaluate[Sequence@@ecosimopts]]]
 	]
 ];
 If[Length[stableeq]==1,res=stableeq[[1]];Goto[done]]; (* successful *)
@@ -6426,10 +6597,10 @@ If[method=="EcoSim",
 	
 	If[verbosity>=1,
 		With[{ics=ics,tmax=tmax,time=time,attributes=attributes,Gs=Gs,options=Sequence@@ecosimopts},
-			PrintCall[Global`essol=EcoSim[attributes,ics,Gs,tmax,Time->time,options]]]
+			PrintCall[Global`essol=EcoSim[attributes,Gs,ics,tmax,Time->time,options]]]
 	];
 
-	Global`essol=essol=EcoSim[attributes,ics,Gs,tmax,Time->time,Evaluate[Sequence@@ecosimopts]];
+	Global`essol=essol=EcoSim[attributes,Gs,ics,tmax,Time->time,Evaluate[Sequence@@ecosimopts]];
 	VPrint[1,PlotDynamics[essol]];
 	
 	(* if aperiodically forced, we're done *)
@@ -6531,7 +6702,7 @@ Module[{
 (* options *)
 verbose,fixed,time,percapita,isoclinestyle,framelabel,contourplotopts,ignorevar,
 (* other variables *)
-attributes,Gs,fixedvars,nonfixedvars,lookup1,lookup2,style1,style2,label1,label2,g,res},
+attributes,Gs,fixedvars,nonfixedvars,lookup1,lookup2,style1,style2,label1,label2,g,res1,res2},
 
 Block[{\[ScriptCapitalN],verbosity,func="PlotEcoIsoclines"},
 
@@ -6605,24 +6776,29 @@ Do[
 ,{var,AllPopsAndAuxs}];
 
 contourplotopts=FilterRules[Flatten[{opts,ContourShading->None,Options[PlotEcoIsoclines]}],Options[ContourPlot]];
-(*Print[contourplotopts];*)
+(*Print["contourplotopts=",contourplotopts];*)
 
 g=(EcoEqns[attributes,Fixed->fixed,NonFixedVars->nonfixedvars,IgnoreVar->ignorevar,opts]/.RHS/.Gs/.{t->time})
 	-Which[modeltype=="DiscreteTime"&&percapita==False,{var1,var2},modeltype=="DiscreteTime"&&percapita==True,{1,1},Else,{0,0}];
 VPrint[1,"g=",g];
 
-res=ContourPlot[{g[[1]]==0,g[[2]]==0},{var1,var1min-10^-10,var1max},{var2,var2min-10^-10,var2max},
-	ContourStyle->{style1,style2},Evaluate[Sequence@@contourplotopts],FrameLabel->framelabel];
+res1=ContourPlot[g[[1]]==0,{var1,var1min-10^-8(var1max-var1min),var1max},{var2,var2min-10^-8(var2max-var2min),var2max},
+	ContourStyle->style1,Evaluate[Sequence@@contourplotopts],FrameLabel->framelabel,
+	ContourLabels->{None,Tooltip[Null,DisplayForm[OverDot[var1]==0]]&}];
 	
+res2=ContourPlot[g[[2]]==0,{var1,var1min-10^-8(var1max-var1min),var1max},{var2,var2min-10^-8(var2max-var2min),var2max},
+	ContourStyle->style2,Evaluate[Sequence@@contourplotopts],FrameLabel->framelabel,
+	ContourLabels->{None,Tooltip[Null,DisplayForm[OverDot[var2]==0]]&}];
+
 If[monitor,NotebookClose[nb]];
 
-Return[res]
+Return[Show[res1,res2]]
 
 ]];
 
 
 Options[PlotEcoIsoclines]={Verbose->False,Verbosity->0,
-Time->t,PerCapita->False,Fixed->{},IgnoreVar->False,IsoclineStyle->Automatic,FrameLabel->Automatic,MaxRecursion->3};
+Time->t,PerCapita->False,Fixed->{},IgnoreVar->False,IsoclineStyle->Automatic,FrameLabel->Automatic,MaxRecursion->5};
 
 
 PlotEcoStreams::usage =
@@ -6741,9 +6917,12 @@ StyleBox[\"attributes\", \"TI\"]\).";
 
 PlotEcoPhasePlane[attributes:(_?AttributesQ):{},Gsin:(_?GsQ):{},{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},opts___?OptionQ]:=
 
-Module[{
+Module[{eq,Gs,
 (* options *)
-plotecoisoclinesopts,plotecostreamsopts},
+findecoeqopts,plotecoisoclinesopts,plotecostreamsopts,ecostableqopts,rulelistplotopts,
+verbose},
+
+Block[{verbosity},
 
 (* handle options *)
 
@@ -6753,16 +6932,42 @@ plotecoisoclinesopts=FilterRules[
 plotecostreamsopts=FilterRules[
 	Flatten[{Evaluate[PlotEcoStreamsOpts/.Flatten[{opts,Options[PlotEcoPhasePlane]}]],opts,Options[PlotEcoPhasePlane]}],
 	Join[Options[PlotEcoStreams],Options[StreamPlot]]];
+findecoeqopts=FilterRules[
+	Flatten[{Evaluate[FindEcoEqOpts/.Flatten[{opts,Options[PlotEcoPhasePlane]}]],opts,Options[PlotEcoPhasePlane]}],
+	Options[EcoEq]];
+ecostableqopts=FilterRules[
+	Flatten[{Evaluate[EcoStableQOpts/.Flatten[{opts,Options[PlotEcoPhasePlane]}]],opts,Options[PlotEcoPhasePlane]}],
+	Options[EcoStableQ]];
+rulelistplotopts=Evaluate[RuleListPlotOpts/.Flatten[{opts,Options[PlotEcoPhasePlane]}]];
+	
+(* set verbosity *)
 
-Return[Show[
-	PlotEcoStreams[attributes,Gsin,{var1,var1min,var1max},{var2,var2min,var2max},Evaluate[Sequence@@plotecostreamsopts]],
-	PlotEcoIsoclines[attributes,Gsin,{var1,var1min,var1max},{var2,var2min,var2max},Evaluate[Sequence@@plotecoisoclinesopts]]
-]]
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[PlotEcoPhasePlane]}]];
+If[verbose,
+	verbosity=Max[1,Evaluate[Verbosity/.Flatten[{opts,Options[PlotEcoPhasePlane]}]]],
+	verbosity=Evaluate[Verbosity/.Flatten[{opts,Options[PlotEcoPhasePlane]}]]
 ];
+If[IntegerQ[Global`$verbosity],verbosity=Max[Global`$verbosity,verbosity]];
+
+eq=FindEcoEq[attributes,Gsin,{var1,var1min,var1max},{var2,var2min,var2max},findecoeqopts];
+VPrint[1,"eq=",eq];
+
+Return[Show[DeleteNulls[{
+	PlotEcoStreams[attributes,Gsin,{var1,var1min,var1max},{var2,var2min,var2max},Evaluate[Sequence@@plotecostreamsopts]],
+	PlotEcoIsoclines[attributes,Gsin,{var1,var1min,var1max},{var2,var2min,var2max},Evaluate[Sequence@@plotecoisoclinesopts]],
+	If[eq!={},
+		RuleListPlot[eq,{var1,var2},PlotMarkers->EcoStableQ[attributes,Gsin,eq,Evaluate[Sequence@@ecostableqopts]],
+		Evaluate[Sequence@@rulelistplotopts]]
+	]
+}]]]
+
+]];
 
 
 Options[PlotEcoPhasePlane]={
-Fixed->{},Time->t,FrameLabel->Automatic,PlotEcoIsoclinesOpts->{},PlotEcoStreamsOpts->{}};
+Fixed->{},Time->t,FrameLabel->Automatic,
+PlotEcoIsoclinesOpts->{},PlotEcoStreamsOpts->{},EcoStableQOpts->{},RuleListPlotOpts->{},FindEcoEqOpts->{},
+Verbose->False,Verbosity->0};
 
 
 PrestonPlot::usage =
@@ -10461,7 +10666,7 @@ If[boundarydetection==True,
 		modeltype=="ContinuousTime",
 		bdwhens=Flatten[WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.(evoeqns/.(var_'[t]==rhs_):>{
 			{event->var[t]>Max[range[var/.FromUnks]],action->in[var][t]->0},
-			{event->var[t]<Min[range[var]/.FromUnks],action->in[var][t]->0},
+			{event->var[t]<Min[range[var/.FromUnks]],action->in[var][t]->0},
 			{event->rhs>0&&var[t]==Min[range[var/.FromUnks]],action->in[var][t]->1},
 			{event->rhs<0&&var[t]==Max[range[var/.FromUnks]],action->in[var][t]->1}
 		}),1];
@@ -10867,7 +11072,7 @@ StyleBox[\"varcovars\", \"TI\"]\).";
 
 
 (* Periodic system *)
-FindEcoEvoCycle[traitsin_?TraitsQ,variablesin_?VariablesQ,Gs:(_?GsQ):{},opts___?OptionQ]:=
+FindEcoEvoCycle[traitsin_?TraitsQ,Gs:(_?GsQ):{},variablesin_?VariablesQ,opts___?OptionQ]:=
 
 Module[{
 func=FuncStyle["FindEcoEvoCycle (Periodic)"],
@@ -11182,7 +11387,7 @@ FindEvoEq[args___]:=EvoEq[args,Method->"FindRoot"];
 
 Options[EvoEq]={
 Method->"None",
-DelayDInv->False,DInvOpts->{},SolveOpts->{},NSolveOpts->{},FindRootOpts->{},FindInstanceOpts->{Reals},
+DelayDInv->False,DInvOpts->{},SolveOpts->{Reals},NSolveOpts->{Reals},FindRootOpts->{},FindInstanceOpts->{Reals},
 BoundaryDetection->False,Fixed->{},
 Verbose->False,VerboseAll->False};
 
