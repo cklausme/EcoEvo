@@ -5294,7 +5294,9 @@ If[zerogrowthby===None,
 	zeroedvars={},
 	zeroedvars=Which[
 		LookUp[zerogrowthby][[1]]=="gcomp",
-		Table[Subscript[gcomp, LookUp[zerogrowthby][[4]]],{gcomp,gcomps[LookUp[zerogrowthby][[2]]]}]
+		Table[Subscript[gcomp, LookUp[zerogrowthby][[4]]],{gcomp,gcomps[LookUp[zerogrowthby][[2]]]}],
+		LookUp[zerogrowthby][[1]]=="pcomp",
+		pcomps[LookUp[zerogrowthby][[2]]]
 	]
 ];
 (*Print["zeroedvars=",zeroedvars];*)
