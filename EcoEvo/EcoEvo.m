@@ -352,7 +352,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0X (September 11, 2022)";
+$EcoEvoVersion="1.7.0 (September 12, 2022)";
 
 
 modelloaded=False;
@@ -431,19 +431,9 @@ SetAttributes[RuleListSet,HoldAll];
 RuleListSet[rulelist:{__Rule}]:=(Set@@@Unevaluated[rulelist];)
 
 
-InequalityToInterval::usage="InequalityToInterval converts an inequality to an Interval.";
-
-
-(* based on <https://mathematica.stackexchange.com/a/32473/> by Kuba *)
-(*InequalityToInterval[ineq_]:=
-Replace[
-	Fold[
-		ReplaceAll[#,#2]&,
-		ineq//LogicalExpand,
-		{i_[s_?NumericQ,f_]\[RuleDelayed]Reduce[i[s,f]],{i_[s_,f_?NumericQ]\[RuleDelayed]Which[MemberQ[{Greater,GreaterEqual},i],Interval[{f,Infinity}],MemberQ[{Less,LessEqual},i],Interval[{-Infinity,f}]]},{Or\[Rule]IntervalUnion,And\[Rule]IntervalIntersection}}
-	],
-	{var:Except[_Interval]\[Rule]Interval[{-\[Infinity],\[Infinity]}]}
-];*)
+InequalityToInterval::usage="InequalityToInterval[\!\(\*
+StyleBox[\"ineq\", \"TI\"]\)] converts inequality \!\(\*
+StyleBox[\"ineq\", \"TI\"]\) to an Interval.";
 
 
 (* based on <https://mathematica.stackexchange.com/a/271537/> by Somnium *)
@@ -2993,7 +2983,7 @@ Module[{v, myBlock, mySet, vals},
 
 NEqual::usage="NEqual[\!\(\*
 StyleBox[\"x1\", \"TI\"]\), \!\(\*
-StyleBox[\"x2\", \"TI\"]\)] tests is \!\(\*
+StyleBox[\"x2\", \"TI\"]\)] tests if \!\(\*
 StyleBox[\"x1\", \"TI\"]\) approximately equals \!\(\*
 StyleBox[\"x2\", \"TI\"]\).";
 
@@ -3015,7 +3005,23 @@ Options[NEqual]={SameThreshold->10^-8};
 NEqual::nedd="Arguments of NEqual have different dimensions.";
 
 
-FindRoots::usage="FindRoots[{f1, f2}, {x, \!\(\*SubscriptBox[\(x\), \(min\)]\), \!\(\*SubscriptBox[\(x\), \(max\)]\)}, {y, \!\(\*SubscriptBox[\(y\), \(min\)]\), \!\(\*SubscriptBox[\(y\), \(max\)]\)}] finds all roots of {f1, f2} in a given range.";
+FindRoots::usage="FindRoots[\!\(\*
+StyleBox[\"f\", \"TI\"]\), {\!\(\*
+StyleBox[\"x\", \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\)}] finds all roots of \!\(\*
+StyleBox[\"f\", \"TI\"]\) in the range \!\(\*
+StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\) <= \!\(\*
+StyleBox[\"x\", \"TI\"]\) <= \!\(\*
+StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\).
+FindRoots[{\!\(\*
+StyleBox[SubscriptBox[\"f\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"f\", \"2\"], \"TI\"]\), \[Ellipsis]}, {\!\(\*
+StyleBox[\"x\", \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\)}, \[Ellipsis]] finds all roots of {\!\(\*
+StyleBox[SubscriptBox[\"f\", \"1\"], \"TI\"]\), \!\(\*
+StyleBox[SubscriptBox[\"f\", \"2\"], \"TI\"]\), \[Ellipsis]} (up to three dimensions).";
 
 
 (* wrappers for 1D, 2D, 3D functions from mathematica.stackexchange *)
@@ -3040,7 +3046,7 @@ findAllRoots[fn_, {l_, lmin_, lmax_}, opts : OptionsPattern[]] :=
   localFunction = ReleaseHold[Hold[fn] /. HoldPattern[l] :> x];
   If[
    lmin != lmax,
-   pl = Plot[localFunction, {x, lmin - 2$MachineEpsilon, lmax + 2$MachineEpsilon},
+   pl = Plot[localFunction, {x, lmin - 0.8 10^-5(lmax-lmin), lmax + 1.1 10^-5(lmax-lmin)},
      Evaluate@
       FilterRules[Join[{opts}, Options[findAllRoots]], Options[Plot]]
      ];
@@ -3985,7 +3991,9 @@ ExtractInvaders[list_?RuleListQ]:=FilterRules[list,Subscript[_, 0]->_];
 DeleteInvaders[list_?RuleListQ]:=DeleteCases[list,Subscript[_,0,___]->_];
 
 
-ValidQ::usage="ValidQ[sol] returns True if sol is within the allowed range of variables.";
+ValidQ::usage="ValidQ[\!\(\*
+StyleBox[\"sol\", \"TI\"]\)] returns True if \!\(\*
+StyleBox[\"sol\", \"TI\"]\) is within the allowed range of variables.";
 
 
 ValidQ[eq_?RuleListQ,opts___?OptionQ]:=Module[{
@@ -5558,12 +5566,12 @@ StyleBox[\"attributes\", \"TI\"]\).";
 
 FindEcoEq::usage = 
 "FindEcoEq[\!\(\*
-StyleBox[\"init\", \"TI\"]\)] finds an ecological equilibrium using initial guess \!\(\*
+StyleBox[\"init\", \"TI\"]\)] finds an ecological equilibrium using initial guess / range \!\(\*
 StyleBox[\"init\", \"TI\"]\).
 FindEcoEq[\!\(\*
 StyleBox[\"attributes\", \"TI\"]\), \!\(\*
 StyleBox[\"init\", \"TI\"]\)] uses trait values/interaction coefficients \!\(\*
-StyleBox[\"attributes\", \"TI\"]\) and initial guess \!\(\*
+StyleBox[\"attributes\", \"TI\"]\) and initial guess / range \!\(\*
 StyleBox[\"init\", \"TI\"]\).";
 
 
