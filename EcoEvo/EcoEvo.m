@@ -352,7 +352,8 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.0 (September 12, 2022)";
+$EcoEvoVersion="1.7.1 (November 28, 2022)";
+(* orange = changed in 1.7.1 *)
 
 
 modelloaded=False;
@@ -418,7 +419,7 @@ StyleBox[\"list\", \"TI\"]\)] deletes all Null elements in \!\(\*
 StyleBox[\"list\", \"TI\"]\).";
 
 
-DeleteNulls[list_]:=DeleteCases[list,Null];
+DeleteNulls[list_List]:=DeleteCases[list,Null];
 
 
 RuleListSet::usage="RuleListSet[\!\(\*
@@ -1262,7 +1263,7 @@ StyleBox[\"plot\", \"TI\"]\).";
 
 
 (* by Jens <http://mathematica.stackexchange.com/a/20282/6358> *)
-ExtractPlotPoints[plot_Graphics]:=Cases[Normal@plot,Line[x_]:>x,\[Infinity]];
+ExtractPlotPoints[plot:(_Graphics|_Graphics3D)]:=Cases[Normal@plot,Line[x_]:>x,\[Infinity]];
 
 
 (* prF2 by kglr <https://mathematica.stackexchange.com/a/156783/6358> *)
@@ -1846,7 +1847,7 @@ StyleBox[\"x\", \"TI\"]\)] returns True if \!\(\*
 StyleBox[\"x\", \"TI\"]\) is a RuleList with temporal values, False otherwise.";
 
 
-TemporalRuleListQ[x_]:=If[RuleListQ[x],VectorQ[x,MatchQ[#,(*_Symbol|_Subscript*)_->_InterpolatingFunction(*|_List*)|_TemporalData]&],False];
+TemporalRuleListQ[x_]:=If[RuleListQ[x],VectorQ[x,MatchQ[#,_->_InterpolatingFunction|_TemporalData]&],False];
 
 
 RuleListListQ::usage=
@@ -1913,11 +1914,19 @@ RuleListTweak[point_?RuleListQ,var_List,h_List]:=Join[Select[point,!MemberQ[var,
 RuleListAdd::usage=
 "RuleListAdd[\!\(\*
 StyleBox[\"rulelist1\", \"TI\"]\), \!\(\*
-StyleBox[\"rulelist2\", \"TI\"]\)] adds corresponding elements of two rulelists.";
+StyleBox[\"rulelist2\", \"TI\"]\)] adds corresponding elements of two rulelists.
+RuleListAdd[\!\(\*
+StyleBox[\"rulelist\", \"TI\"]\), \!\(\*
+StyleBox[\"x\", \"TI\"]\)] or RuleListAdd[\!\(\*
+StyleBox[\"x\", \"TI\"]\), \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] adds number \!\(\*
+StyleBox[\"x\", \"TI\"]\) to all elements of rulelist \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\).";
 
 
-(*RuleListAdd[l1_?RuleListQ,l2_?RuleListQ,m2_:1,m1_:1]:=Table[e\[LeftDoubleBracket]1\[RightDoubleBracket]\[Rule]m1*e\[LeftDoubleBracket]2\[RightDoubleBracket]+m2*(e\[LeftDoubleBracket]1\[RightDoubleBracket]/.l2),{e,l1}];*)
-RuleListAdd[a_?RuleListQ,b_?RuleListQ]:=Normal[Merge[{a,b},Total]]
+RuleListAdd[a_?RuleListQ,b_?RuleListQ]:=Normal[Merge[{a,b},Total]];
+RuleListAdd[a_?RuleListQ,x_?NumericQ]:=Normal[Merge[a,x+#[[1]]&]];
+RuleListAdd[x_?NumericQ,a_?RuleListQ]:=Normal[Merge[a,x+#[[1]]&]];
 
 
 RuleListSubtract::usage=
@@ -2522,9 +2531,9 @@ If[tdvars!={},
 	tdsol=Select[sol,MemberQ[tdvars,#[[1]]]&];
 	{xinit,xfinal}={InitialTime[tdsol],FinalTime[tdsol]};
 	If[logged==True,
-		tdplot=ListLogPlot[tdvars/.sol,Evaluate[Sequence@@plotopts],PlotRange->plotrange]
+		tdplot=ListLogPlot[Normal[tdvars/.sol],Evaluate[Sequence@@plotopts],PlotRange->plotrange]
 	,
-		tdplot=ListPlot[tdvars/.sol,Evaluate[Sequence@@plotopts],AxesOrigin->{xinit,0},PlotRange->plotrange];
+		tdplot=ListPlot[Normal[tdvars/.sol],Evaluate[Sequence@@plotopts],AxesOrigin->{xinit,0},PlotRange->plotrange];
 	]
 ,
 	tdplot={};
@@ -3098,16 +3107,20 @@ Options[FindAllCrossings3D]=Sort[Join[Options[FindRoot],
 
 FindAllCrossings3D[funcs_?VectorQ,{x_,xmin_,xmax_},{y_,ymin_,ymax_},{z_,zmin_,zmax_},opts___]:= Module[{
 	contourData,seeds,roots,tt,fz=Compile[{x,y,z},Evaluate[funcs[[3]]]]}, 
-
+		
 	contourData=ExtractPlotPoints[ContourPlot3D[Evaluate[Most[funcs]],
-		{x,xmin-2$MachineEpsilon,xmax+2$MachineEpsilon},{y,ymin-2$MachineEpsilon,ymax+2$MachineEpsilon},{z,zmin-2$MachineEpsilon,zmax+2$MachineEpsilon},
+		{x,xmin-0.8 10^-5(xmax-xmin),xmax+1.1 10^-5(xmax-xmin)},{y,ymin-0.8 10^-5(ymax-ymin),ymax+1.1 10^-5(ymax-ymin)},{z,zmin-0.8 10^-5(zmax-zmin),zmax+1.1 10^-5(zmax-zmin)},
 		BoundaryStyle->{1->None,2->None,{1,2}->{}},ContourStyle->None,Mesh->None,Method->Automatic,
-		Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[ContourPlot3D]]]]];
+		Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[ContourPlot3D]]]]];	
+	(*Print[contourData];*)
+	
 	seeds=Flatten[Pick[Rest[#],Most[#] Rest[#]&@Sign[Apply[fz,#,2]],-1]&/@contourData,1];
+	(*Print["seeds=",seeds];*)
+	
 	Return[If[seeds==={},seeds,
 		roots=Union[Map[{x,y,z}/.
 			FindRoot[funcs,Transpose[{{x,y,z},#}],Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[FindRoot]]]]&,seeds]];
-(*Print[roots];*)
+		(*Print[roots];*)
 		Select[Chop@roots,
 			(xmin-$MachineEpsilon<=#[[1]]<=xmax+$MachineEpsilon&&ymin-$MachineEpsilon<=#[[2]]<=ymax+$MachineEpsilon&&zmin-$MachineEpsilon<=#[[3]]<=zmax+$MachineEpsilon)&]
 	]];
@@ -3907,7 +3920,6 @@ If[RuleListQ[list]&&
 ListOfVariablesQ[x_]:=If[x==={},False,VectorQ[x,VariablesQ[#]&]];
 
 
-(* ::Code::Initialization:: *)
 AttributesVariablesAndGsQ[list_]:=
 If[RuleListQ[list]&&
 	FixAttributes[Union[ExtractTraits[list],ExtractInteractions[list]]]=!=list&&
@@ -3919,7 +3931,6 @@ If[RuleListQ[list]&&
 	True,False,False]
 
 
-(* ::Code::Initialization:: *)
 AttributesAndGsQ[list_]:=
 If[RuleListQ[list]&&
 	FixAttributes[Union[ExtractTraits[list],ExtractInteractions[list]]]=!=list&&
@@ -5391,9 +5402,9 @@ Module[{
 (* options *)
 verbose,method,
 ndsolveopts,logged,interpolationpoints,interpolationopts,fixed,fixedvars,whenevents,timescale,outputtmin,randomseeding,
-output,tmin,
+output,tmin,minpop,wheneventopts,
 (* other variables *)
-attributes,nonfixedvars,Gs,luv,sp,eqns,unks,ics,tic,exprule,sol,res,fixedres},
+attributes,nonfixedvars,Gs,luv,sp,eqns,unks,ics,tic,exprule,sol,res,fixedres,minwhens,minvar,minval},
 
 Block[{\[ScriptCapitalN],verbosity,func="EcoSim"},
 
@@ -5422,6 +5433,8 @@ outputtmin=Evaluate[OutputTMin/.Flatten[{opts,Options[EcoSim]}]];
 If[outputtmin===Automatic,outputtmin=tmin];
 randomseeding=Evaluate[RandomSeeding/.Flatten[{opts,Options[EcoSim]}]];
 If[IntegerQ[randomseeding],SeedRandom[randomseeding]];
+minpop=Evaluate[MinPop/.Flatten[{opts,Options[EcoSim]}]];
+wheneventopts=Evaluate[WhenEventOpts/.Flatten[{opts,Options[EcoSim]}]];
 
 interpolationopts=FilterRules[Flatten[{opts,Options[EcoSim]}],Options[Interpolation]];
 interpolationpoints=Evaluate[InterpolationPoints/.Flatten[{opts,Options[EcoSim]}]];
@@ -5439,6 +5452,36 @@ Do[
 		AppendTo[fixedvars,var];
 	]
 ,{var,AllPopsAndAuxs}];
+
+Which[
+	NumberQ[minpop],
+	minwhens=Table[
+		If[comptype[var]==="Extensive",
+			If[logged===False,
+				WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->var[t]<minpop,action->var[t]->0},
+				WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->log[var][t]<Log[minpop],action->log[var][t]->-10^10}
+			]]
+	,{var,nonfixedvars}]//DeleteNulls,
+	RuleListQ[minpop],
+	minwhens=Table[
+		{minvar,minval}={rule[[1]],rule[[2]]};
+		If[logged===False,
+							WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->minvar[t]<minval,action->minvar[t]->0},
+			WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->log[minvar][t]<Log[minval],action->log[minvar][t]->-10^10}
+		]
+	,{rule,minpop}]//DeleteNulls,
+	minpop===Automatic,
+	minwhens=Table[
+		If[comptype[var]==="Extensive"&&Min[range[var]]>0,
+			If[logged===False,
+				WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->var[t]<Min[range[var]],action->var[t]->0},
+				WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->log[var][t]<Log[Min[range[var]]],action->log[var][t]->-10^10}
+			]]
+	,{var,nonfixedvars}]//DeleteNulls,
+	Else,
+	minwhens={}
+];
+VPrint[3,"minwhens=",minwhens];
 
 (* fix attributes *)
 attributes=FixAttributes[attributesin];
@@ -5473,10 +5516,10 @@ Which[
 	modeltype=="ContinuousTime",
 	Off[NDSolve::wenset]; (* in case a modelwhenevent involves a fixed variable *)
 	If[verbosity>=1,
-		With[{ndsolveeqns=Join[eqns,ics,modelwhenevents,whenevents],unks=unks,outputtmin=outputtmin,options=Sequence@@ndsolveopts},
+		With[{ndsolveeqns=Join[eqns,ics,modelwhenevents,whenevents,minwhens],unks=unks,outputtmin=outputtmin,options=Sequence@@ndsolveopts},
 			PrintCall[Global`sol=NDSolve[ndsolveeqns,unks,{t,outputtmin,tmax},options][[1]]]
 	]];
-	sol=NDSolve[Join[eqns,ics,modelwhenevents,whenevents],unks,{t,outputtmin,tmax},Evaluate[Sequence@@ndsolveopts]][[1]];
+	sol=NDSolve[Join[eqns,ics,modelwhenevents,whenevents,minwhens],unks,{t,outputtmin,tmax},Evaluate[Sequence@@ndsolveopts]][[1]];
 	On[NDSolve::wenset];
 	If[logged===True,
 		If[output=="FinalSlice",Return[SortRuleList[FinalSlice[sol]/.(log[var_]->val_)->(var->E^val),AllVariables]]];
@@ -5485,7 +5528,8 @@ Which[
 			var->(var/.sol)]
 		,{var,nonfixedvars}]
 	,
-		res=sol
+		(*res=sol*)
+		res=FilterRules[sol,nonfixedvars]
 	];
 	res=Join[res,Table[fixedvar->Interpolation[{{tmin,fixedvar/.fixed},{tmax,fixedvar/.fixed}},InterpolationOrder->0],{fixedvar,fixedvars}]];
 	,
@@ -5512,7 +5556,8 @@ Return[SortRuleList[res,AllVariables]];
 
 Options[EcoSim]={Verbose->False,Verbosity->0,
 Method->Automatic,NDSolveOpts->{},Logged->False,Fixed->{},WhenEvents->{},InterpolationOrder->7,InterpolationPoints->1000,
-EqStop->False,EqThreshold->10^-8,TimeScale->1,TMin->0,OutputTMin->Automatic,Output->"Dynamics",TMin->0,RandomSeeding->None};
+EqStop->False,EqThreshold->10^-8,TimeScale->1,TMin->0,OutputTMin->Automatic,Output->"Dynamics",TMin->0,RandomSeeding->None,
+MinPop->None,WhenEventOpts->{}};
 
 
 (* split traitsandvariables *)
@@ -5664,14 +5709,18 @@ Which[
 	VPrint[3,"unks=",unks];
 	If[verbosity>=1,
 		With[{eqns=eqns,unks=unks,options=Sequence@@solveopts},PrintCall[Global`sol=Solve[eqns,unks,options]]]];
-	sol=Solve[eqns,unks,Evaluate[Sequence@@solveopts]],
+	sol=Solve[eqns,unks,Evaluate[Sequence@@solveopts]];
+	If[Head[sol]===Solve,sol=Solve[eqns,unks,Reals,Evaluate[Sequence@@solveopts]]]
+	,
 
 	method=="NSolve",
 	unks=nonfixedvars;
 	VPrint[3,"unks=",unks];
 	If[verbosity>=1,
 		With[{eqns=eqns,unks=unks,options=Sequence@@nsolveopts},PrintCall[Global`sol=NSolve[eqns,unks,options]]]];
-	sol=NSolve[eqns,unks,Evaluate[Sequence@@nsolveopts]],
+	sol=NSolve[eqns,unks,Evaluate[Sequence@@nsolveopts]];
+	If[Head[sol]===NSolve,sol=NSolve[eqns,unks,Reals,Evaluate[Sequence@@nsolveopts]]]
+	,
 
 	method=="FindRoot",
 	unks=Table[
@@ -6418,7 +6467,7 @@ If[method===Automatic,
 		variables=={},
 		method="NSolveEcoEq",
 		Else,
-		If[nauxs+npops+Sum[\[ScriptCapitalN][gu]*ngcomps[gu],{gu,guilds}]<=4,
+		If[nauxs+npops+Sum[\[ScriptCapitalN][gu]*ngcomps[gu],{gu,guilds}]-Length[fixed]<=4,
 			method="NSolveEcoEq",
 			method="FindEcoEq"
 		];
@@ -6428,7 +6477,8 @@ VPrint[3,"method=",method];
 
 Which[
 	method=="EcoSim",Goto[ecosim],
-	method=="FindEcoCycle",Goto[findecocycle]
+	method=="FindEcoCycle",If[icsin=={},Message[FindEcoAttractor::novars,"FindEcoCycle"];Return[$Failed],ics=icsin];
+	Goto[findecocycle]
 ];
 
 
@@ -6587,7 +6637,8 @@ If[Length[stableeq]==0, (* no stable eq, try EcoSim once *)
 		method="EcoSim"
 	,
 		Message[FindEcoAttractor::giveup];
-		Return[EcoSim[attributes,Gs,FinalSlice[essol],finaltmax,Time->time,Evaluate[Sequence@@ecosimopts]]]
+		(*Return[EcoSim[attributes,FinalSlice[essol],finaltmax,Time\[Rule]time,Evaluate[Sequence@@ecosimopts],VerboseAll\[Rule]verboseall]]*)
+		Return[essol]
 	]
 ];
 If[Length[stableeq]==1,res=stableeq[[1]];Goto[done]]; (* successful *)
@@ -6635,11 +6686,16 @@ If[method=="EcoSim",
 	,
 		(* steady state eq failed *)
 		Message[FindEcoAttractor::nostst,ddt,tmax];
-		(* attempt to find Period using FindEcoCycle approach *)
-		ecosimflag=True; (* already been through ecosim *)
-		method="FindEcoCycle";
-		period=FindPeriod[essol,MaxPeriod->maxperiod];
-		Goto[findecocycle];
+		If[SelectValid[{FinalSlice[essol]}]!={},
+			(* attempt to find Period using FindEcoCycle approach *)
+			ecosimflag=True; (* already been through ecosim *)
+			method="FindEcoCycle";
+			ics=FinalSlice[essol];
+			period=FindPeriod[essol,MaxPeriod->maxperiod];
+			Goto[findecocycle],
+			Message[FindEcoAttractor::giveup2];
+			Return[essol]
+		];
 	];
 ];
 
