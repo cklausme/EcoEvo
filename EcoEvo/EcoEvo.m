@@ -79,7 +79,7 @@ UnfactorSums;GaussianIntegral;GaussianIntegralApproximation;
 VPrint;
 CreateBlock;NEqual;(*MaxEigenvalue;MaxEigenvector;MaxEigensystem;*)
 FindRoots;
-VectorPlot1D;
+VectorPlot1D;PlotVector;
 
 
 Set\[ScriptCapitalN];
@@ -301,7 +301,7 @@ QSSMethod::usage = "QSSMethod is an option for Inv that selects how to solve for
 RelativeStepSize::usage = "RelativeStepSize is an option for NDInv that sets the relative step size.";
 RidgelinePlot3DOpts::usage = "RidgelinePlot3DOpts is an option for PlotGuild that passes options for a 3D ridgeline plot.";
 RuleListDistanceOpts::usage = "RuleListDistanceOpts is an option for various EcoEvo functions that passes options to RuleListDistance.";
-RuleListOpts::usage = "RuleListOpts is an option for various EcoEvo functions that passes options to RuleListPlot.";
+RuleListPlotOpts::usage = "RuleListPlotOpts is an option for various EcoEvo functions that passes options to RuleListPlot.";
 RV::usage = "RV is an option for InvSPS when called from ReproductiveValues.";
 SameThreshold::usage = "SameThreshold is an option for various EcoEvo functions that is the threshold to consider two numbers the same.";
 ShowSpecies::usage = "ShowSpecies is an option for various EcoEvo functions that specifies how to show species markers.";
@@ -352,8 +352,8 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.1 (November 28, 2022)";
-(* orange = changed in 1.7.1 *)
+$EcoEvoVersion="1.7.1 (December 14, 2022)";
+(* orange & pink = changed in 1.7.1 *)
 
 
 modelloaded=False;
@@ -2376,10 +2376,10 @@ PlotDynamics[sol_?RuleListQ,plotvarsin_List,opts___?OptionQ]:=
 Module[{
 (* options *)
 logged,plotstyle,plotmarkers,axeslabel,plotopts,plotrange,linestyles,plottype,plotvariance,
-histogram,histogrampoints,histogramscale,histogramposition,histogramopts,histogramopacity,
+histogram,histogrampoints,histogramscale,histogramposition,histogramopts,histogramopacity,exclusions,
 (* other variables *)
-lookup,gu,sp,vars,varvar,plotvars,plotcolor,ls,i,yaxislabel,xinit,xfinal,ifvars,tdvars,cvars,tdsol,
-ifplot,tdplot,cplot,varplots,var,varvars,
+lookup,gu,sp,vars,varvar,plotvars,plotcolor,ls,i,yaxislabel,xinit,xfinal,ifvars,tdvars,cvars,funcs,tdsol,
+ifplot,tdplot,cplot,varplots,var,varvars,funcplots,if,
 xrange,hmax,histo,hplot},
 	
 Block[{\[ScriptCapitalN]},
@@ -2401,6 +2401,7 @@ histogramopts=Evaluate[HistogramOpts/.Flatten[{opts,Options[PlotDynamics]}]];
 histogramopacity=Evaluate[HistogramOpacity/.Flatten[{opts,Options[PlotDynamics]}]];
 plottype=Evaluate[PlotType/.Flatten[{opts,Options[PlotDynamics]}]];
 plotvariance=Evaluate[PlotVariance/.Flatten[{opts,Options[PlotDynamics]}]];
+exclusions=Evaluate[Exclusions/.Flatten[{opts,Options[PlotDynamics]}]];
 
 vars=sol[[All,1]];
 (*Print["vars=",vars];*)
@@ -2431,10 +2432,8 @@ If[plotvarsin==={All},
 ];
 (*Print["plotvars=",plotvars];*)
 
-
 If[axeslabel===Automatic,
-	yaxislabel=Table[var/.{Subscript[v_,sp_]->Subscript[v,"i"]},{var,plotvars}];
-	yaxislabel=Sort[Union[yaxislabel]];
+	yaxislabel=Sort[Union[Replace[plotvars,{Subscript[v_,sp_]->Subscript[v,"i"]},1]]];
 	axeslabel={t,Row[yaxislabel,","]}
 ];
 (*Print["axeslabel=",axeslabel];*)
@@ -2446,6 +2445,8 @@ tdvars=Select[plotvars,Head[#/.sol]==TemporalData||Head[#/.sol]==List&];
 (*Print["tdvars=",tdvars];*)
 cvars=Select[plotvars,NumericQ[#/.sol]&];
 (*Print["cvars=",cvars];*)
+funcs=Complement[plotvars,ifvars,tdvars,cvars];
+(*Print["funcs=",funcs];*)
 
 If[plotstyle==={},
 	i=0;
@@ -2502,8 +2503,10 @@ If[ifvars!={},
 			plotopts=FilterRules[Flatten[{opts,AxesLabel->axeslabel,PlotStyle->plotstyle,Options[PlotDynamics]}],Options[ListPlot]];
 			ifplot=ListPlot[ifvars/.sol,Evaluate[Sequence@@plotopts],PlotRange->plotrange],
 			Else,
-			plotopts=FilterRules[Flatten[{opts,AxesLabel->axeslabel,PlotStyle->plotstyle,Options[PlotDynamics]}],Options[Plot]];
-			ifplot=Plot[Evaluate[Table[Tooltip[var[x],ToString[var]],{var,ifvars}]/.sol],{x,xinit,xfinal},Evaluate[Sequence@@plotopts],PlotRange->plotrange];
+			plotopts=FilterRules[Flatten[{Exclusions->exclusions,opts,AxesLabel->axeslabel,PlotStyle->plotstyle,Options[PlotDynamics]}],Options[Plot]];
+			If[exclusions===Automatic,exclusions=Union@Select[Split[Flatten@Table[(var/.sol)["Coordinates"][[1]],{var,ifvars}]],Length[#]>1&][[All,1]]];
+			(*Print["exclusions=",exclusions];*)
+			ifplot=Plot[Evaluate[Table[Tooltip[var[x],ToString[var]],{var,ifvars}]/.sol],{x,xinit,xfinal},Exclusions->exclusions,Evaluate[Sequence@@plotopts],PlotRange->plotrange];
 			If[plotvariance==True,
 				varplots=DeleteNulls@Table[
 					varvar=var/.{Subscript[x_, i_]->Subscript[Var[x], i],Subscript[x_[n_], i_]->Subscript[Var[x][n], i],x_->Var[x],x_[n_]->Var[x][n]};
@@ -2546,6 +2549,22 @@ If[cvars!={},
 	cplot={}
 ];
 
+If[funcs!={},
+	funcplots=Table[
+		func=funcs[[f]];
+		(*Print[func/.sol];*)
+		if=Reinterpolation[func/.sol];
+		{xinit,xfinal}=if["Domain"][[1]]; (* extract domain *)
+		(*Print["{xinit,xfinal}=",{xinit,xfinal}];*)
+		plotopts=FilterRules[Flatten[{Exclusions->exclusions,opts,AxesLabel->axeslabel,Options[PlotDynamics]}],Options[Plot]];
+		If[ListQ[plotstyle],ps=plotstyle[[f]],ps=plotstyle];
+		If[exclusions===Automatic,exclusions=Union@Select[Split[Flatten@Table[(var/.sol)["Coordinates"][[1]],{var,ifvars}]],Length[#]>1&][[All,1]]];
+		Plot[Evaluate[Tooltip[if[x],ToString[func]]],{x,xinit,xfinal},Exclusions->exclusions,PlotStyle->ps,Evaluate[Sequence@@plotopts]]
+	,{f,Length[funcs]}]
+,
+	funcplots={};
+];
+
 If[histogram,
 	xrange=(xfinal-xinit);
 	hmax=Max[Table[
@@ -2568,14 +2587,14 @@ If[histogram,
 (*Print[hplot];*)
 
 If[histogram,
-	Return[Show[ifplot,tdplot,cplot,hplot,PlotRange->{{xinit,xfinal},All},PlotRangeClipping->False,ImagePadding->All(*{{20,400*histogramposition+250*histogramscale},{20,20}}*)]],
-	Return[Show[ifplot,varplots,tdplot,cplot]]
+	Return[Show[ifplot,tdplot,cplot,hplot,funcplots,PlotRange->{{xinit,xfinal},All},PlotRangeClipping->False,ImagePadding->All(*{{20,400*histogramposition+250*histogramscale},{20,20}}*)]],
+	Return[Show[ifplot,varplots,tdplot,cplot,funcplots]]
 ];
 ]];
 
 
 (* if only one plotvar given, doesn't need to be in a list *)
-PlotDynamics[sol_?RuleListQ,plotvarin_Symbol:All,opts___?OptionQ]:=PlotDynamics[sol,{plotvarin},opts];
+PlotDynamics[sol_?RuleListQ,plotvarin:(_Symbol|_Subscript):All,opts___?OptionQ]:=PlotDynamics[sol,{plotvarin},opts];
 
 (* if only a rule given, doesn't need to be in a list *)
 PlotDynamics[sol_Rule,plotvarsin_List,opts___?OptionQ]:=PlotDynamics[{sol},plotvarsin,opts];
@@ -2590,11 +2609,11 @@ PlotInterpolatingFunction[sol_,plotvarsin___,opts___?OptionQ]:=PlotDynamics[sol,
 
 Options[PlotDynamics]=
 {Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotVariance->True,PlotRangePadding->Scaled[0.02],
-Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6};
+Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6,Exclusions->Automatic};
 
 Options[PlotInterpolatingFunction]=
 {Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotRangePadding->Scaled[0.02],
-Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6};
+Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6,Exclusions->Automatic};
 
 
 RuleListPlot::usage=
@@ -3040,7 +3059,7 @@ FindRoots[{f1_,f2_,f3_},{x_,a_,b_},{y_,c_,d_},{z_,e_,f_},opts___?OptionQ]:=Threa
 	FindAllCrossings3D[{f1,f2,f3}/.(lhs_==rhs_)->rhs-lhs,{x,a,b},{y,c,d},{z,e,f},opts];
 
 
-(* "findAllRoots" by Jens <https://mathematica.stackexchange.com/a/16444/6358> *)
+(* (modified) "findAllRoots" by Jens <https://mathematica.stackexchange.com/a/16444/6358> *)
 
 SyntaxInformation[findAllRoots] = {"LocalVariables" -> {"Plot", {2, 2}}, "ArgumentsPattern" -> {_, _, OptionsPattern[]}};
 SetAttributes[findAllRoots, HoldAll];
@@ -3055,7 +3074,7 @@ findAllRoots[fn_, {l_, lmin_, lmax_}, opts : OptionsPattern[]] :=
   localFunction = ReleaseHold[Hold[fn] /. HoldPattern[l] :> x];
   If[
    lmin != lmax,
-   pl = Plot[localFunction, {x, lmin - 0.8 10^-5(lmax-lmin), lmax + 1.1 10^-5(lmax-lmin)},
+   pl = Plot[localFunction, {x,lmin-10^-3(lmax-lmin),lmax+10^-3(lmax-lmin)},
      Evaluate@
       FilterRules[Join[{opts}, Options[findAllRoots]], Options[Plot]]
      ];
@@ -3086,12 +3105,11 @@ FindRoots2D::usage="FindRoots2D[funcs,{x,a,b},{y,c,d}] finds all nontangential s
 Options[FindRoots2D]={PlotPoints->Automatic,MaxRecursion->Automatic};
 
 FindRoots2D[funcs:{f1_,f2_},{x_,a_,b_},{y_,c_,d_},opts:OptionsPattern[]]:=Module[{fZero,seeds,fy=Compile[{x,y},f2]},
-	fZero=ExtractPlotPoints[ContourPlot[f1==0,{x,a-0.8 10^-5(b-a),b+1.1 10^-5(b-a)},{y,c-0.9 10^-5(d-c),d+1.2 10^-5(d-c)},
+	fZero=ExtractPlotPoints[ContourPlot[f1==0,{x,a-10^-3(b-a),b+10^-3(b-a)},{y,c-10^-3(d-c),d+10^-3(d-c)},
 		Evaluate@FilterRules[{opts},Options@ContourPlot]]];
 	(*Print[fZero];*)
 	seeds=Pick[Rest@#,Rest[#]Most[#]&@Sign@Apply[fy,#,2],-1]&/@fZero;
-	(*Print[seeds];*)
-	(*Print[{x,y}/. FindRoot[funcs,{x,#},{y,#2}]&@@@Join@@seeds];*)
+	(*Print["seeds=",seeds];*)
 	With[{seq=FilterRules[{opts},Options@FindRoot]},
 		Select[Chop@Union[{x,y}/.FindRoot[funcs,{x,#},{y,#2},seq]&@@@Join@@seeds,SameTest->(Norm[#-#2]<1*^-6&)],
 			a-$MachineEpsilon<=#[[1]]<=b+$MachineEpsilon&&c-$MachineEpsilon<=#[[2]]<=d+$MachineEpsilon&]
@@ -3099,7 +3117,7 @@ FindRoots2D[funcs:{f1_,f2_},{x_,a_,b_},{y_,c_,d_},opts:OptionsPattern[]]:=Module
 ];
 
 
-(* "FindAllCrossings3D" by J.M. <https://mathematica.stackexchange.com/a/11365/> *)
+(* (modified) "FindAllCrossings3D" by J.M. <https://mathematica.stackexchange.com/a/11365/> *)
 
 Options[FindAllCrossings3D]=Sort[Join[Options[FindRoot],
 	{MaxRecursion->Automatic,PerformanceGoal:>$PerformanceGoal,PlotPoints->Automatic}
@@ -3109,9 +3127,9 @@ FindAllCrossings3D[funcs_?VectorQ,{x_,xmin_,xmax_},{y_,ymin_,ymax_},{z_,zmin_,zm
 	contourData,seeds,roots,tt,fz=Compile[{x,y,z},Evaluate[funcs[[3]]]]}, 
 		
 	contourData=ExtractPlotPoints[ContourPlot3D[Evaluate[Most[funcs]],
-		{x,xmin-0.8 10^-5(xmax-xmin),xmax+1.1 10^-5(xmax-xmin)},{y,ymin-0.8 10^-5(ymax-ymin),ymax+1.1 10^-5(ymax-ymin)},{z,zmin-0.8 10^-5(zmax-zmin),zmax+1.1 10^-5(zmax-zmin)},
+		{x,xmin-10^-3(xmax-xmin),xmax+10^-3(xmax-xmin)},{y,ymin-10^-3(ymax-ymin),ymax+10^-3(ymax-ymin)},{z,zmin-10^-3(zmax-zmin),zmax+10^-3(zmax-zmin)},
 		BoundaryStyle->{1->None,2->None,{1,2}->{}},ContourStyle->None,Mesh->None,Method->Automatic,
-		Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[ContourPlot3D]]]]];	
+		Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[ContourPlot3D]]]]];
 	(*Print[contourData];*)
 	
 	seeds=Flatten[Pick[Rest[#],Most[#] Rest[#]&@Sign[Apply[fz,#,2]],-1]&/@contourData,1];
@@ -3141,6 +3159,7 @@ VectorPlot1D[func_,{var_,varmin_,varmax_},opts___?OptionQ]:=Module[{
 vectorpoints,markerwidth,markeraspectratio,markerspacing,
 rt,lt,varrange,w,h},
 
+(* handle options *)
 vectorpoints=Evaluate[VectorPoints/.Flatten[{opts,Options[VectorPlot1D]}]];
 markerwidth=Evaluate[MarkerWidth/.Flatten[{opts,Options[VectorPlot1D]}]];
 If[markerwidth==Automatic,markerwidth=varrange/vectorpoints];
@@ -3166,6 +3185,34 @@ Show[Graphics[Table[
 
 
 Options[VectorPlot1D]={VectorPoints->21,MarkerWidth->Automatic,MarkerAspectRatio->0.5,MarkerSpacing->0.5};
+
+
+PlotVector::usage="PlotVector[\!\(\*
+StyleBox[\"vec\", \"TI\"]\)] plots a vector from the origin.
+PlotVector[\!\(\*
+StyleBox[\"vec\", \"TI\"]\), \!\(\*
+StyleBox[\"pt\", \"TI\"]\)] plots a vector starting at \!\(\*
+StyleBox[\"pt\", \"TI\"]\).";
+
+
+PlotVector[vec_,ptin_List:ZeroVector,opts___?OptionQ]:=Module[{plotstyle,dim,pt},
+
+(* handle options *)
+plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotVector]}]];
+dim=Length[vec];
+
+If[ptin===ZeroVector,pt=ZeroVector[dim],pt=ptin];
+
+Which[
+	dim==2,
+	Graphics[Join[Flatten[{plotstyle}],{Arrow[{pt,pt+vec}]}]],
+	dim==3,
+	Graphics3D[Join[Flatten[{plotstyle}],{Arrow[{pt,pt+vec}]}]]
+]
+]
+
+
+Options[PlotVector]={PlotStyle->Black};
 
 
 Set\[ScriptCapitalN][attributes:(_?AttributesQ):{},variables:(_?VariablesQ):{}]:=Module[{tmp,interxns,tnsp,pnsp,insp},
@@ -4364,8 +4411,8 @@ Do[
 		Color[gcomp]=Color[_[gcomp]]=With[{cd=ColorData[gradient]},cd[0.5]];
 		LineStyle[Subscript[gcomp,_]]=LineStyle[gcomp]=LineStyle[_[gcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
 		PlotMarker[Subscript[gcomp,_]]=PlotMarker[gcomp]=PlotMarker[_[gcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
-		LookUp[gcomp]=LookUp[_[gcomp]]={"gcomp",gu,gcomp};
-		LookUp[Subscript[gcomp,sp_]]=LookUp[_[Subscript[gcomp,sp_]]]={"gcomp",gu,gcomp,sp};
+		LookUp[gcomp]=LookUp[_[gcomp]]=LookUp[gcomp[_]]={"gcomp",gu,gcomp};
+		LookUp[Subscript[gcomp,sp_]]=LookUp[_[Subscript[gcomp,sp_]]]=LookUp[Subscript[gcomp,sp_][_]]={"gcomp",gu,gcomp,sp};
 	,{gcomp,gcomps[gu]}];
 	
 	Color[gu]=Color[_[gu]]=With[{cd=ColorData[gradient]},cd[0.5]];
@@ -4431,7 +4478,7 @@ If[nauxs!=0,
 		Color[aux]=Color[_[aux]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
 		LineStyle[aux]=LineStyle[_[aux]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
 		PlotMarker[aux]=PlotMarker[_[aux]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
-		LookUp[aux]=LookUp[_[aux]]={"aux",aux};
+		LookUp[aux]=LookUp[_[aux]]=LookUp[aux[_]]={"aux",aux};
 	,{aux,auxs}];
 ];
 
@@ -4473,7 +4520,7 @@ Do[
 		Color[pcomp]=Color[_[pcomp]]=Color/.Append[in,Color->ModPart[colors,stylecount]];
 		LineStyle[pcomp]=LineStyle[_[pcomp]]=LineStyle/.Append[in,LineStyle->ModPart[linestyles,stylecount]];
 		PlotMarker[pcomp]=PlotMarker[_[pcomp]]=PlotMarker/.Append[in,PlotMarker->ModPart[plotmarkers,stylecount]];
-		LookUp[pcomp]=LookUp[_[pcomp]]={"pcomp",pop,pcomp};
+		LookUp[pcomp]=LookUp[_[pcomp]]=LookUp[pcomp[_]]={"pcomp",pop,pcomp};
 	,{pcomp,pcomps[pop]}];
 ,{pop,pops}];
 
@@ -5396,7 +5443,7 @@ StyleBox[\"tmax\", \"TI\"]\)] uses trait values/interaction coefficients \!\(\*
 StyleBox[\"attributes\", \"TI\"]\).";
 
 
-EcoSim[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},init:(_?VariablesQ):{},tmax_?NumericQ,opts___?OptionQ]:=
+EcoSim[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},initin:(_?VariablesQ):{},tmax_?NumericQ,opts___?OptionQ]:=
 
 Module[{
 (* options *)
@@ -5404,7 +5451,8 @@ verbose,method,
 ndsolveopts,logged,interpolationpoints,interpolationopts,fixed,fixedvars,whenevents,timescale,outputtmin,randomseeding,
 output,tmin,minpop,wheneventopts,
 (* other variables *)
-attributes,nonfixedvars,Gs,luv,sp,eqns,unks,ics,tic,exprule,sol,res,fixedres,minwhens,minvar,minval},
+attributes,nonfixedvars,Gs,luv,sp,eqns,unks,ics,tic,exprule,sol,res,fixedres,minwhens,minvar,minval,
+init,delayedics,icwhens,var,t0,var0},
 
 Block[{\[ScriptCapitalN],verbosity,func="EcoSim"},
 
@@ -5439,6 +5487,10 @@ wheneventopts=Evaluate[WhenEventOpts/.Flatten[{opts,Options[EcoSim]}]];
 interpolationopts=FilterRules[Flatten[{opts,Options[EcoSim]}],Options[Interpolation]];
 interpolationpoints=Evaluate[InterpolationPoints/.Flatten[{opts,Options[EcoSim]}]];
 
+
+init=initin/.{(va_[tmin]->vl_)->(va->vl),(va_[_?NumericQ]->_)->(va->0)};
+VPrint[3,"init=",init];
+
 (* process fixed variables *)
 fixed=Evaluate[Fixed/.Flatten[{opts,Options[EcoSim]}]];
 fixedvars=fixed[[All,1]];
@@ -5453,6 +5505,7 @@ Do[
 	]
 ,{var,AllPopsAndAuxs}];
 
+(* set up MinPop WhenEvents *)
 Which[
 	NumberQ[minpop],
 	minwhens=Table[
@@ -5466,7 +5519,7 @@ Which[
 	minwhens=Table[
 		{minvar,minval}={rule[[1]],rule[[2]]};
 		If[logged===False,
-							WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->minvar[t]<minval,action->minvar[t]->0},
+			WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->minvar[t]<minval,action->minvar[t]->0},
 			WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->log[minvar][t]<Log[minval],action->log[minvar][t]->-10^10}
 		]
 	,{rule,minpop}]//DeleteNulls,
@@ -5482,6 +5535,17 @@ Which[
 	minwhens={}
 ];
 VPrint[3,"minwhens=",minwhens];
+
+(* setup delayed IC WhenEvents *)
+
+(*Print["initin=",initin];*)
+delayedics=FilterRules[initin,_[_?NumericQ]];
+VPrint[3,"delayedics=",delayedics];
+icwhens=Table[
+	{var,t0,var0}={dic[[1,0]],dic[[1,1]],dic[[2]]};
+	If[tmin<t0<tmax,WhenEvent[event,action,Evaluate[Sequence@@wheneventopts]]/.{event->t==t0,action->var[t]->var0}]
+,{dic,delayedics}]//DeleteNulls;
+VPrint[3,"icwhens=",icwhens];
 
 (* fix attributes *)
 attributes=FixAttributes[attributesin];
@@ -5516,10 +5580,10 @@ Which[
 	modeltype=="ContinuousTime",
 	Off[NDSolve::wenset]; (* in case a modelwhenevent involves a fixed variable *)
 	If[verbosity>=1,
-		With[{ndsolveeqns=Join[eqns,ics,modelwhenevents,whenevents,minwhens],unks=unks,outputtmin=outputtmin,options=Sequence@@ndsolveopts},
+		With[{ndsolveeqns=Join[eqns,ics,modelwhenevents,whenevents,minwhens,icwhens],unks=unks,outputtmin=outputtmin,options=Sequence@@ndsolveopts},
 			PrintCall[Global`sol=NDSolve[ndsolveeqns,unks,{t,outputtmin,tmax},options][[1]]]
 	]];
-	sol=NDSolve[Join[eqns,ics,modelwhenevents,whenevents,minwhens],unks,{t,outputtmin,tmax},Evaluate[Sequence@@ndsolveopts]][[1]];
+	sol=NDSolve[Join[eqns,ics,modelwhenevents,whenevents,minwhens,icwhens],unks,{t,outputtmin,tmax},Evaluate[Sequence@@ndsolveopts]][[1]];
 	On[NDSolve::wenset];
 	If[logged===True,
 		If[output=="FinalSlice",Return[SortRuleList[FinalSlice[sol]/.(log[var_]->val_)->(var->E^val),AllVariables]]];
@@ -6836,7 +6900,7 @@ Which[
 
 nonfixedvars={var1,var2};
 
-(* look for aux and pcomps not in the ICs, treat as fixed at 0 *)
+(* look for aux and pcomps not in the vars, treat as fixed at 0 *)
 Do[
 	If[!MemberQ[Join[nonfixedvars,fixedvars],var],AppendTo[fixed,var->0]]
 ,{var,AllPopsAndAuxs}];
@@ -6983,8 +7047,9 @@ StyleBox[\"attributes\", \"TI\"]\).";
 
 PlotEcoPhasePlane[attributes:(_?AttributesQ):{},Gsin:(_?GsQ):{},{var1_,var1min_?NumericQ,var1max_?NumericQ},{var2_,var2min_?NumericQ,var2max_?NumericQ},opts___?OptionQ]:=
 
-Module[{eq,Gs,
+Module[{nonfixedvars,eq,Gs,
 (* options *)
+fixed,fixedvars,
 findecoeqopts,plotecoisoclinesopts,plotecostreamsopts,ecostableqopts,rulelistplotopts,
 verbose},
 
@@ -7541,13 +7606,40 @@ PlotImpactVector[{var1_,var2_},sps_List,point_?RuleListQ,opts___?OptionQ]:=Modul
 ];
 
 
-PlotImpactVector[{var1_,var2_},sp_,point_?RuleListQ,opts___?OptionQ]:=Module[{scale,plotstyle},
+PlotImpactVector[{var1_,var2_},sp_,ptin_?RuleListQ,opts___?OptionQ]:=Module[{
+scale,scale1,scale2,plotstyle,plotstyle1,plotstyle2,
+impactvector,pt},
 (* handle options *)
 scale=Evaluate[Scale/.Flatten[{opts,Options[PlotImpactVector]}]];
 plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotImpactVector]}]];
-If[plotstyle===Automatic,plotstyle={Color[sp],LineStyle[sp]}];
 
-Graphics[Join[Flatten[{plotstyle}],{Arrow[{{var1,var2},{var1,var2}+scale*Normalize@ImpactVector[{var1,var2},sp]}/.point]}]]
+Which[
+	Length[scale]==2,
+	{scale1,scale2}=scale,
+	NumericQ[scale],
+	scale1=scale,
+	Else,
+	scale1=1;
+];
+(*Print[{scale1,scale2}];*)
+
+Which[
+	plotstyle===Automatic,
+	{plotstyle1,plotstyle2}={Automatic,Automatic},
+	Length[plotstyle]==2&&Length[scale]==2,
+	{plotstyle1,plotstyle2}=plotstyle,
+	Else,
+	plotstyle1=plotstyle2=plotstyle
+];
+If[plotstyle1===Automatic,plotstyle1=Color[sp]];
+If[plotstyle2===Automatic,plotstyle2={Color[sp],Dashed}];
+(*Print[{plotstyle1,plotstyle2}];*)
+
+pt={var1,var2}/.ptin;
+impactvector=Normalize@ImpactVector[{var1,var2},sp]/.ptin;
+
+{PlotVector[scale1*impactvector,pt,PlotStyle->plotstyle1],
+If[NumericQ[scale2],Graphics[Join[Flatten[{plotstyle2}],{Line[{pt,pt+scale2*impactvector}]}]]]}//DeleteNulls
 ];
 
 
