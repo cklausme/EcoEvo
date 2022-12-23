@@ -78,7 +78,7 @@ DoubleDotProduct;HessianMatrix;
 UnfactorSums;GaussianIntegral;GaussianIntegralApproximation;
 VPrint;
 CreateBlock;NEqual;(*MaxEigenvalue;MaxEigenvector;MaxEigensystem;*)
-FindRoots;
+FindRoots;VarRangeQ;
 VectorPlot1D;PlotVector;
 
 
@@ -193,6 +193,7 @@ CoreSatellite::usage = "CoreSatellite is an option for PlotGuild to split core a
 DelayDInv::usage = "DelayDInv is an option for various EcoEvo functions that delays the evaluation of DInv.";
 DelayDInv2::usage = "DelayDInv2 is an option for PlotEvoIsoclines whether to delay evaluation of DInv in ESS-test.";
 DelayInv::usage = "DelayInv is an option for various EcoEvo functions that delays the evaluation of Inv.";
+DEq::usage = "DEq is an option for FindRoots that specifies which equation to not plot.";
 DInv2Opts::usage = "DInvOpts is an option for PlotEvoIsoclines that passed options to DInv in ESS-test.";
 DInvOpts::usage = "DInvOpts is an option for various EcoEvo functions that passes options to DInv.";
 dTMaxPower::usage = "dTMaxPower is an option for FindEcoCycle that sets the stepsize base-10 power of tmax.";
@@ -276,6 +277,7 @@ NormalizeDistance::usage = "NormalizeDistance is an option for FunctionalDistinc
 NSolveEcoEqOpts::usage = "NSolveEcoEqOpts is an option for various EcoEvo functions that passes options to NSolveEcoEq.";
 NSolveOpts::usage = "NSolveOpts is an option for various EcoEvo functions that passes options to NSolve.";
 \[ScriptCapitalN]s::usage = "\[ScriptCapitalN]s is an option for TraitEqns that sets the number of species in each Guild.";
+NumSeeds::usage = "NumSeeds is an option for FindRoots that defines the number of seeds.";
 NumTries::usage = "NumTries is an option for FindEcoAttractor's method \"FindRoot\" that says how many initial guesses to try.";
 Output::usage = "Output is an option for various EcoEvo functions that determines the type of output.";
 OutputTMin::usage = "OutputTMin is an option for EcoSim and EcoEvoSim that that sets the length of the results (default=0).";
@@ -352,7 +354,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.1 (December 14, 2022)";
+$EcoEvoVersion="1.7.1 (December 22, 2022)";
 (* orange & pink = changed in 1.7.1 *)
 
 
@@ -2371,6 +2373,17 @@ StyleBox[\"vars\", \"TI\"]\) in \!\(\*
 StyleBox[\"sol\", \"TI\"]\) across their entire domain.";
 
 
+Options[PlotDynamics]=
+{Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotVariance->True,PlotRangePadding->Scaled[0.02],
+Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6,Exclusions->Automatic};
+
+Options[PlotInterpolatingFunction]=
+{Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotRangePadding->Scaled[0.02],
+Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6,Exclusions->Automatic};
+
+notPlotDynamicsOpts=Except[Alternatives@@Replace[Options[PlotDynamics],h_[a_,_]:>h[a,_],1]];
+
+
 PlotDynamics[sol_?RuleListQ,plotvarsin_List,opts___?OptionQ]:=
 
 Module[{
@@ -2594,7 +2607,7 @@ If[histogram,
 
 
 (* if only one plotvar given, doesn't need to be in a list *)
-PlotDynamics[sol_?RuleListQ,plotvarin:(_Symbol|_Subscript):All,opts___?OptionQ]:=PlotDynamics[sol,{plotvarin},opts];
+PlotDynamics[sol_?RuleListQ,plotvarin:notPlotDynamicsOpts:All,opts___?OptionQ]:=(*(Print[1];*)PlotDynamics[sol,{plotvarin},opts];
 
 (* if only a rule given, doesn't need to be in a list *)
 PlotDynamics[sol_Rule,plotvarsin_List,opts___?OptionQ]:=PlotDynamics[{sol},plotvarsin,opts];
@@ -2605,15 +2618,6 @@ PlotDynamics[sol_Rule,opts___?OptionQ]:=PlotDynamics[{sol},All,opts];
 PlotDynamics[list_?RuleListListQ,rest___]:=Show[PlotDynamics[#,rest]&/@list];
 
 PlotInterpolatingFunction[sol_,plotvarsin___,opts___?OptionQ]:=PlotDynamics[sol,plotvarsin,opts,AxesLabel->None];
-
-
-Options[PlotDynamics]=
-{Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotVariance->True,PlotRangePadding->Scaled[0.02],
-Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6,Exclusions->Automatic};
-
-Options[PlotInterpolatingFunction]=
-{Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotRangePadding->Scaled[0.02],
-Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6,Exclusions->Automatic};
 
 
 RuleListPlot::usage=
@@ -3033,6 +3037,17 @@ Options[NEqual]={SameThreshold->10^-8};
 NEqual::nedd="Arguments of NEqual have different dimensions.";
 
 
+VarRangeQ::usage="VarRangeQ[\!\(\*
+StyleBox[\"x\", \"TI\"]\)] tests if \!\(\*
+StyleBox[\"x\", \"TI\"]\) has the form {\!\(\*
+StyleBox[\"var\", \"TI\"]\), \!\(\*
+StyleBox[\"min\", \"TI\"]\), \!\(\*
+StyleBox[\"max\", \"TI\"]\)}.";
+
+
+VarRangeQ[x_]:=If[ListQ[x]&&Length[x]==3&&NumericQ[x[[2]]]&&NumericQ[x[[3]]],True,False,False];
+
+
 FindRoots::usage="FindRoots[\!\(\*
 StyleBox[\"f\", \"TI\"]\), {\!\(\*
 StyleBox[\"x\", \"TI\"]\), \!\(\*
@@ -3049,100 +3064,124 @@ StyleBox[\"x\", \"TI\"]\), \!\(\*
 StyleBox[SubscriptBox[\"x\", \"min\"], \"TI\"]\), \!\(\*
 StyleBox[SubscriptBox[\"x\", \"max\"], \"TI\"]\)}, \[Ellipsis]] finds all roots of {\!\(\*
 StyleBox[SubscriptBox[\"f\", \"1\"], \"TI\"]\), \!\(\*
-StyleBox[SubscriptBox[\"f\", \"2\"], \"TI\"]\), \[Ellipsis]} (up to three dimensions).";
+StyleBox[SubscriptBox[\"f\", \"2\"], \"TI\"]\), \[Ellipsis]}.";
 
 
-(* wrappers for 1D, 2D, 3D functions from mathematica.stackexchange *)
-FindRoots[f_,{x_,xmin_,xmax_},opts___?OptionQ]:=Thread[{x->#}]&/@findAllRoots[f/.(lhs_==rhs_)->rhs-lhs,{x,xmin,xmax},opts];
-FindRoots[{f1_,f2_},{x_,a_,b_},{y_,c_,d_},opts___?OptionQ]:=Thread[{x,y}->#]&/@FindRoots2D[{f1,f2}/.(lhs_==rhs_)->rhs-lhs,{x,a,b},{y,c,d},opts];
-FindRoots[{f1_,f2_,f3_},{x_,a_,b_},{y_,c_,d_},{z_,e_,f_},opts___?OptionQ]:=Thread[{x,y,z}->#]&/@
-	FindAllCrossings3D[{f1,f2,f3}/.(lhs_==rhs_)->rhs-lhs,{x,a,b},{y,c,d},{z,e,f},opts];
+(* based on:
+FindAllCrossings2D by Stan Wagon,
+findAllRoots by Jens <https://mathematica.stackexchange.com/a/16444/>,
+FindRoots2D by Mr. Wizard <https://mathematica.stackexchange.com/a/770/>,
+FindAllCrossings3D by J.M. <https://mathematica.stackexchange.com/a/11365/> *)
 
 
-(* (modified) "findAllRoots" by Jens <https://mathematica.stackexchange.com/a/16444/6358> *)
+FindRoots[eqnsin_List,ranges__?VarRangeQ,opts___?OptionQ]:=
 
-SyntaxInformation[findAllRoots] = {"LocalVariables" -> {"Plot", {2, 2}}, "ArgumentsPattern" -> {_, _, OptionsPattern[]}};
-SetAttributes[findAllRoots, HoldAll];
+Module[{
+(* options *)
+numseeds,method,pad,plotopts,findrootopts,deq,
+verbose,
+(* other variables *)
+eqns,dim,roots,seeds,peqns,var,min,max,dvar,vars,plot,f},
 
-Options[findAllRoots] = 
-  Join[{"ShowPlot" -> False, PlotRange -> All}, 
-   FilterRules[Options[Plot], Except[PlotRange]]];
+Block[{verbosity},
 
-findAllRoots[fn_, {l_, lmin_, lmax_}, opts : OptionsPattern[]] := 
- Module[
-  {pl, p, x, localFunction, brackets},
-  localFunction = ReleaseHold[Hold[fn] /. HoldPattern[l] :> x];
-  If[
-   lmin != lmax,
-   pl = Plot[localFunction, {x,lmin-10^-3(lmax-lmin),lmax+10^-3(lmax-lmin)},
-     Evaluate@
-      FilterRules[Join[{opts}, Options[findAllRoots]], Options[Plot]]
-     ];
-   p = Cases[pl, Line[{x__}] :> x, Infinity];
-   If[OptionValue["ShowPlot"], 
-    Print[Show[pl, PlotLabel -> "Finding roots for this function", 
-      ImageSize -> 200, BaseStyle -> {FontSize -> 8}]]],
-   p = {}
-   ];
-  brackets = Map[
-    First,
-    Select[
-     (* This Split trick pretends that two points on the curve are "equal" if the function values 
-     have _opposite _ sign. Pairs of such sign-changes form the brackets for the subsequent FindRoot *)
-     Split[p, Sign[Last[#2]] == -Sign[Last[#1]] &],
-     Length[#1] == 2 &
-     ],
-    {2}
-    ];
-  Select[Chop[x /. Apply[FindRoot[localFunction == 0, {x, ##1}] &, brackets, {1}] /. x -> {}], lmin-$MachineEpsilon<=#<=lmax+$MachineEpsilon &]
-  ]
+(* set verbosity *)
+verbose=Evaluate[Verbose/.Flatten[{opts,Options[FindRoots]}]];
+If[verbose,
+	verbosity=Max[1,Evaluate[Verbosity/.Flatten[{opts,Options[FindRoots]}]]],
+	verbosity=Evaluate[Verbosity/.Flatten[{opts,Options[FindRoots]}]]
+];
+If[IntegerQ[Global`$verbosity],verbosity=Max[Global`$verbosity,verbosity]];
 
+(* handle options *)
+plotopts=Evaluate[PlotOpts/.Flatten[{opts,Options[FindRoots]}]];
+findrootopts=Evaluate[FindRootOpts/.Flatten[{opts,Options[FindRoots]}]];
+method=Evaluate[Method/.Flatten[{opts,Options[FindRoots]}]];
+numseeds=Evaluate[NumSeeds/.Flatten[{opts,Options[FindRoots]}]];
+pad=Evaluate[Padding/.Flatten[{opts,Options[FindRoots]}]];
+deq=Evaluate[DEq/.Flatten[{opts,Options[FindRoots]}]];
 
-(* (modified) "FindRoots2D" by Mr. Wizard <https://mathematica.stackexchange.com/a/770/>, based on "FindAllCrossings2D" by Stan Wagon *)
+eqns=eqnsin/.(lhs_==rhs_)->rhs-lhs; (* convert equations into functions *)
+dim=Length[eqns];
+If[dim!=Length[{ranges}],Message[FindRoots::baddim];Abort[]];
 
-FindRoots2D::usage="FindRoots2D[funcs,{x,a,b},{y,c,d}] finds all nontangential solutions to {f=0, g=0} in the given rectangle.";
+Do[
+	{var[i],min[i],max[i]}={ranges}[[i]];
+	dvar[i]=(max[i]-min[i]);
+	(*Print[i," ",{var[i],min[i],max[i],dvar[i]}];*)
+,{i,dim}];
+vars=Table[var[i],{i,dim}];
 
-Options[FindRoots2D]={PlotPoints->Automatic,MaxRecursion->Automatic};
+(* set seeds *)
+If[
+	method===Automatic,
+	Which[
+		dim==1,
+		plot=Plot[Evaluate[eqns/.{var[1]->x}],{x,min[1]-pad*dvar[1],max[1]+pad*dvar[1]}];
+		VPrint[3,plot];
+		seeds=Mean/@Map[First,Select[Split[ExtractPlotPoints[plot][[1]],Sign[Last[#2]]==-Sign[Last[#1]]&],Length[#1]==2&],{2}]/.{x_?NumericQ->{x}};
+		seeds=Join[seeds,{{min[1]},{max[1]}}]
+	,
+		dim==2,
+		peqns=Drop[eqns,{deq}];
+		plot=ContourPlot[Evaluate[peqns/.{var[1]->x,var[2]->y}],
+			{x,min[1]-1.1*pad*dvar[1],max[1]+pad*dvar[1]},{y,min[2]-pad*dvar[2],max[2]+1.1*pad*dvar[2]},
+			Contours->{0},ContourShading->False,Evaluate[Sequence@@plotopts]];
+		VPrint[3,plot];
+		f=Compile[{x,y},Evaluate[eqns[[deq]]/.{var[1]->x,var[2]->y}]];
+		seeds=Flatten[Pick[Rest@#,Rest[#]Most[#]&@Sign@Apply[f,#,2],-1]&/@ExtractPlotPoints[plot],1];
+		seeds=Join[seeds,Tuples[Table[{min[i],max[i]},{i,dim}]]]
+	,
+		dim==3,
+		peqns=Drop[eqns,{deq}];
+		plot=ContourPlot3D[Evaluate[peqns/.{var[1]->x,var[2]->y,var[3]->z}],
+			{x,min[1]-1.1*pad*dvar[1],max[1]+pad*dvar[1]},{y,min[2]-pad*dvar[2],max[2]+1.1*pad*dvar[2]},{z,min[3]-1.05*pad*dvar[3],max[3]+1.05*pad*dvar[3]},
+			BoundaryStyle->{1->None,2->None,{1,2}->{}},ContourStyle->None,Mesh->None,
+			Evaluate[Sequence@@plotopts]];
+		VPrint[3,plot];
+		f=Compile[{x,y,z},Evaluate[eqns[[deq]]/.{var[1]->x,var[2]->y,var[3]->z}]];
+		seeds=Flatten[Pick[Rest[#],Most[#] Rest[#]&@Sign@Apply[f,#,2],-1]&/@ExtractPlotPoints[plot],1];
+		seeds=Join[seeds,Tuples[Table[{min[i],max[i]},{i,dim}]]]
+	,
+		Else,
+		method=Grid
+	];
+];
+Which[
+	method===Grid,
+	If[numseeds==Automatic,numseeds=5];
+	If[IntegerQ[numseeds],numseeds=Table[numseeds,{dim}]];
+	seeds=Tuples[Table[Subdivide[min[i],max[i],numseeds[[i]]-1],{i,dim}]]
+,
+	method===Random,
+	If[numseeds==Automatic,numseeds=10];
+	seeds=RandomVariate[UniformDistribution[Table[{min[i],max[i]},{i,dim}]],numseeds]	
+];
+VPrint[1,"seeds=",seeds];
 
-FindRoots2D[funcs:{f1_,f2_},{x_,a_,b_},{y_,c_,d_},opts:OptionsPattern[]]:=Module[{fZero,seeds,fy=Compile[{x,y},f2]},
-	fZero=ExtractPlotPoints[ContourPlot[f1==0,{x,a-10^-3(b-a),b+10^-3(b-a)},{y,c-10^-3(d-c),d+10^-3(d-c)},
-		Evaluate@FilterRules[{opts},Options@ContourPlot]]];
-	(*Print[fZero];*)
-	seeds=Pick[Rest@#,Rest[#]Most[#]&@Sign@Apply[fy,#,2],-1]&/@fZero;
-	(*Print["seeds=",seeds];*)
-	With[{seq=FilterRules[{opts},Options@FindRoot]},
-		Select[Chop@Union[{x,y}/.FindRoot[funcs,{x,#},{y,#2},seq]&@@@Join@@seeds,SameTest->(Norm[#-#2]<1*^-6&)],
-			a-$MachineEpsilon<=#[[1]]<=b+$MachineEpsilon&&c-$MachineEpsilon<=#[[2]]<=d+$MachineEpsilon&]
-	]
+If[seeds!={},
+	roots=Union[
+		Chop[Map[Quiet@Check[
+			FindRoot[eqns,Evaluate[Transpose[{vars,#}]],Evaluate[Sequence@@findrootopts]],Null,{FindRoot::jsing}]&,seeds]]//DeleteNulls,
+		SameTest->(RuleListDistance[#1,#2]<10^-8&)
+		];
+	VPrint[1,"roots=",roots];
+	Return[Select[roots,And@@Table[min[i]-$MachineEpsilon<=#[[i,2]]<=max[i]+$MachineEpsilon,{i,dim}]&]],
+	Return[{}]
 ];
 
-
-(* (modified) "FindAllCrossings3D" by J.M. <https://mathematica.stackexchange.com/a/11365/> *)
-
-Options[FindAllCrossings3D]=Sort[Join[Options[FindRoot],
-	{MaxRecursion->Automatic,PerformanceGoal:>$PerformanceGoal,PlotPoints->Automatic}
 ]];
 
-FindAllCrossings3D[funcs_?VectorQ,{x_,xmin_,xmax_},{y_,ymin_,ymax_},{z_,zmin_,zmax_},opts___]:= Module[{
-	contourData,seeds,roots,tt,fz=Compile[{x,y,z},Evaluate[funcs[[3]]]]}, 
-		
-	contourData=ExtractPlotPoints[ContourPlot3D[Evaluate[Most[funcs]],
-		{x,xmin-10^-3(xmax-xmin),xmax+10^-3(xmax-xmin)},{y,ymin-10^-3(ymax-ymin),ymax+10^-3(ymax-ymin)},{z,zmin-10^-3(zmax-zmin),zmax+10^-3(zmax-zmin)},
-		BoundaryStyle->{1->None,2->None,{1,2}->{}},ContourStyle->None,Mesh->None,Method->Automatic,
-		Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[ContourPlot3D]]]]];
-	(*Print[contourData];*)
-	
-	seeds=Flatten[Pick[Rest[#],Most[#] Rest[#]&@Sign[Apply[fz,#,2]],-1]&/@contourData,1];
-	(*Print["seeds=",seeds];*)
-	
-	Return[If[seeds==={},seeds,
-		roots=Union[Map[{x,y,z}/.
-			FindRoot[funcs,Transpose[{{x,y,z},#}],Evaluate[Sequence@@FilterRules[Join[{opts},Options[FindAllCrossings3D]],Options[FindRoot]]]]&,seeds]];
-		(*Print[roots];*)
-		Select[Chop@roots,
-			(xmin-$MachineEpsilon<=#[[1]]<=xmax+$MachineEpsilon&&ymin-$MachineEpsilon<=#[[2]]<=ymax+$MachineEpsilon&&zmin-$MachineEpsilon<=#[[3]]<=zmax+$MachineEpsilon)&]
-	]];
-];
+
+Options[FindRoots]={Method->Automatic,NumSeeds->Automatic,FindRootOpts->{},PlotOpts->{},Padding->10^-3,DEq->-1,
+Verbose->False,Verbosity->0};
+
+
+FindRoots::baddim="Number of functions does not match number of unknowns.";
+
+
+(* handle one-function case *)
+FindRoots[func_,range_?VarRangeQ,opts___?OptionQ]:=FindRoots[{func},range,opts];
 
 
 VectorPlot1D::usage="VectorPlot1D[\!\(\*
@@ -7722,12 +7761,14 @@ Return[Plot[var/.eq,{par,parmin,parmax},PlotRange->plotrange,AxesLabel->axeslabe
 
 Options[PlotEcoEq]={
 	TestStability->True,StableStyle->{},UnstableStyle->{Dashed},
-	PlotRange->Automatic,AxesLabel->Automatic,PlotRangePadding->Scaled[0.02]
+	PlotRange->Automatic,AxesLabel->Automatic,PlotRangePadding->Scaled[0.02],
+	Verbose->False,Verbosity->0
 };
 
 
 (* no vars given = All *)
-PlotEcoEq[eqs_?ListOfVariablesQ,{par_,parmin_?NumericQ,parmax_?NumericQ},opts___?OptionQ]:=Module[{axeslabel,vars},
+PlotEcoEq[eqs_?ListOfVariablesQ,{par_,parmin_?NumericQ,parmax_?NumericQ},opts___?OptionQ]:=
+Module[{axeslabel,vars},
 	axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[PlotEcoEq]}]];
 	vars=Keys[eqs[[1]]];
 	
