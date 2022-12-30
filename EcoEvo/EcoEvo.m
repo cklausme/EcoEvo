@@ -809,63 +809,6 @@ CellBaseline\[Rule]Scaled[0.005],CellMargins\[Rule]{{66,Inherited},{Inherited,In
 PrintCall[expr_,dingbat_:""]:=Print[DeleteCases[Unevaluated@Defer[expr],Verbatim[Sequence][],\[Infinity]]];
 
 
-ColorData[1]; (* load ColorData *)
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"EEReds","",{}},{"Gradients"},1,{0,1},
-	Map[ColorConvert[#,"RGB"]&,{Hue[0.083,0.4,1],Hue[0.083,0.7,1],Hue[0.083,1,1],Hue[0,1,1],Hue[0.917,1,1],Hue[0.917,1,0.7],Hue[0.917,1,0.4]}]
-	,""}];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"EEReds"];
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"EEGreens","",{}},{"Gradients"},1,{0,1},
-	Map[ColorConvert[#,"RGB"]&,{Hue[0.25,0.4,1],Hue[0.25,0.7,1],Hue[0.25,1,1],Hue[0.333,1,1],Hue[0.417,1,1],Hue[0.417,1,0.7],Hue[0.417,1,0.4]}]
-	,""}];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"EEGreens"];
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"EEBlues","",{}},{"Gradients"},1,{0,1},
-	Map[ColorConvert[#,"RGB"]&,{Hue[0.567,0.4,1],Hue[0.583,0.7,1],Hue[0.583,1,1],Hue[0.667,1,1],Hue[0.75,1,1],Hue[0.75,1,0.7],Hue[0.75,1,0.4]}]
-	,""}];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"EEBlues"];
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"EEBrowns","",{}},{"Gradients"},1,{0,1},
-	Map[ColorConvert[#,"RGB"]&,{Lighter[Brown,0.5],Lighter[Blend[{Brown,Orange},0.5],0.5],Blend[{Brown,Orange},0.5],Darker[Blend[{Brown,Orange},0.5],0.5],Darker[Brown,0.5]}]
-	,""}];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"EEBrowns"];
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"EEGrays","",{}},{"Gradients"},1,{0,1},
-	{LightGray,Black}
-	,""}];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"EEGrays"];
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"Black","",{}},{"Gradients"},1,{0,1},
-	{Black,Black}
-	,""}];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"Black"];
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"Gray","",{}},{"Gradients"},1,{0,1},
-	{Gray,Gray}
-	,""}];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"Gray"];
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"DarkerRainbow","darkerrainbow",{}},{"Gradients"},1,{0,1},{RGBColor[0.3142746666666667, 0.07251066666666667, 0.35134400000000005`],RGBColor[0.20737333333333335`, 0.07838666666666667, 0.44297933333333334`],RGBColor[0.16715200000000002`, 0.15025733333333335`, 0.512768],RGBColor[0.16272, 0.24082800000000001`, 0.5440560000000001],RGBColor[0.1774146666666667, 0.32444266666666666`, 0.5350193333333334],RGBColor[0.20394600000000002`, 0.3903833333333333, 0.4931106666666667],RGBColor[0.24032000000000003`, 0.43717266666666665`, 0.43046133333333336`],RGBColor[0.28656133333333333`, 0.46789933333333333`, 0.36021400000000003`],RGBColor[0.342278, 0.48661333333333334`, 0.29378800000000005`],RGBColor[0.4051006666666667, 0.49581200000000003`, 0.2390586666666667],RGBColor[0.4700253333333334, 0.4950606666666667, 0.1994446666666667],RGBColor[0.5296993333333333, 0.480772, 0.17388599999999999`],RGBColor[0.5756746666666667, 0.44718066666666667`, 0.15770933333333334`],RGBColor[0.600676, 0.38855066666666666`, 0.14436133333333334`],RGBColor[0.601902, 0.30264266666666667`, 0.12800933333333334`],RGBColor[0.5854046666666667, 0.19547200000000003`, 0.10698733333333335`],RGBColor[0.5715726666666667, 0.08740400000000001, 0.08808533333333333]},""}
-];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"DarkerRainbow"];
-
-AppendTo[DataPaclets`ColorDataDump`colorSchemes,
-	{{"LighterRainbow","lighterrainbow",{}},{"Gradients"},1,{0,1},{RGBColor[0.647608, 0.405844, 0.6846773333333334],RGBColor[0.5407066666666667, 0.41172, 0.7763126666666667],RGBColor[0.5004853333333333, 0.4835906666666666, 0.8461013333333333],RGBColor[0.49605333333333335`, 0.5741613333333333, 0.8773893333333334],RGBColor[0.510748, 0.6577759999999999, 0.8683526666666667],RGBColor[0.5372793333333333, 0.7237166666666666, 0.8264440000000001],RGBColor[0.5736533333333333, 0.770506, 0.7637946666666667],RGBColor[0.6198946666666667, 0.8012326666666666, 0.6935473333333333],RGBColor[0.6756113333333333, 0.8199466666666667, 0.6271213333333333],RGBColor[0.738434, 0.8291453333333333, 0.572392],RGBColor[0.8033586666666667, 0.828394, 0.532778],RGBColor[0.8630326666666667, 0.8141053333333333, 0.5072193333333332],RGBColor[0.9090079999999999, 0.780514, 0.4910426666666666],RGBColor[0.9340093333333334, 0.721884, 0.47769466666666666`],RGBColor[0.9352353333333333, 0.635976, 0.4613426666666667],RGBColor[0.9187379999999999, 0.5288053333333333, 0.4403206666666667],RGBColor[0.904906, 0.42073733333333335`, 0.4214186666666666]},""}
-];
-AppendTo[DataPaclets`ColorDataDump`colorSchemeNames,"LighterRainbow"];
-
-GrayScale[x_]:=GrayLevel[1-x];
-
-
 ClearCache::usage="ClearCache[\!\(\*
 StyleBox[\"f\", \"TI\"]\), \!\(\*
 StyleBox[\"g\", \"TI\"]\), ...] removes memoized DownValues of \!\(\*
@@ -2518,7 +2461,7 @@ If[ifvars!={},
 			Else,
 			plotopts=FilterRules[Flatten[{Exclusions->exclusions,opts,AxesLabel->axeslabel,PlotStyle->plotstyle,Options[PlotDynamics]}],Options[Plot]];
 			If[exclusions===Automatic,exclusions=Union@Select[Split[Flatten@Table[(var/.sol)["Coordinates"][[1]],{var,ifvars}]],Length[#]>1&][[All,1]]];
-			(*Print["exclusions=",exclusions];*)
+			Print["exclusions=",exclusions];
 			ifplot=Plot[Evaluate[Table[Tooltip[var[x],ToString[var]],{var,ifvars}]/.sol],{x,xinit,xfinal},Exclusions->exclusions,Evaluate[Sequence@@plotopts],PlotRange->plotrange];
 			If[plotvariance==True,
 				varplots=DeleteNulls@Table[
@@ -2910,7 +2853,7 @@ StyleBox[\"A\", \"TI\"]\) and \!\(\*
 StyleBox[\"B\", \"TI\"]\).";
 
 
-DoubleDotProduct[A_?MatrixQ,B_?MatrixQ]:=Flatten[A] . Flatten[B];
+DoubleDotProduct[A_?MatrixQ,B_?MatrixQ]:=Flatten[A].Flatten[B];
 
 
 HessianMatrix::usage="HessianMatrix[\!\(\*
@@ -3570,7 +3513,7 @@ RemoveTraitts:=Flatten[Table[Table[{
 ,{gtrait,gtraits[gu]}],{gu,guilds}]];
 
 
-(* ::Code::Initialization:: *)
+(* ::Code:: *)
 RemoveVarCovts:=Flatten[Table[Table[{
 	Subscript[Var[gtrait],\[FormalS]_][t]->Subscript[Var[gtrait],\[FormalS]],
 	Table[Subscript[Cov[gtrait,gtrait\[Prime]],\[FormalS]_]->Subscript[Cov[gtrait,gtrait\[Prime]],\[FormalS]][t],{gtrait\[Prime],gtraits[gu]}],
@@ -4605,13 +4548,13 @@ Do[Do[
 			d2f\[Prime]=Simplify@HessianMatrix[f\[Prime],sourcetraits];
 			VPrint[3,"d2f\[Prime]=",d2f\[Prime]];
 			{Subscript[source, \[FormalI]]f,
-			Subscript[source, \[FormalI]]/Subscript[gcomp, \[FormalI]]*(f(sourcetraits-desttraits)+sourceG . df),
-			Subscript[source, \[FormalI]]/Subscript[gcomp, \[FormalI]](mut+f(sourceG-destG+(sourcetraits-desttraits)^2)+sourceG . d2f . sourceG
-				+df*sourceG . Transpose[sourcetraits-desttraits]+(sourcetraits-desttraits) . Transpose[sourceG . df]),
+			Subscript[source, \[FormalI]]/Subscript[gcomp, \[FormalI]]*(f(sourcetraits-desttraits)+sourceG.df),
+			Subscript[source, \[FormalI]]/Subscript[gcomp, \[FormalI]](mut+f(sourceG-destG+(sourcetraits-desttraits)^2)+sourceG.d2f.sourceG
+				+df*sourceG.Transpose[sourcetraits-desttraits]+(sourcetraits-desttraits).Transpose[sourceG.df]),
 			Subscript[source, \[FormalI]]f\[Prime],
-			Subscript[source, \[FormalI]]/Subscript[gcomp, \[FormalI]]*(f\[Prime](sourcetraits-desttraits)+sourceG . df\[Prime]),
-			Subscript[source, \[FormalI]]/Subscript[gcomp, \[FormalI]](mut\[Prime]+f\[Prime](sourceG-destG+(sourcetraits-desttraits)^2)+sourceG . d2f\[Prime] . sourceG
-				+df\[Prime]*sourceG . Transpose[sourcetraits-desttraits]+(sourcetraits-desttraits) . Transpose[sourceG . df\[Prime]])
+			Subscript[source, \[FormalI]]/Subscript[gcomp, \[FormalI]]*(f\[Prime](sourcetraits-desttraits)+sourceG.df\[Prime]),
+			Subscript[source, \[FormalI]]/Subscript[gcomp, \[FormalI]](mut\[Prime]+f\[Prime](sourceG-destG+(sourcetraits-desttraits)^2)+sourceG.d2f\[Prime].sourceG
+				+df\[Prime]*sourceG.Transpose[sourcetraits-desttraits]+(sourcetraits-desttraits).Transpose[sourceG.df\[Prime]])
 			}
 		,{source,gcomps[gu]}]];
 		Unprotect[Equation];Equation[Subscript[gcomp, i_]]:=Evaluate[dndt[gcomp]/.\[FormalI]->i];Protect[Equation];
@@ -6299,7 +6242,7 @@ Which[
 	variables!={}&&((variables[[1,2,0]]===InterpolatingFunction||(modeltype=="ContinousTime"&&modelperiod=!=0))&&time===t),
 	dim=Length[j];
 	per=FinalTime[variables];
-	xsol=NDSolve[{x'[t]==j . x[t],x[0]==IdentityMatrix[dim]},x,{t,0,per},Sequence@@ndsolveopts][[1]];
+	xsol=NDSolve[{x'[t]==j.x[t],x[0]==IdentityMatrix[dim]},x,{t,0,per},Sequence@@ndsolveopts][[1]];
 	If[Global`debug,Print[func,": x[per]/.xsol=",x[per]/.xsol]];
 	If[multipliers,
 		res=Eigenvalues[x[per]/.xsol],
@@ -8150,10 +8093,10 @@ Which[
 		VPrint[3,"j=",j];
 		If[verbose,
 			With[{j=j/.invtraits,liu=Length[invunks],tstart=tstart,tend=tend,dt=tend-tstart,op=Sequence@@ndsolveopts},
-			PrintCall[Global`invsol=NDSolve[{Global`x'[t]==j . Global`x[t]/.Global`sol/.Global`qsssol,Global`x[tstart]==IdentityMatrix[liu]},Global`x,{t,tstart,tend},op]];
+			PrintCall[Global`invsol=NDSolve[{Global`x'[t]==j.Global`x[t]/.Global`sol/.Global`qsssol,Global`x[tstart]==IdentityMatrix[liu]},Global`x,{t,tstart,tend},op]];
 			PrintCall[Global`eval=Max@Re@Log@Chop@Sort@Eigenvalues@Evaluate[Global`x[tend]/.Global`invsol]/dt]
 		]];
-		invsol=NDSolve[{x'[t]==j . x[t]/.invtraits/.sol/.qsssol,x[tstart]==IdentityMatrix[Length[invunks]]},x,{t,tstart,tend},Evaluate[Sequence@@ndsolveopts]];
+		invsol=NDSolve[{x'[t]==j.x[t]/.invtraits/.sol/.qsssol,x[tstart]==IdentityMatrix[Length[invunks]]},x,{t,tstart,tend},Evaluate[Sequence@@ndsolveopts]];
 		eval=Max@Re@Log@Chop@Sort@Eigenvalues@Evaluate[x[tend]/.invsol]/(tend-tstart);
 		Return[{eval,"?"}];
 	]
@@ -10040,7 +9983,7 @@ If[delaydinv==True,
 	If[sol==="FindEcoAttractor",sol=BlankVariables];
 	eqns=Flatten[Table[Table[
 		Thread[Table[Subscript[gtrait,sp]',{gtrait,gtraits[gu]}]==(
-		pre[gu,sp]*g[gu,sp] . DInv[BlankTraits,sol,Guild->gu,Species->sp,Time->time,Fixed->fixed,Evaluate[Sequence@@dinvopts]]
+		pre[gu,sp]*g[gu,sp].DInv[BlankTraits,sol,Guild->gu,Species->sp,Time->time,Fixed->fixed,Evaluate[Sequence@@dinvopts]]
 		-Table[dtrait[gu,gtrait],{gtrait,gtraits[gu]}]
 		+If[modeltype=="DiscreteTime",Table[Subscript[gtrait,sp],{gtrait,gtraits[gu]}],0]
 		/.fixed)]
