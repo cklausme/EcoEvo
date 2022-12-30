@@ -3151,7 +3151,7 @@ Which[
 	method===Grid,
 	If[numseeds==Automatic,numseeds=5];
 	If[IntegerQ[numseeds],numseeds=Table[numseeds,{dim}]];
-	seeds=Tuples[Table[Subdivide[min[i],max[i],numseeds[[i]]-1],{i,dim}]]
+	seeds=Tuples[Table[Range[min[i],max[i],(max[i]-min[i])/(numseeds[[i]]-1)],{i,dim}]]
 ,
 	method===Random,
 	If[numseeds==Automatic,numseeds=10];
