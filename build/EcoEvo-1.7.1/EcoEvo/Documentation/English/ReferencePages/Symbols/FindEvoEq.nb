@@ -1,0 +1,1457 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     46696,       1448]
+NotebookOptionsPosition[     39947,       1233]
+NotebookOutlinePosition[     42471,       1301]
+CellTagsIndexPosition[     42385,       1296]
+WindowTitle->FindEvoEq
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[GridBox[{
+   {Cell["ECOEVO PACKAGE SYMBOL", "PacletNameCell"], Cell[TextData[{
+     Cell[BoxData[
+      ActionMenuBox[
+       FrameBox[
+        InterpretationBox[Cell[TextData[{
+          "See Also",
+          StyleBox[" \[FilledDownTriangle]", "AnchorBarArrow",
+           StripOnInput->False]
+         }]],
+         TextCell[
+          Row[{"See Also", 
+            Style[" \[FilledDownTriangle]", "AnchorBarArrow"]}]]],
+        StripOnInput->False], {"\<\"SolveEvoEq\"\>":>Documentation`HelpLookup[
+       "paclet:EcoEvo/ref/SolveEvoEq"], "\<\" . \"\>":>
+       Documentation`HelpLookup["paclet:ref/FindRoot"], "\<\"NSolveEvoEq\"\>":>
+       Documentation`HelpLookup[
+       "paclet:EcoEvo/ref/NSolveEvoEq"], "\<\" . \"\>":>
+       Documentation`HelpLookup[
+       "paclet:ref/FindRoot"], "\<\"FindEcoEvoEq\"\>":>
+       Documentation`HelpLookup[
+       "paclet:EcoEvo/ref/FindEcoEvoEq"], "\<\"FindRoot\"\>":>
+       Documentation`HelpLookup[
+       "paclet:ref/FindRoot"], "\<\"FindInstance\"\>":>
+       Documentation`HelpLookup["paclet:ref/FindInstance"]},
+       Appearance->None,
+       MenuAppearance->Automatic,
+       MenuStyle->"SeeAlso"]],
+      LineSpacing->{1.4, 0}],
+     "\[ThickSpace]\[ThickSpace]\[ThickSpace]\[ThickSpace]\[ThickSpace]\
+\[ThickSpace]",
+     Cell[BoxData[
+      ActionMenuBox[
+       FrameBox[
+        InterpretationBox[Cell[TextData[{
+          "Related Guides",
+          StyleBox[" \[FilledDownTriangle]", "AnchorBarArrow",
+           StripOnInput->False]
+         }]],
+         TextCell[
+          Row[{"Related Guides", 
+            Style[" \[FilledDownTriangle]", "AnchorBarArrow"]}]]],
+        StripOnInput->False], {"\<\"EcoEvo\"\>":>Documentation`HelpLookup[
+       "paclet:EcoEvo/guide/EcoEvo"]},
+       Appearance->None,
+       MenuAppearance->Automatic,
+       MenuStyle->"MoreAbout"]],
+      LineSpacing->{1.4, 0}],
+     "\[ThickSpace]\[ThickSpace]\[ThickSpace]\[ThickSpace]\[ThickSpace]\
+\[ThickSpace]",
+     Cell[BoxData[
+      ActionMenuBox[
+       FrameBox[
+        InterpretationBox[Cell[TextData[{
+          "URL",
+          StyleBox[" \[FilledDownTriangle]", "AnchorBarArrow",
+           StripOnInput->False]
+         }]],
+         TextCell[
+          Row[{"URL", 
+            Style[" \[FilledDownTriangle]", "AnchorBarArrow"]}]]],
+        StripOnInput->False], {"\<\"EcoEvo/ref/FindEvoEq\"\>":>
+       None, "\<\"Copy Wolfram Documentation Center URL\"\>":>
+       Module[{DocumentationSearch`Private`nb$}, 
+        DocumentationSearch`Private`nb$ = NotebookPut[
+           Notebook[{
+             Cell["EcoEvo/ref/FindEvoEq"]}, Visible -> False]]; 
+        SelectionMove[DocumentationSearch`Private`nb$, All, Notebook]; 
+        FrontEndTokenExecute[DocumentationSearch`Private`nb$, "Copy"]; 
+        NotebookClose[DocumentationSearch`Private`nb$]; Null]},
+       Appearance->None,
+       MenuAppearance->Automatic,
+       MenuStyle->"URLMenu"]],
+      LineSpacing->{1.4, 0}]
+    }], "AnchorBar"]}
+  }]], "AnchorBarGrid",
+ CellID->1],
+
+Cell[TextData[{
+ Cell["FindEvoEq", "ObjectName"],
+ Cell[BoxData[
+  InterpretationBox[
+   StyleBox[
+    GraphicsBox[{},
+     BaselinePosition->Baseline,
+     ImageSize->{8, 0}],
+    CacheGraphics->False],
+   Spacer[8]]]],
+ Cell[BoxData[""], "ObjectNameTranslation"]
+}], "ObjectNameGrid"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[GridBox[{
+   {"", Cell[TextData[{
+     Cell[BoxData[
+      RowBox[{"FindEvoEq", "[", 
+       StyleBox["sol", "TI"], "]"}]], "InlineFormula",
+      $CellContext`ExpressionUUID -> "4539c921-0e70-4425-90ca-e5e20276ab09"],
+     "\[LineSeparator]finds an evolutionary equilibrium using ecological \
+equilibrium ",
+     StyleBox["sol", "TI"],
+     "."
+    }]]},
+   {"", Cell[TextData[{
+     Cell[BoxData[
+      RowBox[{"FindEvoEq", "[", 
+       StyleBox[
+        RowBox[{"traits", ",", " ", "sol"}], "TI"], "]"}]], "InlineFormula",
+      $CellContext`ExpressionUUID -> "c337c7d5-23a9-4c2e-afc5-4d593ecb090b"],
+     " \[LineSeparator]finds an evolutionary equilibrium using ecological \
+equilibrium ",
+     StyleBox["sol", "TI"],
+     ", with initial guess ",
+     StyleBox["traits", "TI"],
+     "."
+    }]]}
+  }]], "Usage",
+ GridBoxOptions->{
+ GridBoxBackground->{
+  "Columns" -> {{None}}, "ColumnsIndexed" -> {}, "Rows" -> {None, {None}}, 
+   "RowsIndexed" -> {}}},
+ CellID->982511436,
+ $CellContext`ExpressionUUID -> "8982038f-afa7-4e40-b2ee-cdb5271f7775"],
+
+Cell[CellGroupData[{
+
+Cell[TextData[Cell[BoxData[
+ ButtonBox[Cell[TextData[{
+   Cell[BoxData[
+    InterpretationBox[
+     StyleBox[
+      GraphicsBox[{},
+       BaselinePosition->Baseline,
+       ImageSize->{6, 0}],
+      CacheGraphics->False],
+     Spacer[6]]]],
+   "Details"
+  }], "NotesFrameText"],
+  Appearance->{Automatic, None},
+  BaseStyle->None,
+  ButtonFunction:>(FrontEndExecute[{
+     FrontEnd`SelectionMove[
+      FrontEnd`SelectedNotebook[], All, ButtonCell], 
+     FrontEndToken["OpenCloseGroup"], 
+     FrontEnd`SelectionMove[
+      FrontEnd`SelectedNotebook[], After, CellContents]}]& ),
+  Evaluator->None,
+  Method->"Preemptive"]]]], "NotesSection",
+ WholeCellGroupOpener->True,
+ CellGroupingRules->{"SectionGrouping", 50},
+ CellID->365664301],
+
+Cell["", "SectionHeaderSpacer"],
+
+Cell["The following options can be given:", "Notes",
+ CellID->1067943069,
+ $CellContext`ExpressionUUID -> "68887739-90a9-4ec2-bf7e-b01534884864"],
+
+Cell[BoxData[GridBox[{
+   {Cell["      ", "TableRowIcon"], "DelayDInv", 
+    ButtonBox["False",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/False"], Cell[TextData[Cell[TextData[{
+     "evaluate ",
+     Cell[BoxData[
+      TemplateBox[{Cell[
+         TextData["NDInv"]],"paclet:EcoEvo/ref/NDInv"},
+       "RefLink",
+       BaseStyle->{"InlineFormula"}]], "InlineFormula",
+      $CellContext`ExpressionUUID -> "5ed0ae78-166e-4b47-b545-86f256797dab"],
+     " numerically at each point"
+    }], "TableText",
+     $CellContext`ExpressionUUID -> "1131c0ab-d439-4b23-bfd0-2aa3836dfe27"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "9f574de6-2dc3-4292-871c-c8a0accfceee"]},
+   {Cell["      ", "TableRowIcon"], "DInvOpts", 
+    RowBox[{"{", "}"}], Cell[TextData[Cell[TextData[{
+     "options to pass to ",
+     Cell[BoxData[
+      TemplateBox[{Cell[
+         TextData["DInv"]],"paclet:EcoEvo/ref/DInv"},
+       "RefLink",
+       BaseStyle->{"InlineFormula"}]], "InlineFormula",
+      $CellContext`ExpressionUUID -> "9f45d41e-3987-4e55-a422-2f18bd05ce33"],
+     " / ",
+     Cell[BoxData[
+      TemplateBox[{Cell[
+         TextData["NDInv"]],"paclet:EcoEvo/ref/NDInv"},
+       "RefLink",
+       BaseStyle->{"InlineFormula"}]], "InlineFormula",
+      $CellContext`ExpressionUUID -> "32eaa894-0926-40f4-ac4a-407cf209dc7d"]
+    }], "TableText",
+     $CellContext`ExpressionUUID -> "460db234-71d6-4cb2-bc6f-43e45df2067d"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "2be27ca3-b664-4f78-996a-b60cc0e14cb3"]},
+   {Cell["      ", "TableRowIcon"], "FindInstanceOpts", 
+    RowBox[{"{", "Reals", "}"}], Cell[TextData[{
+     "options to pass to ",
+     ButtonBox["FindInstance",
+      BaseStyle->"Link",
+      ButtonData->"paclet:ref/FindInstance"]
+    }], "TableText",
+     $CellContext`ExpressionUUID -> "779a4216-0167-4e1f-8a96-a9164dd51256"]},
+   {Cell["      ", "TableRowIcon"], "FindRootOpts", 
+    RowBox[{"{", "}"}], Cell[TextData[Cell[TextData[{
+     "options to pass to ",
+     ButtonBox["FindRoot",
+      BaseStyle->"Link",
+      ButtonData->"paclet:ref/FindRoot"]
+    }], "TableText",
+     $CellContext`ExpressionUUID -> "bf027eee-1bab-4af9-8d7d-6bb735b0e849"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "e72dd683-2059-46f7-8ddc-6a4c6136b72c"]},
+   {Cell["      ", "TableRowIcon"], "EvoEquation", "\"\<QG\>\"", Cell[
+    TextData[Cell["equation for trait dynamics", "TableText",
+     $CellContext`ExpressionUUID -> "b36a8f4d-6db7-49a3-b345-4de1204feb51"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "7dc35fcd-ddb7-4ae3-8d36-55c9bcf806c3"]},
+   {Cell["      ", "TableRowIcon"], "BoundaryDetection", 
+    ButtonBox["False",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/False"], Cell[TextData[Cell[
+    "force traits in traitrange", "TableText",
+     $CellContext`ExpressionUUID -> "d0c3e1b8-4711-49c9-9e3d-7d7d6e13e538"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "08a85f85-d8b3-4956-b808-164a7c8ad5bb"]},
+   {Cell["      ", "TableRowIcon"], "TraitShiftRate", 
+    RowBox[{"{", "}"}], Cell[TextData[Cell[
+    "rate of environmental change", "TableText",
+     $CellContext`ExpressionUUID -> "f14c7702-cda0-4d53-9dfa-348a5da6b542"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "4d87421f-06f8-4be1-af21-da6e67f6ee2f"]},
+   {Cell["      ", "TableRowIcon"], "Fised", 
+    RowBox[{"{", "}"}], Cell[TextData[{
+     Cell["fixed variables", "TableText",
+      $CellContext`ExpressionUUID -> "b1d82d55-5d76-45d5-81cb-d862803dfb1c"],
+     " (not written yet)"
+    }], "TableText",
+     $CellContext`ExpressionUUID -> "7eba1308-5ffe-4946-b707-25afcb16bd86"]},
+   {Cell["      ", "TableRowIcon"], "Verbose", 
+    ButtonBox["False",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/False"], Cell[TextData[Cell[
+    "print extra info", "TableText",
+     $CellContext`ExpressionUUID -> "ce4d3bd5-ed7c-49ae-a21b-c546f311863f"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "2822008c-bcac-4c7f-ae63-d8694d0571ca"]},
+   {Cell["      ", "TableRowIcon"], "VerboseAll", 
+    ButtonBox["False",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/False"], Cell[TextData[Cell[
+    "apply Verbose recursively", "TableText",
+     $CellContext`ExpressionUUID -> "bcd09ceb-6cdf-405a-a99e-5c86d81fe959"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "ab46ba95-6698-4eab-8d54-fc1363952022"]}
+  }]], "3ColumnTableMod",
+ GridBoxOptions->{
+ GridBoxBackground->{
+  "Columns" -> {{None}}, "ColumnsIndexed" -> {}, 
+   "Rows" -> {None, None, None, None, None, None, None, None, None, {None}}, 
+   "RowsIndexed" -> {}},
+ GridBoxDividers->{
+  "Rows" -> {{
+     True, True, True, True, True, True, True, True, True, True, True}}}},
+ CellID->778781181,
+ $CellContext`ExpressionUUID -> "be3293f1-89b6-4c42-a210-cbe96ca810b4"],
+
+Cell["Possible settings for the EvoEquation option are:", "Notes",
+ CellID->721119105,
+ $CellContext`ExpressionUUID -> "660375ec-368f-4739-9661-71d62e50b13d"],
+
+Cell[BoxData[GridBox[{
+   {Cell["      ", "TableRowIcon"], "\"\<QG\>\"", Cell[
+    "quantitative genetics (breeders equation)", "TableText",
+     $CellContext`ExpressionUUID -> "27e0ff2e-5666-4589-835b-623ee6bc18ee"]},
+   {Cell["      ", "TableRowIcon"], "\"\<CE\>\"", Cell[
+    "canonical equation of adaptive dynamics", "TableText",
+     $CellContext`ExpressionUUID -> "a00ee3e9-bce6-46b9-b1cc-a8e284100285"]}
+  }]], "2ColumnTableMod",
+ GridBoxOptions->{
+ GridBoxBackground->{
+  "Columns" -> {{None}}, "ColumnsIndexed" -> {}, "Rows" -> {None, {None}}, 
+   "RowsIndexed" -> {}},
+ GridBoxDividers->{"Rows" -> {{True, True, True}}}},
+ CellID->862266387,
+ $CellContext`ExpressionUUID -> "cd6acf35-877d-443c-b941-5c19320ddd49"],
+
+Cell[TextData[{
+ "When no initial trait guess is given, ",
+ ButtonBox["FindInstance",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/FindInstance"],
+ " is used.  When one is given, ",
+ ButtonBox["FindRoot",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/FindRoot"],
+ " is used."
+}], "Notes",
+ CellID->247802074,
+ $CellContext`ExpressionUUID -> "e49ce902-c507-457e-81f5-0fc317fa8266"],
+
+Cell["", "SectionFooterSpacer"]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ Cell[BoxData[
+  InterpretationBox[
+   StyleBox[
+    GraphicsBox[{},
+     BaselinePosition->Baseline,
+     ImageSize->{6, 0}],
+    CacheGraphics->False],
+   Spacer[6]]]],
+ "Examples",
+ "\[NonBreakingSpace]\[NonBreakingSpace]",
+ Cell["(3)", "ExampleCount"]
+}], "PrimaryExamplesSection",
+ WholeCellGroupOpener->True,
+ CellTags->"PrimaryExamplesSection",
+ CellID->1769192840],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Basic Examples",
+ "\[NonBreakingSpace]\[NonBreakingSpace]",
+ Cell["(3)", "ExampleCount"]
+}], "ExampleSection", "ExampleSection",
+ WholeCellGroupOpener->True,
+ CellID->765485518],
+
+Cell["The trait-based Lotka-Volterra competition model:", "ExampleText",
+ CellID->306461916,
+ $CellContext`ExpressionUUID -> "5155e2dc-93dd-4a15-a7a7-4b703f9488d7"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Needs", "[", "\"\<EcoEvo`\>\"", "]"}], ";"}]], "Input",
+ CellLabel->"In[1]:=",
+ CellID->2067907618,
+ $CellContext`ExpressionUUID -> "9bb6365f-323f-4eed-8701-82ff1d8c93c4"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"SetModel", "[", 
+    RowBox[{"{", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Guild", "[", "n", "]"}], "\[Rule]", 
+       RowBox[{"{", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"Equation", "\[RuleDelayed]", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"r", "[", 
+              SubscriptBox["x", "\[FormalI]"], "]"}], "-", 
+             RowBox[{"Sum", "[", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"a", "[", 
+                 RowBox[{
+                  SubscriptBox["x", "\[FormalI]"], ",", 
+                  SubscriptBox["x", "\[FormalJ]"]}], "]"}], 
+                SubscriptBox["n", "\[FormalJ]"]}], ",", 
+               RowBox[{"{", 
+                RowBox[{"\[FormalJ]", ",", 
+                 SubscriptBox["\[ScriptCapitalN]", "n"]}], "}"}]}], "]"}]}], 
+            ")"}], 
+           SubscriptBox["n", "\[FormalI]"]}]}], ",", "\[IndentingNewLine]", 
+         RowBox[{"Traits", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "1"}], "\[LessEqual]", "x", "\[LessEqual]", "1"}], 
+           "}"}]}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+      RowBox[{"Parameters", "\[RuleDelayed]", 
+       RowBox[{"{", 
+        RowBox[{"\[Sigma]", ">", "0"}], "}"}]}]}], "\[IndentingNewLine]", 
+     "}"}], "]"}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"a", "[", 
+    RowBox[{"xi_", ",", "xj_"}], "]"}], ":=", 
+   RowBox[{"E", "^", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", "1"}], "/", "2"}], "*", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"xi", "-", "xj"}], ")"}], "^", "2"}], "/", 
+       RowBox[{"\[Sigma]", "^", "2"}]}]}], ")"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"r", "[", "x_", "]"}], ":=", 
+   RowBox[{"1", "-", 
+    RowBox[{"x", "^", "2"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"\[Sigma]", "=", 
+   RowBox[{"1", "/", "2"}]}], ";"}]}], "Input",
+ CellLabel->"In[2]:=",
+ CellID->1042986035,
+ $CellContext`ExpressionUUID -> "7bbb0c0f-94b2-402f-9de5-cb49ad7d7cd0"],
+
+Cell["\<\
+To find a one-species evolutionary equilibrium, first find a one-species \
+ecological equilibrium:\
+\>", "ExampleText",
+ CellID->1397647335,
+ $CellContext`ExpressionUUID -> "ffa48231-dd56-4459-aae0-81a7542dc1a3"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"eq", "=", 
+  RowBox[{"SolveEcoEq", "[", 
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["\[ScriptCapitalN]", "n"], "\[Rule]", "1"}], "}"}], 
+   "]"}]}]], "Input",
+ CellLabel->"In[3]:=",
+ CellID->952772532,
+ $CellContext`ExpressionUUID -> "78fd14cb-f875-4ceb-957a-ce9cfae29184"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", "0"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", 
+     RowBox[{"1", "-", 
+      SubsuperscriptBox["x", "1", "2"]}]}], "}"}]}], "}"}]], "Output",
+ CellLabel->"Out[3]=",
+ CellID->1513117376,
+ $CellContext`ExpressionUUID -> "e1cc5764-b556-4eea-b93a-7bddf51ccb9b"]
+}, Open  ]],
+
+Cell["Then use that equilibrium in FindEvoEq:", "ExampleText",
+ CellID->1669985368,
+ $CellContext`ExpressionUUID -> "b208d574-2f78-41f9-93f0-9764d92e51ba"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FindEvoEq", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", "0.1"}], "}"}], ",", 
+   RowBox[{"eq", "\[LeftDoubleBracket]", 
+    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}]}], "]"}]], "Input",
+ CellLabel->"In[4]:=",
+ CellID->71072811,
+ $CellContext`ExpressionUUID -> "0de0760f-1584-4214-80ce-774639c5f229"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   SubscriptBox["x", "1"], "\[Rule]", "0"}], "}"}]], "Output",
+ CellLabel->"Out[4]=",
+ CellID->883438774,
+ $CellContext`ExpressionUUID -> "022115aa-279a-4796-88da-86cd2f60ac80"]
+}, Open  ]],
+
+Cell["Incorporate environmental change:", "ExampleText",
+ CellID->472905536,
+ $CellContext`ExpressionUUID -> "ba9f661f-7ef9-4cf8-8a73-6717c909e638"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FindEvoEq", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", 
+     RowBox[{"-", "0.2"}]}], "}"}], ",", 
+   RowBox[{"eq", "\[LeftDoubleBracket]", 
+    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], ",", 
+   RowBox[{"TraitShiftRate", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"x", "\[Rule]", "1"}], "}"}]}]}], "]"}]], "Input",
+ CellLabel->"In[5]:=",
+ CellID->1128104607,
+ $CellContext`ExpressionUUID -> "25be3a6f-caa8-43fc-96e2-dcd8b732eaa8"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   SubscriptBox["x", "1"], "\[Rule]", 
+   RowBox[{"-", "0.5`"}]}], "}"}]], "Output",
+ CellLabel->"Out[5]=",
+ CellID->1004711269,
+ $CellContext`ExpressionUUID -> "459b5031-aa88-4d25-9c32-763682370ba4"]
+}, Open  ]],
+
+Cell["Find a two-species evolutionary equilibrium:", "ExampleText",
+ CellID->1697611243,
+ $CellContext`ExpressionUUID -> "5bd3a705-7744-4e87-8104-104c365ee6f7"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"eq2", "=", 
+  RowBox[{"SolveEcoEq", "[", 
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["\[ScriptCapitalN]", "n"], "\[Rule]", "2"}], "}"}], 
+   "]"}]}]], "Input",
+ CellLabel->"In[6]:=",
+ CellID->185713928,
+ $CellContext`ExpressionUUID -> "f8c5ade0-1241-4faa-b20e-e671764ea1cd"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["n", "1"], "\[Rule]", "0"}], ",", 
+     RowBox[{
+      SubscriptBox["n", "2"], "\[Rule]", "0"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["n", "1"], "\[Rule]", 
+      RowBox[{"1", "-", 
+       SubsuperscriptBox["x", "1", "2"]}]}], ",", 
+     RowBox[{
+      SubscriptBox["n", "2"], "\[Rule]", "0"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["n", "1"], "\[Rule]", "0"}], ",", 
+     RowBox[{
+      SubscriptBox["n", "2"], "\[Rule]", 
+      RowBox[{"1", "-", 
+       SubsuperscriptBox["x", "2", "2"]}]}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["n", "1"], "\[Rule]", 
+      RowBox[{"-", 
+       FractionBox[
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"2", " ", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             RowBox[{
+              SubscriptBox["x", "1"], "-", 
+              SubscriptBox["x", "2"]}], ")"}], "2"]}]], " ", 
+         RowBox[{"(", 
+          RowBox[{"1", "-", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{"2", " ", 
+             SuperscriptBox[
+              RowBox[{"(", 
+               RowBox[{
+                SubscriptBox["x", "1"], "-", 
+                SubscriptBox["x", "2"]}], ")"}], "2"]}]], "+", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", 
+             RowBox[{"2", " ", 
+              SuperscriptBox[
+               RowBox[{"(", 
+                RowBox[{
+                 SubscriptBox["x", "1"], "-", 
+                 SubscriptBox["x", "2"]}], ")"}], "2"]}]], " ", 
+            SubsuperscriptBox["x", "1", "2"]}], "-", 
+           SubsuperscriptBox["x", "2", "2"]}], ")"}]}], 
+        RowBox[{
+         RowBox[{"-", "1"}], "+", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"4", " ", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             RowBox[{
+              SubscriptBox["x", "1"], "-", 
+              SubscriptBox["x", "2"]}], ")"}], "2"]}]]}]]}]}], ",", 
+     RowBox[{
+      SubscriptBox["n", "2"], "\[Rule]", 
+      RowBox[{"-", 
+       FractionBox[
+        RowBox[{
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"2", " ", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             RowBox[{
+              SubscriptBox["x", "1"], "-", 
+              SubscriptBox["x", "2"]}], ")"}], "2"]}]], " ", 
+         RowBox[{"(", 
+          RowBox[{"1", "-", 
+           SuperscriptBox["\[ExponentialE]", 
+            RowBox[{"2", " ", 
+             SuperscriptBox[
+              RowBox[{"(", 
+               RowBox[{
+                SubscriptBox["x", "1"], "-", 
+                SubscriptBox["x", "2"]}], ")"}], "2"]}]], "-", 
+           SubsuperscriptBox["x", "1", "2"], "+", 
+           RowBox[{
+            SuperscriptBox["\[ExponentialE]", 
+             RowBox[{"2", " ", 
+              SuperscriptBox[
+               RowBox[{"(", 
+                RowBox[{
+                 SubscriptBox["x", "1"], "-", 
+                 SubscriptBox["x", "2"]}], ")"}], "2"]}]], " ", 
+            SubsuperscriptBox["x", "2", "2"]}]}], ")"}]}], 
+        RowBox[{
+         RowBox[{"-", "1"}], "+", 
+         SuperscriptBox["\[ExponentialE]", 
+          RowBox[{"4", " ", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             RowBox[{
+              SubscriptBox["x", "1"], "-", 
+              SubscriptBox["x", "2"]}], ")"}], "2"]}]]}]]}]}]}], "}"}]}], 
+  "}"}]], "Output",
+ CellLabel->"Out[6]=",
+ CellID->269993883,
+ $CellContext`ExpressionUUID -> "a65f430d-9abc-49da-8411-8e5e55971315"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FindEvoEq", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["x", "1"], "\[Rule]", 
+      RowBox[{"-", "0.2"}]}], ",", 
+     RowBox[{
+      SubscriptBox["x", "2"], "\[Rule]", "0.2"}]}], "}"}], ",", 
+   RowBox[{"eq2", "\[LeftDoubleBracket]", 
+    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}]}], "]"}]], "Input",
+ CellLabel->"In[7]:=",
+ CellID->1308660010,
+ $CellContext`ExpressionUUID -> "2403d7dd-6fbe-4c2f-bf68-c9f76be58219"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{
+    SubscriptBox["x", "1"], "\[Rule]", 
+    RowBox[{"-", "0.34098418877421155`"}]}], ",", 
+   RowBox[{
+    SubscriptBox["x", "2"], "\[Rule]", "0.34098418877421155`"}]}], 
+  "}"}]], "Output",
+ CellLabel->"Out[7]=",
+ CellID->2050638801,
+ $CellContext`ExpressionUUID -> "e7edeeb8-76ac-42cd-9efe-b76a58cbbf7f"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[Cell["\t", "ExampleDelimiter",
+   $CellContext`ExpressionUUID -> "d13bf0ea-2fe1-424f-9c48-61c473e9221c"],
+  $Line = 0; Null]], "ExampleDelimiter",
+ CellID->1425121483,
+ $CellContext`ExpressionUUID -> "9676bb47-b133-4eac-a667-d5d091ca7be2"],
+
+Cell["A two-trait Lotka-Volterra competition model:", "ExampleText",
+ CellID->1551656072,
+ $CellContext`ExpressionUUID -> "a374495d-73ae-44ea-89f1-8c541c2446cb"],
+
+Cell["\<\
+Multiple traits \[LongDash] a two-trait Lotka-Volterra competition model:\
+\>", "ExampleText",
+ CellID->121277704,
+ $CellContext`ExpressionUUID -> "50877b3e-b90a-49e8-8727-be1550455a42"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Needs", "[", "\"\<EcoEvo`\>\"", "]"}], ";"}]], "Input",
+ CellLabel->"In[1]:=",
+ CellID->1884205905,
+ $CellContext`ExpressionUUID -> "1d5a170c-bf23-4f65-8077-51df6f32d9fb"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetModel", "[", 
+   RowBox[{"{", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Guild", "[", "n", "]"}], "\[Rule]", 
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Equation", "\[RuleDelayed]", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"r", "[", 
+             RowBox[{
+              SubscriptBox["x", "\[FormalI]"], ",", 
+              SubscriptBox["y", "\[FormalI]"]}], "]"}], "-", 
+            RowBox[{"Sum", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"a", "[", 
+                RowBox[{
+                 SubscriptBox["x", "\[FormalI]"], ",", 
+                 SubscriptBox["x", "\[FormalJ]"], ",", 
+                 SubscriptBox["y", "\[FormalI]"], ",", 
+                 SubscriptBox["y", "\[FormalJ]"]}], "]"}], 
+               SubscriptBox["n", "\[FormalJ]"]}], ",", 
+              RowBox[{"{", 
+               RowBox[{"\[FormalJ]", ",", 
+                SubscriptBox["\[ScriptCapitalN]", "n"]}], "}"}]}], "]"}]}], 
+           ")"}], 
+          SubscriptBox["n", "\[FormalI]"]}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"Traits", "\[Rule]", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "1"}], "\[LessEqual]", "x", "\[LessEqual]", "1"}], 
+           ",", 
+           RowBox[{
+            RowBox[{"-", "1"}], "\[LessEqual]", "y", "\[LessEqual]", "1"}]}], 
+          "}"}]}]}], "\[IndentingNewLine]", "}"}]}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"Parameters", "\[RuleDelayed]", 
+      RowBox[{"{", 
+       RowBox[{"\[Sigma]", ">", "0"}], "}"}]}]}], "\[IndentingNewLine]", 
+    "}"}], "]"}], ";"}]], "Input",
+ CellLabel->"In[2]:=",
+ CellID->1668729423,
+ $CellContext`ExpressionUUID -> "315dbc7b-319a-438d-843b-27cf165b6427"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"r", "[", 
+    RowBox[{"x_", ",", "y_"}], "]"}], ":=", 
+   RowBox[{"1", "-", 
+    RowBox[{"x", "^", "2"}], "-", 
+    RowBox[{"y", "^", "2"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"a", "[", 
+    RowBox[{"xi_", ",", "xj_", ",", "yi_", ",", "yj_"}], "]"}], ":=", 
+   RowBox[{"E", "^", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", "1"}], "/", "2"}], "*", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"xi", "-", "xj"}], ")"}], "^", "2"}], "+", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"yi", "-", "yj"}], ")"}], "^", "2"}]}], ")"}], "/", 
+       RowBox[{"\[Sigma]", "^", "2"}]}]}], ")"}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{"\[Sigma]", "=", 
+   RowBox[{"1", "/", "2"}]}], ";"}]}], "Input",
+ CellLabel->"In[3]:=",
+ CellID->198982541,
+ $CellContext`ExpressionUUID -> "1264e32d-e4c7-4917-ba81-a7069793db5a"],
+
+Cell["\<\
+To find a one-species evolutionary equilibrium, first find a one-species \
+ecological equilibrium:\
+\>", "ExampleText",
+ CellID->84709561,
+ $CellContext`ExpressionUUID -> "2fe6270f-a7f5-466b-adf6-350c5043bf25"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"eq", "=", 
+  RowBox[{"SolveEcoEq", "[", 
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["\[ScriptCapitalN]", "n"], "\[Rule]", "1"}], "}"}], 
+   "]"}]}]], "Input",
+ CellLabel->"In[4]:=",
+ CellID->651765978,
+ $CellContext`ExpressionUUID -> "8a60b86d-0241-43a2-a058-7b5ca00b4aa3"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", "0"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", 
+     RowBox[{"1", "-", 
+      SubsuperscriptBox["x", "1", "2"], "-", 
+      SubsuperscriptBox["y", "1", "2"]}]}], "}"}]}], "}"}]], "Output",
+ CellLabel->"Out[4]=",
+ CellID->934835116,
+ $CellContext`ExpressionUUID -> "c18601fa-d58b-4b64-b9cd-bef031015a2a"]
+}, Open  ]],
+
+Cell["Then use that equilibrium in FindEvoEq.", "ExampleText",
+ CellID->2079417413,
+ $CellContext`ExpressionUUID -> "aa53b468-bdba-4ae7-b576-fbf00b2f6b5b"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FindEvoEq", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["x", "1"], "\[Rule]", "0.1"}], ",", 
+     RowBox[{
+      SubscriptBox["y", "1"], "\[Rule]", "0.1"}]}], "}"}], ",", 
+   RowBox[{"eq", "\[LeftDoubleBracket]", 
+    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}]}], "]"}]], "Input",
+ CellLabel->"In[5]:=",
+ CellID->284337188,
+ $CellContext`ExpressionUUID -> "d76bcacf-a13a-43c0-adec-171c39af53ba"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{
+    SubscriptBox["x", "1"], "\[Rule]", "0"}], ",", 
+   RowBox[{
+    SubscriptBox["y", "1"], "\[Rule]", "0"}]}], "}"}]], "Output",
+ CellLabel->"Out[5]=",
+ CellID->52422785,
+ $CellContext`ExpressionUUID -> "245eb4c2-d59b-48b4-b63a-cce771600bd1"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[Cell["\t", "ExampleDelimiter",
+   $CellContext`ExpressionUUID -> "896b5a22-f96c-4eaa-bbcc-7e25996f5e4f"],
+  $Line = 0; Null]], "ExampleDelimiter",
+ CellID->1805075683,
+ $CellContext`ExpressionUUID -> "c1ef6ffd-6bf2-4e28-a08a-30f7a72a7e50"],
+
+Cell["Multiple guilds \[LongDash] a trait-based predator-prey model:", \
+"ExampleText",
+ CellID->389849294,
+ $CellContext`ExpressionUUID -> "6deef3a8-6526-4c6c-97fb-fc40711534e5"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Needs", "[", "\"\<EcoEvo`\>\"", "]"}], ";"}]], "Input",
+ CellLabel->"In[1]:=",
+ CellID->880472321,
+ $CellContext`ExpressionUUID -> "4c50a244-ba7d-4baa-994d-1bd3c22b5a59"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"SetModel", "[", 
+   RowBox[{"{", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"Guild", "[", "n", "]"}], "\[Rule]", 
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Equation", "\[RuleDelayed]", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"r", "[", 
+             SubscriptBox["xn", "\[FormalI]"], "]"}], "-", 
+            RowBox[{"Sum", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"a", "[", 
+                RowBox[{
+                 SubscriptBox["xn", "\[FormalI]"], ",", 
+                 SubscriptBox["xn", "\[FormalJ]"]}], "]"}], 
+               SubscriptBox["n", "\[FormalJ]"]}], ",", 
+              RowBox[{"{", 
+               RowBox[{"\[FormalJ]", ",", 
+                SubscriptBox["\[ScriptCapitalN]", "n"]}], "}"}]}], "]"}], "-", 
+            RowBox[{"Sum", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"c", "[", 
+                RowBox[{
+                 SubscriptBox["xn", "\[FormalI]"], ",", 
+                 SubscriptBox["xp", "\[FormalJ]"]}], "]"}], 
+               SubscriptBox["p", "\[FormalJ]"]}], ",", 
+              RowBox[{"{", 
+               RowBox[{"\[FormalJ]", ",", 
+                SubscriptBox["\[ScriptCapitalN]", "p"]}], "}"}]}], "]"}]}], 
+           ")"}], 
+          SubscriptBox["n", "\[FormalI]"]}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"Traits", "\[Rule]", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"-", "1"}], "\[LessEqual]", "xn", "\[LessEqual]", "1"}], 
+          "}"}]}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"Guild", "[", "p", "]"}], "\[Rule]", 
+      RowBox[{"{", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"Equation", "\[RuleDelayed]", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"Sum", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"c", "[", 
+                RowBox[{
+                 SubscriptBox["xn", "\[FormalJ]"], ",", 
+                 SubscriptBox["xp", "\[FormalI]"]}], "]"}], 
+               SubscriptBox["n", "\[FormalJ]"]}], ",", 
+              RowBox[{"{", 
+               RowBox[{"\[FormalJ]", ",", 
+                SubscriptBox["\[ScriptCapitalN]", "n"]}], "}"}]}], "]"}], "-",
+             "m"}], ")"}], 
+          SubscriptBox["p", "\[FormalI]"]}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"Traits", "\[Rule]", 
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"-", "1"}], "\[LessEqual]", "xp", "\[LessEqual]", "1"}], 
+          "}"}]}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+     RowBox[{"Parameters", "\[RuleDelayed]", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"\[Sigma]", ">", "0"}], ",", 
+        RowBox[{"\[Sigma]c", ">", "0"}], ",", 
+        RowBox[{"m", ">", "0"}]}], "}"}]}]}], "\[IndentingNewLine]", "}"}], 
+   "]"}], ";"}]], "Input",
+ CellLabel->"In[2]:=",
+ CellID->1437855568,
+ $CellContext`ExpressionUUID -> "6320d7ee-f40f-40f8-9d94-0bc6c7e418ce"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"a", "[", 
+    RowBox[{"xi_", ",", "xj_"}], "]"}], ":=", 
+   RowBox[{"E", "^", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"-", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"xi", "-", "xj"}], ")"}], "^", "2"}]}], "/", 
+      RowBox[{"(", 
+       RowBox[{"2", 
+        RowBox[{"\[Sigma]", "^", "2"}]}], ")"}]}], ")"}]}]}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"c", "[", 
+    RowBox[{"xi_", ",", "xj_"}], "]"}], ":=", 
+   RowBox[{"E", "^", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{"-", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"xi", "-", "xj"}], ")"}], "^", "2"}]}], "/", 
+      RowBox[{"(", 
+       RowBox[{"2", 
+        RowBox[{"\[Sigma]c", "^", "2"}]}], ")"}]}], ")"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"r", "[", "x_", "]"}], ":=", 
+   RowBox[{"1", "-", 
+    RowBox[{"x", "^", "2"}]}]}], ";"}]}], "Input",
+ CellLabel->"In[3]:=",
+ CellID->405051685,
+ $CellContext`ExpressionUUID -> "e720f229-77af-4442-8918-7f9a8534b841"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"\[Sigma]", "=", 
+   RowBox[{"1", "/", "2"}]}], ";", 
+  RowBox[{"\[Sigma]c", "=", 
+   RowBox[{"1", "/", "2"}]}], ";", 
+  RowBox[{"m", "=", "0.1"}], ";"}]], "Input",
+ CellLabel->"In[4]:=",
+ CellID->180508805,
+ $CellContext`ExpressionUUID -> "5c1475df-fa19-45b0-99f1-6b61c9926bb8"],
+
+Cell["\<\
+Find a one-predator, one-prey evolutionary equilibrium by first solving for \
+an ecological equilibrium:\
+\>", "ExampleText",
+ CellID->1026682249,
+ $CellContext`ExpressionUUID -> "c098a3ee-fd30-4c63-9674-59b36f64dc42"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"eq", "=", 
+  RowBox[{"SolveEcoEq", "[", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["\[ScriptCapitalN]", "n"], "\[Rule]", "1"}], ",", 
+     RowBox[{
+      SubscriptBox["\[ScriptCapitalN]", "p"], "\[Rule]", "1"}]}], "}"}], 
+   "]"}]}]], "Input",
+ CellLabel->"In[5]:=",
+ CellID->424206617,
+ $CellContext`ExpressionUUID -> "5cc91c9e-646e-4615-92f8-0d7bec027dcb"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["n", "1"], "\[Rule]", "0"}], ",", 
+     RowBox[{
+      SubscriptBox["p", "1"], "\[Rule]", "0"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["n", "1"], "\[Rule]", 
+      RowBox[{"1.`", "\[VeryThinSpace]", "-", 
+       RowBox[{"1.`", " ", 
+        SubsuperscriptBox["xn", "1", "2"]}]}]}], ",", 
+     RowBox[{
+      SubscriptBox["p", "1"], "\[Rule]", "0"}]}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["n", "1"], "\[Rule]", 
+      RowBox[{"0.1`", " ", 
+       SuperscriptBox["\[ExponentialE]", 
+        RowBox[{"2.`", " ", 
+         SuperscriptBox[
+          RowBox[{"(", 
+           RowBox[{
+            SubscriptBox["xn", "1"], "-", 
+            RowBox[{"1.`", " ", 
+             SubscriptBox["xp", "1"]}]}], ")"}], "2"]}]]}]}], ",", 
+     RowBox[{
+      SubscriptBox["p", "1"], "\[Rule]", 
+      RowBox[{
+       RowBox[{"1.`", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"2.`", " ", 
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             SubscriptBox["xn", "1"], "-", 
+             RowBox[{"1.`", " ", 
+              SubscriptBox["xp", "1"]}]}], ")"}], "2"]}]]}], "-", 
+       RowBox[{"0.1`", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"4.`", " ", 
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             SubscriptBox["xn", "1"], "-", 
+             RowBox[{"1.`", " ", 
+              SubscriptBox["xp", "1"]}]}], ")"}], "2"]}]]}], "-", 
+       RowBox[{"1.`", " ", 
+        SuperscriptBox["\[ExponentialE]", 
+         RowBox[{"2.`", " ", 
+          SuperscriptBox[
+           RowBox[{"(", 
+            RowBox[{
+             SubscriptBox["xn", "1"], "-", 
+             RowBox[{"1.`", " ", 
+              SubscriptBox["xp", "1"]}]}], ")"}], "2"]}]], " ", 
+        SubsuperscriptBox["xn", "1", "2"]}]}]}]}], "}"}]}], "}"}]], "Output",
+ CellLabel->"Out[5]=",
+ CellID->2051500238,
+ $CellContext`ExpressionUUID -> "e1793c70-180c-4bd7-b428-e83fb291dd9a"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"FindEvoEq", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      SubscriptBox["xn", "1"], "\[Rule]", "0.1"}], ",", 
+     RowBox[{
+      SubscriptBox["xp", "1"], "\[Rule]", "0.1"}]}], "}"}], ",", 
+   RowBox[{"eq", "\[LeftDoubleBracket]", 
+    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}]}], "]"}]], "Input",
+ CellLabel->"In[6]:=",
+ CellID->1753954261,
+ $CellContext`ExpressionUUID -> "00bc21ac-b752-4a9d-9a3d-d5b67b8440aa"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{
+    SubscriptBox["xn", "1"], "\[Rule]", "0"}], ",", 
+   RowBox[{
+    SubscriptBox["xp", "1"], "\[Rule]", "0"}]}], "}"}]], "Output",
+ CellLabel->"Out[6]=",
+ CellID->681133168,
+ $CellContext`ExpressionUUID -> "c2de1fee-de71-4b00-8702-07c22454d9a6"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+
+Cell["", "SectionFooterSpacer"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ Cell[BoxData[
+  InterpretationBox[
+   StyleBox[
+    GraphicsBox[{},
+     BaselinePosition->Baseline,
+     ImageSize->{6, 0}],
+    CacheGraphics->False],
+   Spacer[6]]]],
+ "See Also"
+}], "SeeAlsoSection",
+ WholeCellGroupOpener->True,
+ CellID->1255426704,
+ $CellContext`ExpressionUUID -> "d44013cf-a077-4c90-9a3e-172a27a8f387"],
+
+Cell[TextData[{
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["SolveEvoEq"]],"paclet:EcoEvo/ref/SolveEvoEq"},
+   "RefLink",
+   BaseStyle->FEPrivate`If[
+     FEPrivate`Less[FEPrivate`$VersionNumber, 11.1], {
+     "InlineFormula", FontFamily -> "Verdana"}, {"InlineFormula"}]]], 
+  "InlineFormula",
+  $CellContext`ExpressionUUID -> "41018b25-f996-48a4-9304-06f9c689d268"],
+ "\[NonBreakingSpace]",
+ StyleBox["\[MediumSpace]\[FilledVerySmallSquare]\[MediumSpace]", 
+  "InlineSeparator"],
+ " ",
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["NSolveEvoEq"]],"paclet:EcoEvo/ref/NSolveEvoEq"},
+   "RefLink",
+   BaseStyle->FEPrivate`If[
+     FEPrivate`Less[FEPrivate`$VersionNumber, 11.1], {
+     "InlineFormula", FontFamily -> "Verdana"}, {"InlineFormula"}]]], 
+  "InlineFormula",
+  $CellContext`ExpressionUUID -> "5de39120-2553-4c2d-a6b3-2b21e520f0c4"],
+ "\[NonBreakingSpace]",
+ StyleBox["\[MediumSpace]\[FilledVerySmallSquare]\[MediumSpace]", 
+  "InlineSeparator"],
+ " ",
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["FindEcoEvoEq"]],"paclet:EcoEvo/ref/FindEcoEvoEq"},
+   "RefLink",
+   BaseStyle->FEPrivate`If[
+     FEPrivate`Less[FEPrivate`$VersionNumber, 11.1], {
+     "InlineFormula", FontFamily -> "Verdana"}, {"InlineFormula"}]]], 
+  "InlineFormula",
+  $CellContext`ExpressionUUID -> "5cd56c10-97d4-4624-9296-ea7c67edb591"]
+}], "SeeAlso",
+ CellID->798077426,
+ $CellContext`ExpressionUUID -> "541f22cc-6a94-4c04-b2e7-0a5ce27eef8c"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ Cell[BoxData[
+  InterpretationBox[
+   StyleBox[
+    GraphicsBox[{},
+     BaselinePosition->Baseline,
+     ImageSize->{6, 0}],
+    CacheGraphics->False],
+   Spacer[6]]]],
+ "Related Guides"
+}], "MoreAboutSection",
+ WholeCellGroupOpener->True,
+ CellID->38303248,
+ $CellContext`ExpressionUUID -> "533c41ec-3f35-4cdb-8bcc-5627632efd1e"],
+
+Cell["", "SectionHeaderSpacer"],
+
+Cell[BoxData[
+ TemplateBox[{Cell[
+    TextData["EcoEvo"]],"paclet:EcoEvo/guide/EcoEvo"},
+  "RefLink",
+  BaseStyle->"MoreAbout"]], "MoreAbout",
+ CellID->2088055496]
+}, Open  ]],
+
+Cell[" ", "FooterCell"]
+},
+Saveable->False,
+ScreenStyleEnvironment->"Working",
+WindowTitle->"FindEvoEq",
+TaggingRules->{
+ "ModificationHighlight" -> False, "ColorType" -> "SymbolColor", "LinkTrails" -> 
+  GridBox[{{
+      RowBox[{
+        ButtonBox[
+        "EcoEvo", ButtonData -> "paclet:EcoEvo/guide/EcoEvo", 
+         BaseStyle -> {"Link", "DockedLinkTrail"}]}]}}, ColumnAlignments -> 
+    Left], "HasOptions" -> False, "ExampleCounter" -> 1, "NeedPlatMsgIn" -> 
+  None, "RootCaptions" -> "", 
+  "Metadata" -> {
+   "built" -> "{2022, 12, 29, 21, 49, 59.122800}", 
+    "history" -> {"1.0", "", "", ""}, "context" -> "EcoEvo`", 
+    "keywords" -> {}, "specialkeywords" -> {}, 
+    "tutorialcollectionlinks" -> {}, "index" -> True, "label" -> 
+    "EcoEvo Package Symbol", "language" -> "en", "paclet" -> "EcoEvo Package",
+     "status" -> "None", "summary" -> 
+    "FindEvoEq[sol] finds an evolutionary equilibrium using ecological \
+equilibrium sol. FindEvoEq[traits, sol] finds an evolutionary equilibrium \
+using ecological equilibrium sol, with initial guess traits.", 
+    "synonyms" -> {}, "tabletags" -> {}, "title" -> "FindEvoEq", 
+    "titlemodifier" -> "", "windowtitle" -> "FindEvoEq", "type" -> "Symbol", 
+    "uri" -> "EcoEvo/ref/FindEvoEq"}, "SearchTextTranslated" -> ""},
+CellContext->"Global`",
+FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
+2014)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[
+    StyleDefinitions -> FrontEnd`FileName[{"Wolfram"}, "Reference.nb"]]], 
+   Cell[
+    StyleData["Input"], CellContext -> "Global`"], 
+   Cell[
+    StyleData["Output"], CellContext -> "Global`"], 
+   Cell[
+    StyleData["NotesSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["PrimaryExamplesSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["ExampleSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["ExampleSubsection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData[
+    "GuideTutorialsSection", StyleDefinitions -> 
+     StyleData["SeeAlsoSection"]]]}, Visible -> False, FrontEndVersion -> 
+  "10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, 2014)", 
+  StyleDefinitions -> "Default.nb"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "PrimaryExamplesSection"->{
+  Cell[12063, 329, 388, 15, 70, "PrimaryExamplesSection",
+   CellTags->"PrimaryExamplesSection",
+   CellID->1769192840]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"PrimaryExamplesSection", 42240, 1289}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[581, 21, 3003, 76, 70, "AnchorBarGrid",
+ CellID->1],
+Cell[3587, 99, 286, 11, 70, "ObjectNameGrid"],
+Cell[CellGroupData[{
+Cell[3898, 114, 1065, 30, 70, "Usage",
+ CellID->982511436],
+Cell[CellGroupData[{
+Cell[4988, 148, 738, 24, 70, "NotesSection",
+ CellGroupingRules->{"SectionGrouping", 50},
+ CellID->365664301],
+Cell[5729, 174, 31, 0, 70, "SectionHeaderSpacer"],
+Cell[5763, 176, 145, 2, 70, "Notes",
+ CellID->1067943069],
+Cell[5911, 180, 4795, 107, 70, "3ColumnTableMod",
+ CellID->778781181],
+Cell[10709, 289, 158, 2, 70, "Notes",
+ CellID->721119105],
+Cell[10870, 293, 724, 14, 70, "2ColumnTableMod",
+ CellID->862266387],
+Cell[11597, 309, 383, 12, 70, "Notes",
+ CellID->247802074],
+Cell[11983, 323, 31, 0, 70, "SectionFooterSpacer"]
+}, Closed]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[12063, 329, 388, 15, 70, "PrimaryExamplesSection",
+ CellTags->"PrimaryExamplesSection",
+ CellID->1769192840],
+Cell[CellGroupData[{
+Cell[12476, 348, 195, 6, 70, "ExampleSection",
+ CellID->765485518],
+Cell[12674, 356, 164, 2, 70, "ExampleText",
+ CellID->306461916],
+Cell[12841, 360, 206, 5, 70, "Input",
+ CellID->2067907618],
+Cell[13050, 367, 2212, 63, 70, "Input",
+ CellID->1042986035],
+Cell[15265, 432, 222, 5, 70, "ExampleText",
+ CellID->1397647335],
+Cell[CellGroupData[{
+Cell[15512, 441, 302, 9, 70, "Input",
+ CellID->952772532],
+Cell[15817, 452, 411, 13, 70, "Output",
+ CellID->1513117376]
+}, Open  ]],
+Cell[16243, 468, 155, 2, 70, "ExampleText",
+ CellID->1669985368],
+Cell[CellGroupData[{
+Cell[16423, 474, 370, 10, 70, "Input",
+ CellID->71072811],
+Cell[16796, 486, 217, 6, 70, "Output",
+ CellID->883438774]
+}, Open  ]],
+Cell[17028, 495, 148, 2, 70, "ExampleText",
+ CellID->472905536],
+Cell[CellGroupData[{
+Cell[17201, 501, 503, 14, 70, "Input",
+ CellID->1128104607],
+Cell[17707, 517, 240, 7, 70, "Output",
+ CellID->1004711269]
+}, Open  ]],
+Cell[17962, 527, 160, 2, 70, "ExampleText",
+ CellID->1697611243],
+Cell[CellGroupData[{
+Cell[18147, 533, 303, 9, 70, "Input",
+ CellID->185713928],
+Cell[18453, 544, 3675, 110, 70, "Output",
+ CellID->269993883]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22165, 659, 482, 14, 70, "Input",
+ CellID->1308660010],
+Cell[22650, 675, 358, 11, 70, "Output",
+ CellID->2050638801]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23045, 691, 272, 5, 70, "ExampleDelimiter",
+ CellID->1425121483],
+Cell[23320, 698, 161, 2, 70, "ExampleText",
+ CellID->1551656072],
+Cell[23484, 702, 196, 4, 70, "ExampleText",
+ CellID->121277704],
+Cell[23683, 708, 206, 5, 70, "Input",
+ CellID->1884205905],
+Cell[23892, 715, 1842, 48, 70, "Input",
+ CellID->1668729423],
+Cell[25737, 765, 992, 32, 70, "Input",
+ CellID->198982541],
+Cell[26732, 799, 220, 5, 70, "ExampleText",
+ CellID->84709561],
+Cell[CellGroupData[{
+Cell[26977, 808, 302, 9, 70, "Input",
+ CellID->651765978],
+Cell[27282, 819, 456, 14, 70, "Output",
+ CellID->934835116]
+}, Open  ]],
+Cell[27753, 836, 155, 2, 70, "ExampleText",
+ CellID->2079417413],
+Cell[CellGroupData[{
+Cell[27933, 842, 458, 13, 70, "Input",
+ CellID->284337188],
+Cell[28394, 857, 295, 9, 70, "Output",
+ CellID->52422785]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[28738, 872, 272, 5, 70, "ExampleDelimiter",
+ CellID->1805075683],
+Cell[29013, 879, 179, 3, 70, "ExampleText",
+ CellID->389849294],
+Cell[29195, 884, 205, 5, 70, "Input",
+ CellID->880472321],
+Cell[29403, 891, 3071, 79, 70, "Input",
+ CellID->1437855568],
+Cell[32477, 972, 1049, 37, 70, "Input",
+ CellID->405051685],
+Cell[33529, 1011, 313, 9, 70, "Input",
+ CellID->180508805],
+Cell[33845, 1022, 228, 5, 70, "ExampleText",
+ CellID->1026682249],
+Cell[CellGroupData[{
+Cell[34098, 1031, 403, 12, 70, "Input",
+ CellID->424206617],
+Cell[34504, 1045, 2123, 64, 70, "Output",
+ CellID->2051500238]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[36664, 1114, 461, 13, 70, "Input",
+ CellID->1753954261],
+Cell[37128, 1129, 298, 9, 70, "Output",
+ CellID->681133168]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]],
+Cell[37465, 1143, 31, 0, 70, "SectionFooterSpacer"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[37533, 1148, 342, 13, 70, "SeeAlsoSection",
+ CellID->1255426704],
+Cell[37878, 1163, 1442, 38, 70, "SeeAlso",
+ CellID->798077426]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[39357, 1206, 348, 13, 70, "MoreAboutSection",
+ CellID->38303248],
+Cell[39708, 1221, 31, 0, 70, "SectionHeaderSpacer"],
+Cell[39742, 1223, 163, 5, 70, "MoreAbout",
+ CellID->2088055496]
+}, Open  ]],
+Cell[39920, 1231, 23, 0, 70, "FooterCell"]
+}
+]
+*)
+
+(* End of internal cache information *)
