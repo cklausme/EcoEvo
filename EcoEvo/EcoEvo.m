@@ -80,6 +80,7 @@ VPrint;
 CreateBlock;NEqual;(*MaxEigenvalue;MaxEigenvector;MaxEigensystem;*)
 FindRoots;VarRangeQ;
 VectorPlot1D;PlotVector;
+NHeavisideTheta;
 
 
 Set\[ScriptCapitalN];
@@ -188,6 +189,7 @@ Bandwidth::usage = "Bandwidth is an option for PrestonPlot that sets the bandwid
 Base::usage = "Base is an option for PrestonPlot that sets the logarithm base.";
 BasePeriod::usage = "BasePeriod is an option for FindPeriod that gives the period to look at multiples of.";
 BoundaryDetection::usage = "BoundaryDetection is an option for various EcoEvo functions to enforce variable/trait bounds.";
+CheckRoots::usage = "CheckRoots is an option for FindRoots whether to check whether roots meet the AccuracyGoal.";
 Constraints::usage = "Constraints is an option for various EcoEvo functions that add extra constraints.";
 CoreSatellite::usage = "CoreSatellite is an option for PlotGuild to split core and satellite species.";
 DelayDInv::usage = "DelayDInv is an option for various EcoEvo functions that delays the evaluation of DInv.";
@@ -354,7 +356,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.1 (December 22, 2022)";
+$EcoEvoVersion="1.7.1 (December 30, 2022)";
 (* orange & pink = changed in 1.7.1 *)
 
 
@@ -460,12 +462,12 @@ SymmetrizeMatrix[mat_?MatrixQ]:=UpperTriangularize[mat]+Transpose[UpperTriangula
 
 NMin::usage="NMin[\!\(\*
 StyleBox[\"x\", \"TI\"]\), \!\(\*
-StyleBox[\"y\", \"TI\"]\)] is a numerical approximation to Min[\!\(\*
+StyleBox[\"y\", \"TI\"]\)] is a smooth approximation to Min[\!\(\*
 StyleBox[\"x\", \"TI\"]\), \!\(\*
 StyleBox[\"y\", \"TI\"]\)].";
 NMax::usage="NMax[\!\(\*
 StyleBox[\"x\", \"TI\"]\), \!\(\*
-StyleBox[\"y\", \"TI\"]\)] is a numerical approximation to Max[\!\(\*
+StyleBox[\"y\", \"TI\"]\)] is a smooth approximation to Max[\!\(\*
 StyleBox[\"x\", \"TI\"]\), \!\(\*
 StyleBox[\"y\", \"TI\"]\)].";
 
@@ -486,12 +488,26 @@ NMin[list_List,opts___]:=If[Length[list]==2,NMin[list[[1]],list[[2]],opts],Messa
 NMax[list_List,opts___]:=If[Length[list]==2,NMax[list[[1]],list[[2]],opts],Message[NMax::nottwo]];
 
 
-Options[NMin]={Slope->10000};
-Options[NMax]={Slope->10000};
+Options[NMin]={Slope->10^6};
+Options[NMax]={Slope->10^6};
 
 
 NMin::nottwo="NMin only works on lists of two values.";
 NMax::nottwo="NMax only works on lists of two values.";
+
+
+NHeavisideTheta::usage="NHeavisideTheta[\!\(\*
+StyleBox[\"x\", \"TI\"]\)] is a smooth approximation to HeavisideTheta[\!\(\*
+StyleBox[\"x\", \"TI\"]\)].";
+
+
+NHeavisideTheta[x_,opts___?OptionQ]:=Module[{h},
+	h=Slope/.Flatten[{opts,Options[NHeavisideTheta]}];
+	0.5+0.31831*ArcTan[h*x]
+]
+
+
+Options[NHeavisideTheta]={Slope->10^6};
 
 
 Reinterpolation::usage="Reinterpolation[\!\(\*
@@ -756,7 +772,12 @@ HighlightChanges[bool_]:=If[bool==True,
 	SelectionMove[EvaluationCell[],All,GeneratedCell];
 	$newoutput=ToExpression@*First/@Select[NotebookRead[SelectedCells[]],#[[2]]=="Output"&];
 	If[($oldoutput/.x_Graphics:>ImageData@Rasterize[x,"Image"])=!=($newoutput/.x_Graphics:>ImageData@Rasterize[x,"Image"]),
-	Print[Style["Output change:",Red],"\nold=",$oldoutput]];
+		If[Head[$oldoutput]=!=Graphics&&Head[$oldoutput]=!=Graphics3D,
+			Print[Style["Output change:",Red],"\nold=",$oldoutput]
+		,
+			Print[Style["Output change:",Red]]
+		];
+	];
 	If[Length[$newoutput]!=0,SelectionMove[EvaluationCell[],After,CellGroup,2],SelectionMove[EvaluationCell[],After,Cell]]
 	)
 	}],
@@ -2381,7 +2402,7 @@ Options[PlotInterpolatingFunction]=
 {Logged->False,PlotStyle->{},PlotMarkers->{},AxesLabel->Automatic,LineStyles->{},PlotType->"Plot",Joined->True,PlotRangePadding->Scaled[0.02],
 Histogram->False,HistogramPoints->10^5,HistogramScale->0.1,HistogramPosition->0.08,HistogramOpts->{},HistogramOpacity->0.6,Exclusions->Automatic};
 
-notPlotDynamicsOpts=Except[Alternatives@@Replace[Options[PlotDynamics],h_[a_,_]:>h[a,_],1]];
+notPlotDynamicsOpts=Except[Alternatives@@Replace[Join[Options[PlotDynamics],Options[Plot],Options[ListPlot],Options[LogPlot]],h_[a_,_]:>h[a,_],1]];
 
 
 PlotDynamics[sol_?RuleListQ,plotvarsin_List,opts___?OptionQ]:=
@@ -3078,7 +3099,7 @@ FindRoots[eqnsin_List,ranges__?VarRangeQ,opts___?OptionQ]:=
 
 Module[{
 (* options *)
-numseeds,method,pad,plotopts,findrootopts,deq,
+numseeds,method,pad,plotopts,findrootopts,deq,checkroots,accuracygoal,
 verbose,
 (* other variables *)
 eqns,dim,roots,seeds,peqns,var,min,max,dvar,vars,plot,f},
@@ -3100,6 +3121,8 @@ method=Evaluate[Method/.Flatten[{opts,Options[FindRoots]}]];
 numseeds=Evaluate[NumSeeds/.Flatten[{opts,Options[FindRoots]}]];
 pad=Evaluate[Padding/.Flatten[{opts,Options[FindRoots]}]];
 deq=Evaluate[DEq/.Flatten[{opts,Options[FindRoots]}]];
+checkroots=Evaluate[CheckRoots/.Flatten[{opts,Options[FindRoots]}]];
+accuracygoal=Evaluate[AccuracyGoal/.Flatten[{opts,Options[FindRoots]}]];
 
 eqns=eqnsin/.(lhs_==rhs_)->rhs-lhs; (* convert equations into functions *)
 dim=Length[eqns];
@@ -3166,14 +3189,22 @@ If[seeds!={},
 		SameTest->(RuleListDistance[#1,#2]<10^-8&)
 		];
 	VPrint[1,"roots=",roots];
-	Return[Select[roots,And@@Table[min[i]-$MachineEpsilon<=#[[i,2]]<=max[i]+$MachineEpsilon,{i,dim}]&]],
-	Return[{}]
+	If[checkroots,
+		VPrint[2,"norm=",Table[Norm[eqns/.root],{root,roots}]];
+		roots=Select[roots,Norm[eqns/.#]<10^-accuracygoal&];
+		VPrint[1,"checked roots=",roots]
+	];
+	roots=Select[roots,And@@Table[min[i]-$MachineEpsilon<=#[[i,2]]<=max[i]+$MachineEpsilon,{i,dim}]&];
+	VPrint[1,"filtered roots=",roots]
+,
+	roots={}	
 ];
+Return[roots]
 
 ]];
 
 
-Options[FindRoots]={Method->Automatic,NumSeeds->Automatic,FindRootOpts->{},PlotOpts->{},Padding->10^-3,DEq->-1,
+Options[FindRoots]={Method->Automatic,NumSeeds->Automatic,FindRootOpts->{},PlotOpts->{},Padding->10^-3,DEq->-1,CheckRoots->True,AccuracyGoal->8,
 Verbose->False,Verbosity->0};
 
 

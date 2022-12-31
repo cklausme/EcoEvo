@@ -131,7 +131,7 @@ PacletInstall[paclet]
 PacletManager`BuildPacletSiteFiles["/Users/klaus/github/EcoEvo"]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*cloud docs*)
 
 
@@ -184,10 +184,7 @@ publishDocDir[pacletDir_,subdir_,prefix_,target_]:=Module[{
 PublishPacletDocs[pacletDir_String,target_CloudObject]:=KeyValueMap[publishDocDir[pacletDir,#1,#2,target]&,dirPrefixes]
 
 
-PublishPacletDocs["~/github/EcoEvo/archive/EcoEvo-1.7.0/EcoEvo",CloudObject["docs"]];
-
-
-
+PublishPacletDocs["~/github/EcoEvo/archive/EcoEvo-1.7.1/EcoEvo",CloudObject["docs"]];
 
 
 
