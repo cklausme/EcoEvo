@@ -1,0 +1,894 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     28317,        885]
+NotebookOptionsPosition[     22855,        714]
+NotebookOutlinePosition[     25345,        782]
+CellTagsIndexPosition[     25260,        777]
+WindowTitle->EvoJacobian
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[GridBox[{
+   {Cell["ECOEVO PACKAGE SYMBOL", "PacletNameCell"], Cell[TextData[{
+     Cell[BoxData[
+      ActionMenuBox[
+       FrameBox[
+        InterpretationBox[Cell[TextData[{
+          "See Also",
+          StyleBox[" \[FilledDownTriangle]", "AnchorBarArrow",
+           StripOnInput->False]
+         }]],
+         TextCell[
+          Row[{"See Also", 
+            Style[" \[FilledDownTriangle]", "AnchorBarArrow"]}]]],
+        StripOnInput->False], {"\<\"EvoEigenvalues\"\>":>
+       Documentation`HelpLookup[
+       "paclet:EcoEvo/ref/EvoEigenvalues"], "\<\"EcoEvoJacobian\"\>":>
+       Documentation`HelpLookup["paclet:EcoEvo/ref/EcoEvoJacobian"]},
+       Appearance->None,
+       MenuAppearance->Automatic,
+       MenuStyle->"SeeAlso"]],
+      LineSpacing->{1.4, 0}],
+     "\[ThickSpace]\[ThickSpace]\[ThickSpace]\[ThickSpace]\[ThickSpace]\
+\[ThickSpace]",
+     Cell[BoxData[
+      ActionMenuBox[
+       FrameBox[
+        InterpretationBox[Cell[TextData[{
+          "Related Guides",
+          StyleBox[" \[FilledDownTriangle]", "AnchorBarArrow",
+           StripOnInput->False]
+         }]],
+         TextCell[
+          Row[{"Related Guides", 
+            Style[" \[FilledDownTriangle]", "AnchorBarArrow"]}]]],
+        StripOnInput->False], {"\<\"EcoEvo\"\>":>Documentation`HelpLookup[
+       "paclet:EcoEvo/guide/EcoEvo"]},
+       Appearance->None,
+       MenuAppearance->Automatic,
+       MenuStyle->"MoreAbout"]],
+      LineSpacing->{1.4, 0}],
+     "\[ThickSpace]\[ThickSpace]\[ThickSpace]\[ThickSpace]\[ThickSpace]\
+\[ThickSpace]",
+     Cell[BoxData[
+      ActionMenuBox[
+       FrameBox[
+        InterpretationBox[Cell[TextData[{
+          "URL",
+          StyleBox[" \[FilledDownTriangle]", "AnchorBarArrow",
+           StripOnInput->False]
+         }]],
+         TextCell[
+          Row[{"URL", 
+            Style[" \[FilledDownTriangle]", "AnchorBarArrow"]}]]],
+        StripOnInput->False], {"\<\"EcoEvo/ref/EvoJacobian\"\>":>
+       None, "\<\"Copy Wolfram Documentation Center URL\"\>":>
+       Module[{DocumentationSearch`Private`nb$}, 
+        DocumentationSearch`Private`nb$ = NotebookPut[
+           Notebook[{
+             Cell["EcoEvo/ref/EvoJacobian"]}, Visible -> False]]; 
+        SelectionMove[DocumentationSearch`Private`nb$, All, Notebook]; 
+        FrontEndTokenExecute[DocumentationSearch`Private`nb$, "Copy"]; 
+        NotebookClose[DocumentationSearch`Private`nb$]; Null]},
+       Appearance->None,
+       MenuAppearance->Automatic,
+       MenuStyle->"URLMenu"]],
+      LineSpacing->{1.4, 0}]
+    }], "AnchorBar"]}
+  }]], "AnchorBarGrid",
+ CellID->1],
+
+Cell[TextData[{
+ Cell["EvoJacobian", "ObjectName"],
+ Cell[BoxData[
+  InterpretationBox[
+   StyleBox[
+    GraphicsBox[{},
+     BaselinePosition->Baseline,
+     ImageSize->{8, 0}],
+    CacheGraphics->False],
+   Spacer[8]]]],
+ Cell[BoxData[""], "ObjectNameTranslation"]
+}], "ObjectNameGrid"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[GridBox[{
+   {"", Cell[TextData[{
+     Cell[BoxData[
+      RowBox[{"EvoJacobian", "[", 
+       RowBox[{
+        StyleBox["traits", "TI"], ",", " ", 
+        StyleBox["variables", "TI"], ",", " ", 
+        StyleBox["varcovars", "TI"]}], "]"}]], "InlineFormula",
+      $CellContext`ExpressionUUID -> "3a10edce-095e-4a3f-b33f-e23f5ca2e021"],
+     " \[LineSeparator]calculates the Jacobian of an evolutionary equilibrium \
+with ",
+     StyleBox["traits", "TI"],
+     ", ",
+     Cell[BoxData[
+      StyleBox["variables", "TI"]], "Code"],
+     ", trait variances/covariances in ",
+     StyleBox["varcovars", "TI"],
+     "."
+    }]]}
+  }]], "Usage",
+ GridBoxOptions->{
+ GridBoxBackground->{
+  "Columns" -> {{None}}, "ColumnsIndexed" -> {}, "Rows" -> {{None}}, 
+   "RowsIndexed" -> {}}},
+ CellID->982511436,
+ $CellContext`ExpressionUUID -> "72601a3c-c386-4531-876c-ab83238729af"],
+
+Cell[CellGroupData[{
+
+Cell[TextData[Cell[BoxData[
+ ButtonBox[Cell[TextData[{
+   Cell[BoxData[
+    InterpretationBox[
+     StyleBox[
+      GraphicsBox[{},
+       BaselinePosition->Baseline,
+       ImageSize->{6, 0}],
+      CacheGraphics->False],
+     Spacer[6]]]],
+   "Details"
+  }], "NotesFrameText"],
+  Appearance->{Automatic, None},
+  BaseStyle->None,
+  ButtonFunction:>(FrontEndExecute[{
+     FrontEnd`SelectionMove[
+      FrontEnd`SelectedNotebook[], All, ButtonCell], 
+     FrontEndToken["OpenCloseGroup"], 
+     FrontEnd`SelectionMove[
+      FrontEnd`SelectedNotebook[], After, CellContents]}]& ),
+  Evaluator->None,
+  Method->"Preemptive"]]]], "NotesSection",
+ WholeCellGroupOpener->True,
+ CellGroupingRules->{"SectionGrouping", 50},
+ CellID->814241465],
+
+Cell["", "SectionHeaderSpacer"],
+
+Cell["The following options can be given:", "Notes",
+ CellID->1067943069,
+ $CellContext`ExpressionUUID -> "81ce302e-f9b5-4b83-8be7-9fa8bca8133c"],
+
+Cell[BoxData[GridBox[{
+   {Cell["      ", "TableRowIcon"], "EvoEquation", "\"\<QG\>\"", Cell[
+    TextData[Cell[TextData[Cell["equation for trait dynamics", "TableText",
+     $CellContext`ExpressionUUID -> "8d479d48-5640-4562-aaaf-b1b63bbd1e9c"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "e4182603-72e8-4d7c-b394-c03500942da0"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "c8a2dc9d-d752-468a-8922-0684494844b9"]},
+   {Cell["      ", "TableRowIcon"], "Fixed", 
+    RowBox[{"{", "}"}], Cell[TextData[Cell["fixed variables", "TableText",
+     $CellContext`ExpressionUUID -> "f2e44de0-ad9e-4c0d-9852-3243f3bbeb89"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "49fd713f-a048-47b2-a6eb-d323b2fa6cb6"]},
+   {Cell["      ", "TableRowIcon"], "TraitShiftRate", 
+    RowBox[{"{", "}"}], Cell[TextData[Cell[
+    "change in traits due to environmental change", "TableText",
+     $CellContext`ExpressionUUID -> "147b947d-8881-4464-a4aa-bbb8b7d1df27"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "446e5a6c-e4b8-4664-b04f-dddb6bea98e5"]},
+   {Cell["      ", "TableRowIcon"], "Chop", 
+    ButtonBox["True",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/True"], Cell[TextData[Cell[TextData[{
+     "apply ",
+     ButtonBox["Chop",
+      BaseStyle->"Link",
+      ButtonData->"paclet:ref/Chop"],
+     " to results"
+    }], "TableText",
+     $CellContext`ExpressionUUID -> "9d83fc71-ee97-4ad3-bb9b-254a46d9b8b9"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "a60c0ff2-fae1-475e-9dbe-468887a363a7"]},
+   {Cell["      ", "TableRowIcon"], "Verbose", 
+    ButtonBox["False",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/False"], Cell[TextData[Cell[
+    "print extra info", "TableText",
+     $CellContext`ExpressionUUID -> "d4fe6f98-597c-4240-9ccb-c8e22aa83983"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "6382e55c-48d3-4d2c-b828-c3ec33103a45"]},
+   {Cell["      ", "TableRowIcon"], "VerboseAll", 
+    ButtonBox["False",
+     BaseStyle->"Link",
+     ButtonData->"paclet:ref/False"], Cell[TextData[Cell[
+    "apply Verbose recursively", "TableText",
+     $CellContext`ExpressionUUID -> "8cd9c846-e068-4faf-8003-d93fef84eaf5"]], 
+     "TableText",
+     $CellContext`ExpressionUUID -> "5435182a-c27d-4bcb-9d2a-da4a086fe5fe"]}
+  }]], "3ColumnTableMod",
+ GridBoxOptions->{
+ GridBoxBackground->{
+  "Columns" -> {{None}}, "ColumnsIndexed" -> {}, 
+   "Rows" -> {None, None, None, None, None, {None}}, "RowsIndexed" -> {}},
+ GridBoxDividers->{"Rows" -> {{True, True, True, True, True, True, True}}}},
+ CellID->2061243311,
+ $CellContext`ExpressionUUID -> "ced3e65e-0323-4c2d-ba95-891dd56d0c9e"],
+
+Cell["Possible settings for the EvoEquation option are:", "Notes",
+ CellID->721119105,
+ $CellContext`ExpressionUUID -> "16b1aac8-cc25-4230-8f6d-6b98c67e0c2c"],
+
+Cell[BoxData[GridBox[{
+   {Cell["      ", "TableRowIcon"], "\"\<QG\>\"", Cell[
+    "quantitative genetics (breeders equation)", "TableText",
+     $CellContext`ExpressionUUID -> "9c4a0ebc-333e-440d-aff7-c1bd027db99a"]},
+   {Cell["      ", "TableRowIcon"], "\"\<CE\>\"", Cell[
+    "canonical equation of adaptive dynamics", "TableText",
+     $CellContext`ExpressionUUID -> "b9ec5476-68f6-4c86-b23b-1177e60a1cc4"]}
+  }]], "2ColumnTableMod",
+ GridBoxOptions->{
+ GridBoxBackground->{
+  "Columns" -> {{None}}, "ColumnsIndexed" -> {}, "Rows" -> {None, {None}}, 
+   "RowsIndexed" -> {}},
+ GridBoxDividers->{"Rows" -> {{True, True, True}}}},
+ CellID->862266387,
+ $CellContext`ExpressionUUID -> "1eff558b-1559-4ec9-8e09-0ca9a851bd14"],
+
+Cell[TextData[{
+ StyleBox["traits", "TI"],
+ " and ",
+ StyleBox["variables", "TI"],
+ " can be combined."
+}], "Notes",
+ CellID->2065816578,
+ $CellContext`ExpressionUUID -> "21ec9e55-180c-413f-ac7e-c7f8c5a44598"],
+
+Cell["", "SectionFooterSpacer"]
+}, Closed]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ Cell[BoxData[
+  InterpretationBox[
+   StyleBox[
+    GraphicsBox[{},
+     BaselinePosition->Baseline,
+     ImageSize->{6, 0}],
+    CacheGraphics->False],
+   Spacer[6]]]],
+ "Examples",
+ "\[NonBreakingSpace]\[NonBreakingSpace]",
+ Cell["(1)", "ExampleCount"]
+}], "PrimaryExamplesSection",
+ WholeCellGroupOpener->True,
+ CellTags->"PrimaryExamplesSection",
+ CellID->1190503571],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Basic Examples",
+ "\[NonBreakingSpace]\[NonBreakingSpace]",
+ Cell["(1)", "ExampleCount"]
+}], "ExampleSection", "ExampleSection",
+ WholeCellGroupOpener->True,
+ CellID->688378698],
+
+Cell["The trait-based Lotka-Volterra competition model:", "ExampleText",
+ CellID->306461916,
+ $CellContext`ExpressionUUID -> "5155e2dc-93dd-4a15-a7a7-4b703f9488d7"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Needs", "[", "\"\<EcoEvo`\>\"", "]"}], ";"}]], "Input",
+ CellLabel->"In[1]:=",
+ CellID->2067907618,
+ $CellContext`ExpressionUUID -> "9bb6365f-323f-4eed-8701-82ff1d8c93c4"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"SetModel", "[", 
+    RowBox[{"{", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"Guild", "[", "n", "]"}], "\[Rule]", 
+       RowBox[{"{", "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"Equation", "\[RuleDelayed]", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"r", "[", 
+              SubscriptBox["x", "\[FormalI]"], "]"}], "-", 
+             RowBox[{"Sum", "[", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"a", "[", 
+                 RowBox[{
+                  SubscriptBox["x", "\[FormalI]"], ",", 
+                  SubscriptBox["x", "\[FormalJ]"]}], "]"}], 
+                SubscriptBox["n", "\[FormalJ]"]}], ",", 
+               RowBox[{"{", 
+                RowBox[{"\[FormalJ]", ",", 
+                 SubscriptBox["\[ScriptCapitalN]", "n"]}], "}"}]}], "]"}]}], 
+            ")"}], 
+           SubscriptBox["n", "\[FormalI]"]}]}], ",", "\[IndentingNewLine]", 
+         RowBox[{"Traits", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"-", "1"}], "\[LessEqual]", "x", "\[LessEqual]", "1"}], 
+           "}"}]}]}], "}"}]}], ",", "\[IndentingNewLine]", 
+      RowBox[{"Parameters", "\[RuleDelayed]", 
+       RowBox[{"{", 
+        RowBox[{"\[Sigma]", ">", "0"}], "}"}]}]}], "\[IndentingNewLine]", 
+     "}"}], "]"}], ";"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"a", "[", 
+    RowBox[{"xi_", ",", "xj_"}], "]"}], ":=", 
+   RowBox[{"E", "^", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"-", "1"}], "/", "2"}], "*", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"xi", "-", "xj"}], ")"}], "^", "2"}], "/", 
+       RowBox[{"\[Sigma]", "^", "2"}]}]}], ")"}]}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"r", "[", "x_", "]"}], ":=", 
+   RowBox[{"1", "-", 
+    RowBox[{"x", "^", "2"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"\[Sigma]", "=", 
+   RowBox[{"1", "/", "2"}]}], ";"}]}], "Input",
+ CellLabel->"In[2]:=",
+ CellID->1042986035,
+ $CellContext`ExpressionUUID -> "7bbb0c0f-94b2-402f-9de5-cb49ad7d7cd0"],
+
+Cell["Find the analytical EvoJacobian for one species:", "ExampleText",
+ CellID->632110811,
+ $CellContext`ExpressionUUID -> "66bc36f8-ab99-4d86-b2fc-f4592a07ae59"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"EvoJacobian", "[", 
+  RowBox[{"{", 
+   RowBox[{
+    SubscriptBox["\[ScriptCapitalN]", "n"], "\[Rule]", "1"}], "}"}], 
+  "]"}]], "Input",
+ CellLabel->"In[3]:=",
+ CellID->1208716027,
+ $CellContext`ExpressionUUID -> "fa37524b-aea1-4229-aa9f-11ba4554cc13"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"-", "2"}], "}"}], "}"}]], "Output",
+ CellLabel->"Out[3]=",
+ CellID->271528843,
+ $CellContext`ExpressionUUID -> "9f406abe-aeb3-4dd3-8216-faf9fa1c5825"]
+}, Open  ]],
+
+Cell["\<\
+Find a one-species eco-evolutionary equilibrium and calculate its EvoJacobian:\
+\>", "ExampleText",
+ CellID->1742993565,
+ $CellContext`ExpressionUUID -> "0a4e4f84-1118-4fce-b50b-adf4571500a1"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"eq", "=", 
+  RowBox[{"FindEcoEvoEq", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      SubscriptBox["x", "1"], "\[Rule]", "0.1"}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      SubscriptBox["n", "1"], "\[Rule]", "0.9"}], "}"}]}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{"EvoJacobian", "[", "eq", "]"}]}], "Input",
+ CellLabel->"In[4]:=",
+ CellID->1030525644,
+ $CellContext`ExpressionUUID -> "7b218913-d464-414c-a0b7-a931273364d5"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{
+    SubscriptBox["n", "1"], "\[Rule]", "1.`"}], ",", 
+   RowBox[{
+    SubscriptBox["x", "1"], "\[Rule]", "0"}]}], "}"}]], "Output",
+ CellLabel->"Out[4]=",
+ CellID->281049240,
+ $CellContext`ExpressionUUID -> "6a7c971b-befe-4cc0-9df0-dcd7bb56abf4"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"{", 
+   RowBox[{"-", "2"}], "}"}], "}"}]], "Output",
+ CellLabel->"Out[4]=",
+ CellID->1278036927,
+ $CellContext`ExpressionUUID -> "6a7c971b-befe-4cc0-9df0-dcd7bb56abf4"]
+}, Open  ]],
+
+Cell["\<\
+Find a two-species eco-evolutionary equilibrium and calculate its EvoJacobian:\
+\>", "ExampleText",
+ CellID->1537297604,
+ $CellContext`ExpressionUUID -> "9a4b6611-b07f-4610-a2dd-b585fcc73799"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{"eq", "=", 
+  RowBox[{"FindEcoEvoEq", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{
+       SubscriptBox["x", "1"], "\[Rule]", 
+       RowBox[{"-", "0.3"}]}], ",", 
+      RowBox[{
+       SubscriptBox["x", "2"], "\[Rule]", "0.3"}]}], "}"}], ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{
+       SubscriptBox["n", "1"], "\[Rule]", "0.5"}], ",", 
+      RowBox[{
+       SubscriptBox["n", "2"], "\[Rule]", "0.5"}]}], "}"}]}], "]"}]}], "\n", 
+ RowBox[{
+  RowBox[{"EvoJacobian", "[", "eq", "]"}], "//", "MatrixForm"}]}], "Input",
+ CellLabel->"In[5]:=",
+ CellID->704150223,
+ $CellContext`ExpressionUUID -> "f4fe0aa4-2eee-4023-bcdb-02718134b2d8"],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{
+   RowBox[{
+    SubscriptBox["n", "1"], "\[Rule]", "0.6337297830059934`"}], ",", 
+   RowBox[{
+    SubscriptBox["n", "2"], "\[Rule]", "0.6337297830059934`"}], ",", 
+   RowBox[{
+    SubscriptBox["x", "1"], "\[Rule]", 
+    RowBox[{"-", "0.3409841887742108`"}]}], ",", 
+   RowBox[{
+    SubscriptBox["x", "2"], "\[Rule]", "0.34098418877421083`"}]}], 
+  "}"}]], "Output",
+ CellLabel->"Out[5]=",
+ CellID->1316956928,
+ $CellContext`ExpressionUUID -> "e907a5e6-8894-4075-9864-414db4d64acc"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {
+      RowBox[{"-", "2.860323471904106`"}], "0.860323471904106`"},
+     {"0.860323471904106`", 
+      RowBox[{"-", "2.860323471904106`"}]}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellLabel->"Out[5]//MatrixForm=",
+ CellID->2128622914,
+ $CellContext`ExpressionUUID -> "e907a5e6-8894-4075-9864-414db4d64acc"]
+}, Open  ]],
+
+Cell["\<\
+In the corresponding EcoEvoJacobian, the EvoJacobian is the lower right block:\
+\>", "ExampleText",
+ CellID->780556139,
+ $CellContext`ExpressionUUID -> "3bc94806-5ef8-44e8-b028-4e6be97cbf13"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"EcoEvoJacobian", "[", "eq", "]"}], "//", "MatrixForm"}]], "Input",
+ CellLabel->"In[6]:=",
+ CellID->314888869,
+ $CellContext`ExpressionUUID -> "b30439b0-6a4e-4092-b4cc-6523b240ed42"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {
+      RowBox[{"-", "0.6337297830059934`"}], 
+      RowBox[{"-", "0.25000000000000006`"}], "0", "0.4321836719207106`"},
+     {
+      RowBox[{"-", "0.25000000000000006`"}], 
+      RowBox[{"-", "0.6337297830059934`"}], 
+      RowBox[{"-", "0.4321836719207106`"}], "0"},
+     {"0", 
+      RowBox[{"-", "1.07611855373692`"}], 
+      RowBox[{"-", "2.860323471904106`"}], "0.860323471904106`"},
+     {"1.07611855373692`", "0", "0.860323471904106`", 
+      RowBox[{"-", "2.860323471904106`"}]}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellLabel->"Out[6]//MatrixForm=",
+ CellID->1850392204,
+ $CellContext`ExpressionUUID -> "92768dc8-c2ea-4e9f-850e-942fd18b277d"]
+}, Open  ]],
+
+Cell["Change trait variance:", "ExampleText",
+ CellID->1979302752,
+ $CellContext`ExpressionUUID -> "10e2ee91-73e9-4282-b370-70b6a19b8b58"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"EvoJacobian", "[", 
+   RowBox[{"eq", ",", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"V", "[", "x", "]"}], "\[Rule]", "10"}], "}"}]}], "]"}], "//", 
+  "MatrixForm"}]], "Input",
+ CellLabel->"In[7]:=",
+ CellID->814441500,
+ $CellContext`ExpressionUUID -> "33faf5eb-f395-450d-960f-a95876bb09b8"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {
+      RowBox[{"-", "28.603234719041062`"}], "8.60323471904106`"},
+     {"8.60323471904106`", 
+      RowBox[{"-", "28.603234719041062`"}]}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellLabel->"Out[7]//MatrixForm=",
+ CellID->1213945161,
+ $CellContext`ExpressionUUID -> "bb7d4d7e-c4ec-4ee8-b0f3-05a6a8e29530"]
+}, Open  ]],
+
+Cell["Use canonical equation:", "ExampleText",
+ CellID->944031871,
+ $CellContext`ExpressionUUID -> "1e8776c0-a1d7-4666-860c-c640e4f90b60"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"EvoJacobian", "[", 
+   RowBox[{"eq", ",", 
+    RowBox[{"EvoEquation", "\[Rule]", "\"\<CE\>\""}]}], "]"}], "//", 
+  "MatrixForm"}]], "Input",
+ CellLabel->"In[8]:=",
+ CellID->1458914743,
+ $CellContext`ExpressionUUID -> "b28cb849-4ca8-4427-83f7-5a4006218478"],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {
+      RowBox[{"-", "1.8126721731767388`"}], "0.545212607164752`"},
+     {"0.545212607164752`", 
+      RowBox[{"-", "1.8126721731767388`"}]}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellLabel->"Out[8]//MatrixForm=",
+ CellID->1610714755,
+ $CellContext`ExpressionUUID -> "98922538-53e2-4d4c-8b29-19506c07d969"]
+}, Open  ]]
+}, Open  ]],
+
+Cell["", "SectionFooterSpacer"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ Cell[BoxData[
+  InterpretationBox[
+   StyleBox[
+    GraphicsBox[{},
+     BaselinePosition->Baseline,
+     ImageSize->{6, 0}],
+    CacheGraphics->False],
+   Spacer[6]]]],
+ "See Also"
+}], "SeeAlsoSection",
+ WholeCellGroupOpener->True,
+ CellID->1255426704,
+ $CellContext`ExpressionUUID -> "fc875a90-6cc5-41a3-8f8e-a0ef062d50ce"],
+
+Cell[TextData[{
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["EvoEigenvalues"]],"paclet:EcoEvo/ref/EvoEigenvalues"},
+   "RefLink",
+   BaseStyle->FEPrivate`If[
+     FEPrivate`Less[FEPrivate`$VersionNumber, 11.1], {
+     "InlineFormula", FontFamily -> "Verdana"}, {"InlineFormula"}]]], 
+  "InlineFormula",
+  $CellContext`ExpressionUUID -> "8bc4946b-474a-4376-950b-7fa8aa49f7b1"],
+ "\[NonBreakingSpace]",
+ StyleBox["\[MediumSpace]\[FilledVerySmallSquare]\[MediumSpace]", 
+  "InlineSeparator"],
+ " ",
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["EcoEvoJacobian"]],"paclet:EcoEvo/ref/EcoEvoJacobian"},
+   "RefLink",
+   BaseStyle->FEPrivate`If[
+     FEPrivate`Less[FEPrivate`$VersionNumber, 11.1], {
+     "InlineFormula", FontFamily -> "Verdana"}, {"InlineFormula"}]]], 
+  "InlineFormula",
+  $CellContext`ExpressionUUID -> "3467c91e-08db-415c-9fcf-c349ba4a8766"]
+}], "SeeAlso",
+ CellID->929782353,
+ $CellContext`ExpressionUUID -> "7a6934f5-84e0-4b22-918b-8448364d65d5"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ Cell[BoxData[
+  InterpretationBox[
+   StyleBox[
+    GraphicsBox[{},
+     BaselinePosition->Baseline,
+     ImageSize->{6, 0}],
+    CacheGraphics->False],
+   Spacer[6]]]],
+ "Related Guides"
+}], "MoreAboutSection",
+ WholeCellGroupOpener->True,
+ CellID->38303248,
+ $CellContext`ExpressionUUID -> "2686f6aa-87b8-4820-b8f6-64ed9cd322fa"],
+
+Cell["", "SectionHeaderSpacer"],
+
+Cell[BoxData[
+ TemplateBox[{Cell[
+    TextData["EcoEvo"]],"paclet:EcoEvo/guide/EcoEvo"},
+  "RefLink",
+  BaseStyle->"MoreAbout"]], "MoreAbout",
+ CellID->1086370897]
+}, Open  ]],
+
+Cell[" ", "FooterCell"]
+},
+Saveable->False,
+ScreenStyleEnvironment->"Working",
+WindowTitle->"EvoJacobian",
+TaggingRules->{
+ "ModificationHighlight" -> False, "ColorType" -> "SymbolColor", "LinkTrails" -> 
+  GridBox[{{
+      RowBox[{
+        ButtonBox[
+        "EcoEvo", ButtonData -> "paclet:EcoEvo/guide/EcoEvo", 
+         BaseStyle -> {"Link", "DockedLinkTrail"}]}]}}, ColumnAlignments -> 
+    Left], "HasOptions" -> False, "ExampleCounter" -> 1, "NeedPlatMsgIn" -> 
+  None, "RootCaptions" -> "", 
+  "Metadata" -> {
+   "built" -> "{2022, 12, 30, 21, 23, 11.166987}", 
+    "history" -> {"1.0", "", "", ""}, "context" -> "EcoEvo`", 
+    "keywords" -> {}, "specialkeywords" -> {}, 
+    "tutorialcollectionlinks" -> {}, "index" -> True, "label" -> 
+    "EcoEvo Package Symbol", "language" -> "en", "paclet" -> "EcoEvo Package",
+     "status" -> "None", "summary" -> 
+    "EvoJacobian[traits, variables, varcovars] calculates the Jacobian of an \
+evolutionary equilibrium with traits, variables, trait variances/covariances \
+in varcovars.", "synonyms" -> {}, "tabletags" -> {}, "title" -> "EvoJacobian",
+     "titlemodifier" -> "", "windowtitle" -> "EvoJacobian", "type" -> 
+    "Symbol", "uri" -> "EcoEvo/ref/EvoJacobian"}, "SearchTextTranslated" -> 
+  ""},
+CellContext->"Global`",
+FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
+2014)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[
+    StyleDefinitions -> FrontEnd`FileName[{"Wolfram"}, "Reference.nb"]]], 
+   Cell[
+    StyleData["Input"], CellContext -> "Global`"], 
+   Cell[
+    StyleData["Output"], CellContext -> "Global`"], 
+   Cell[
+    StyleData["NotesSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["PrimaryExamplesSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["ExampleSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["ExampleSubsection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData[
+    "GuideTutorialsSection", StyleDefinitions -> 
+     StyleData["SeeAlsoSection"]]]}, Visible -> False, FrontEndVersion -> 
+  "10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, 2014)", 
+  StyleDefinitions -> "Default.nb"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "PrimaryExamplesSection"->{
+  Cell[9166, 259, 388, 15, 70, "PrimaryExamplesSection",
+   CellTags->"PrimaryExamplesSection",
+   CellID->1190503571]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"PrimaryExamplesSection", 25116, 770}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[583, 21, 2599, 68, 70, "AnchorBarGrid",
+ CellID->1],
+Cell[3185, 91, 288, 11, 70, "ObjectNameGrid"],
+Cell[CellGroupData[{
+Cell[3498, 106, 884, 25, 70, "Usage",
+ CellID->982511436],
+Cell[CellGroupData[{
+Cell[4407, 135, 738, 24, 70, "NotesSection",
+ CellGroupingRules->{"SectionGrouping", 50},
+ CellID->814241465],
+Cell[5148, 161, 31, 0, 70, "SectionHeaderSpacer"],
+Cell[5182, 163, 145, 2, 70, "Notes",
+ CellID->1067943069],
+Cell[5330, 167, 2653, 55, 70, "3ColumnTableMod",
+ CellID->2061243311],
+Cell[7986, 224, 158, 2, 70, "Notes",
+ CellID->721119105],
+Cell[8147, 228, 724, 14, 70, "2ColumnTableMod",
+ CellID->862266387],
+Cell[8874, 244, 209, 7, 70, "Notes",
+ CellID->2065816578],
+Cell[9086, 253, 31, 0, 70, "SectionFooterSpacer"]
+}, Closed]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9166, 259, 388, 15, 70, "PrimaryExamplesSection",
+ CellTags->"PrimaryExamplesSection",
+ CellID->1190503571],
+Cell[CellGroupData[{
+Cell[9579, 278, 195, 6, 70, "ExampleSection",
+ CellID->688378698],
+Cell[9777, 286, 164, 2, 70, "ExampleText",
+ CellID->306461916],
+Cell[9944, 290, 206, 5, 70, "Input",
+ CellID->2067907618],
+Cell[10153, 297, 2212, 63, 70, "Input",
+ CellID->1042986035],
+Cell[12368, 362, 163, 2, 70, "ExampleText",
+ CellID->632110811],
+Cell[CellGroupData[{
+Cell[12556, 368, 276, 8, 70, "Input",
+ CellID->1208716027],
+Cell[12835, 378, 207, 6, 70, "Output",
+ CellID->271528843]
+}, Open  ]],
+Cell[13057, 387, 202, 4, 70, "ExampleText",
+ CellID->1742993565],
+Cell[CellGroupData[{
+Cell[13284, 395, 471, 14, 70, "Input",
+ CellID->1030525644],
+Cell[13758, 411, 298, 9, 70, "Output",
+ CellID->281049240],
+Cell[14059, 422, 208, 6, 70, "Output",
+ CellID->1278036927]
+}, Open  ]],
+Cell[14282, 431, 202, 4, 70, "ExampleText",
+ CellID->1537297604],
+Cell[CellGroupData[{
+Cell[14509, 439, 685, 21, 70, "Input",
+ CellID->704150223],
+Cell[15197, 462, 521, 15, 70, "Output",
+ CellID->1316956928],
+Cell[15721, 479, 825, 22, 70, "Output",
+ CellID->2128622914]
+}, Open  ]],
+Cell[16561, 504, 201, 4, 70, "ExampleText",
+ CellID->780556139],
+Cell[CellGroupData[{
+Cell[16787, 512, 216, 5, 70, "Input",
+ CellID->314888869],
+Cell[17006, 519, 1173, 30, 70, "Output",
+ CellID->1850392204]
+}, Open  ]],
+Cell[18194, 552, 138, 2, 70, "ExampleText",
+ CellID->1979302752],
+Cell[CellGroupData[{
+Cell[18357, 558, 330, 10, 70, "Input",
+ CellID->814441500],
+Cell[18690, 570, 825, 22, 70, "Output",
+ CellID->1213945161]
+}, Open  ]],
+Cell[19530, 595, 138, 2, 70, "ExampleText",
+ CellID->944031871],
+Cell[CellGroupData[{
+Cell[19693, 601, 291, 8, 70, "Input",
+ CellID->1458914743],
+Cell[19987, 611, 827, 22, 70, "Output",
+ CellID->1610714755]
+}, Open  ]]
+}, Open  ]],
+Cell[20841, 637, 31, 0, 70, "SectionFooterSpacer"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[20909, 642, 342, 13, 70, "SeeAlsoSection",
+ CellID->1255426704],
+Cell[21254, 657, 974, 25, 70, "SeeAlso",
+ CellID->929782353]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22265, 687, 348, 13, 70, "MoreAboutSection",
+ CellID->38303248],
+Cell[22616, 702, 31, 0, 70, "SectionHeaderSpacer"],
+Cell[22650, 704, 163, 5, 70, "MoreAbout",
+ CellID->1086370897]
+}, Open  ]],
+Cell[22828, 712, 23, 0, 70, "FooterCell"]
+}
+]
+*)
+
+(* End of internal cache information *)
