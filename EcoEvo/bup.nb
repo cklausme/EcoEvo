@@ -1,0 +1,1067 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     46253,       1059]
+NotebookOptionsPosition[     43509,       1003]
+NotebookOutlinePosition[     43926,       1020]
+CellTagsIndexPosition[     43883,       1017]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["EcoEigenvalues [backup]", "Subsection",
+ CellChangeTimes->{{3.895562191976424*^9, 
+  3.895562194347497*^9}},ExpressionUUID->"6b5a93e6-0f5f-44a3-9ba4-\
+45bd5eb189be"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.769494692292095*^9, 
+  3.769494692848196*^9}},ExpressionUUID->"0e943b3f-afd3-497c-8db8-\
+16a24fb9ef1b"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"EcoEigenvalues", "::", "usage"}], " ", "=", " ", "\n", 
+    "\"\<EcoEigenvalues[\!\(\*StyleBox[\"sol\", \"TI\"]\)] returns the \
+eigenvalues of the Jacobian matrix of the ecological equations evaluated at \
+\!\(\*StyleBox[\"sol\", \"TI\"]\).\n\
+EcoEigenvalues[\!\(\*StyleBox[\"attributes\", \"TI\"]\), \!\(\*StyleBox[\"sol\
+\", \"TI\"]\)] uses trait values/interaction coefficients \
+\!\(\*StyleBox[\"attributes\", \"TI\"]\).\>\""}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.769484095197171*^9, 3.7694840958240643`*^9}, {
+  3.807381422484379*^9, 3.8073814417063837`*^9}, {3.80739747947915*^9, 
+  3.807397480654428*^9}},
+ CellLabel->
+  "In[1667]:=",ExpressionUUID->"f8b56000-881f-427f-b3db-220d679848be"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsubsection",ExpressionUUID->"ba7acdbd-b0d8-461c-be73-7dee6547c6fa"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Options", "[", "EcoEigenvalues", "]"}], "=", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"Verbose", "\[Rule]", "False"}], ",", 
+      RowBox[{"Verbosity", "->", "0"}], ",", "\n", 
+      RowBox[{"Chop", "\[Rule]", "True"}], ",", 
+      RowBox[{"Time", "\[Rule]", "t"}], ",", 
+      RowBox[{"NDSolveOpts", "\[Rule]", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"Multipliers", "\[Rule]", "False"}], ",", 
+      RowBox[{"Fixed", "\[Rule]", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"IgnoreVar", "->", "False"}]}], "}"}]}], ";"}], "*)"}]], "Code",\
+
+ CellChangeTimes->{
+  3.687881451756421*^9, {3.688571686542431*^9, 3.688571686592046*^9}, 
+   3.7154417382400417`*^9, {3.717197474499758*^9, 3.717197475076635*^9}, {
+   3.7171975324573107`*^9, 3.7171975424972878`*^9}, {3.769861548259386*^9, 
+   3.769861551612172*^9}, {3.7698616721393213`*^9, 3.76986167491406*^9}, {
+   3.859592596014518*^9, 3.8595926008619823`*^9}, {3.859593016151145*^9, 
+   3.8595930327432737`*^9}, 3.8597227306409883`*^9, {3.890145849237534*^9, 
+   3.890145853489065*^9}, {3.890146422210243*^9, 3.890146430972232*^9}, {
+   3.890146615230011*^9, 3.890146616358075*^9}, {3.890147683505371*^9, 
+   3.890147683868249*^9}},ExpressionUUID->"53dcc12b-aacf-4249-8318-\
+c8a2b6dc2f73"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{"notOptsEcoEigenvalues", "=", 
+    RowBox[{"Except", "[", 
+     RowBox[{"Alternatives", "@@", 
+      RowBox[{"Replace", "[", 
+       RowBox[{
+        RowBox[{"Options", "[", "EcoEigenvalues", "]"}], ",", 
+        RowBox[{
+         RowBox[{"h_", "[", 
+          RowBox[{"a_", ",", "_"}], "]"}], ":>", 
+         RowBox[{"h", "[", 
+          RowBox[{"a", ",", "_"}], "]"}]}], ",", "1"}], "]"}]}], "]"}]}], 
+   ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.8901476853907127`*^9, 
+  3.89014768645157*^9}},ExpressionUUID->"9041bbd2-8cf4-4e54-b50a-\
+a321507576b1"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Aliases", "Subsubsection",ExpressionUUID->"d9127618-5618-4afd-95c6-4277352d195a"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{"(*", " ", 
+   RowBox[{"break", " ", "up", " ", "combined", " ", "traitsandpops"}], " ", 
+   "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"EcoEigenvalues", "[", 
+     RowBox[{
+      RowBox[{"in_List", ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"(", 
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{"Print", "[", "\"\<breaking\>\"", "]"}], ";"}], "*)"}], "\n", 
+     RowBox[{"EcoEigenvalues", "[", 
+      RowBox[{
+       RowBox[{"ExtractParameters", "[", "in", "]"}], ",", 
+       RowBox[{"ExtractAttributes", "[", "in", "]"}], ",", 
+       RowBox[{"ExtractVarCovs", "[", "in", "]"}], ",", 
+       RowBox[{"ExtractVariables", "[", "in", "]"}], ",", "opts"}], "]"}], 
+     ")"}]}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.7127802306821003`*^9, 3.71278023163732*^9}, {
+   3.769860889371685*^9, 3.769860898625585*^9}, {3.890088762767192*^9, 
+   3.8900887857559834`*^9}, {3.890088825582732*^9, 3.8900888418951406`*^9}, {
+   3.8900889470940847`*^9, 3.890088957136177*^9}, {3.8901267099939337`*^9, 
+   3.890126710376408*^9}, {3.89012675925627*^9, 3.89012677188067*^9}, {
+   3.890147666024979*^9, 3.890147669484149*^9}, {3.895556083668763*^9, 
+   3.895556095879417*^9}, 3.8955566991026297`*^9, {3.8955577669801817`*^9, 
+   3.8955577681779213`*^9}},ExpressionUUID->"8d90087d-90fb-4cba-b294-\
+773088aff1ba"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.7694936745853653`*^9, 
+  3.769493676072991*^9}},ExpressionUUID->"e1b24388-41f2-4323-b531-\
+ac4b74f83643"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{"(*", " ", 
+   RowBox[{"make", " ", "listable", " ", "across", " ", "pops"}], " ", "*)"}],
+   "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"EcoEigenvalues", "[", 
+     RowBox[{
+      RowBox[{"pars", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "ParametersQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"attributes", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "AttributesQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"Gsin", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "GsQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"variables_", "?", "ListOfVariablesQ"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"EcoEigenvalues", "[", 
+        RowBox[{"attributes", ",", "Gsin", ",", "#", ",", "opts"}], "]"}], 
+       "&"}], "/@", "variables"}], ")"}]}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.712783575459276*^9, 3.712783578387623*^9}, {
+   3.712784863746928*^9, 3.712784884390826*^9}, {3.7127851579743443`*^9, 
+   3.7127851624968*^9}, {3.7127851955597887`*^9, 3.71278523736482*^9}, {
+   3.712785705862076*^9, 3.712785711703575*^9}, {3.712833606594955*^9, 
+   3.712833614050643*^9}, {3.759928119660495*^9, 3.7599281203487177`*^9}, 
+   3.798128132749385*^9, {3.8004659186845217`*^9, 3.800465928157753*^9}, 
+   3.80736938263792*^9, {3.807369661286282*^9, 3.807369661762484*^9}, {
+   3.807381444546845*^9, 3.807381444995007*^9}, {3.8330373357679768`*^9, 
+   3.833037341985462*^9}, {3.871918612969839*^9, 3.871918625034066*^9}, 
+   3.890146022033866*^9},ExpressionUUID->"93e02de9-6db5-4e44-a2fe-\
+536fe4046493"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"EcoEigenvalues", "[", 
+     RowBox[{
+      RowBox[{"pars", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "ParametersQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"attributesin", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "AttributesQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"Gsin", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "GsQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"variables", ":", "notOptsEcoEigenvalues", ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\n", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\n", 
+       RowBox[{"(*", " ", "options", " ", "*)"}], "\n", 
+       RowBox[{
+       "verbose", ",", "chop", ",", "time", ",", "ndsolveopts", ",", 
+        "multipliers", ",", "fixed", ",", "ignorevar", ",", "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{"other", " ", "variables"}], " ", "*)"}], "\n", "attributes",
+         ",", "j", ",", "dim", ",", "per", ",", "xsol", ",", "res"}], "}"}], 
+      ",", "\n", "\n", 
+      RowBox[{"Block", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"\[ScriptCapitalN]", ",", "verbosity", ",", 
+          RowBox[{"func", "=", "\"\<EcoJacobian\>\""}]}], "}"}], ",", "\n", 
+        "\n", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"modelloaded", "\[NotEqual]", "True"}], ",", 
+           RowBox[{
+            RowBox[{"Message", "[", 
+             RowBox[{"EcoEvoGeneral", "::", "nomodel"}], "]"}], ";", 
+            RowBox[{"Return", "[", "$Failed", "]"}]}]}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"set", " ", "verbosity"}], " ", "*)"}], "\n", "\n", 
+         RowBox[{"verbose", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Verbose", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+             "]"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"verbose", ",", "\n", "\t", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Max", "[", 
+             RowBox[{"1", ",", 
+              RowBox[{"Evaluate", "[", 
+               RowBox[{"Verbosity", "/.", 
+                RowBox[{"Flatten", "[", 
+                 RowBox[{"{", 
+                  RowBox[{"opts", ",", 
+                   RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+                 "]"}]}], "]"}]}], "]"}]}], ",", "\n", "\t", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Evaluate", "[", 
+             RowBox[{"Verbosity", "/.", 
+              RowBox[{"Flatten", "[", 
+               RowBox[{"{", 
+                RowBox[{"opts", ",", 
+                 RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+               "]"}]}], "]"}]}]}], "\n", "]"}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"IntegerQ", "[", "Global`$verbosity", "]"}], ",", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Max", "[", 
+             RowBox[{"Global`$verbosity", ",", "verbosity"}], "]"}]}]}], 
+          "]"}], ";", "\n", "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"handle", " ", "options"}], " ", "*)"}], "\n", "\n", 
+         RowBox[{"chop", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Chop", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+             "]"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"time", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Time", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+             "]"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"ndsolveopts", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"NDSolveOpts", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+             "]"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"multipliers", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Multipliers", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+             "]"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"fixed", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Fixed", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+             "]"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"ignorevar", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"IgnoreVar", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoEigenvalues", "]"}]}], "}"}], 
+             "]"}]}], "]"}]}], ";", "\n", "\n", 
+         RowBox[{"attributes", "=", 
+          RowBox[{"FixAttributes", "[", "attributesin", "]"}]}], ";", "\n", 
+         "\n", 
+         RowBox[{"j", "=", 
+          RowBox[{"EcoJacobian", "[", 
+           RowBox[{
+           "pars", ",", "attributes", ",", "Gsin", ",", "variables", ",", 
+            RowBox[{"Time", "\[Rule]", "time"}], ",", 
+            RowBox[{"Fixed", "\[Rule]", "fixed"}], ",", 
+            RowBox[{"IgnoreVar", "->", "ignorevar"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"VPrint", "[", 
+          RowBox[{"1", ",", "\"\<j=\>\"", ",", "j"}], "]"}], ";", "\n", "\n", 
+         
+         RowBox[{"Which", "[", "\n", "\t", 
+          RowBox[{"(*", " ", 
+           RowBox[{"DiscreteTime", " ", "cycle"}], " ", "*)"}], "\n", "\t", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"variables", "\[NotEqual]", 
+             RowBox[{"{", "}"}]}], "&&", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"variables", "\[LeftDoubleBracket]", 
+                  RowBox[{"1", ",", "2", ",", "0"}], 
+                  "\[RightDoubleBracket]"}], "===", "TemporalData"}], "||", 
+                RowBox[{"(", 
+                 RowBox[{
+                  RowBox[{"modeltype", "\[Equal]", "\"\<DiscreteTime\>\""}], "&&", 
+                  RowBox[{"modelperiod", "=!=", "0"}]}], ")"}]}], ")"}], "&&", 
+              RowBox[{"time", "===", "t"}]}], ")"}]}], ",", "\n", "\t", 
+           RowBox[{"res", "=", 
+            RowBox[{"Eigenvalues", "[", 
+             RowBox[{"ListMultiplier", "[", 
+              RowBox[{"Table", "[", 
+               RowBox[{
+                RowBox[{"j", "[", "t\[Prime]", "]"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"t\[Prime]", ",", 
+                  RowBox[{"j", "[", "\"\<Times\>\"", "]"}]}], "}"}]}], "]"}], 
+              "]"}], "]"}]}], "\n", ",", "\n", "\t", 
+           RowBox[{"(*", " ", 
+            RowBox[{"ContinousTime", " ", "cycle"}], " ", "*)"}], "\n", "\t", 
+           
+           RowBox[{
+            RowBox[{"variables", "\[NotEqual]", 
+             RowBox[{"{", "}"}]}], "&&", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"variables", "\[LeftDoubleBracket]", 
+                  RowBox[{"1", ",", "2", ",", "0"}], 
+                  "\[RightDoubleBracket]"}], "===", "InterpolatingFunction"}],
+                 "||", 
+                RowBox[{"(", 
+                 RowBox[{
+                  RowBox[{"modeltype", "\[Equal]", "\"\<ContinousTime\>\""}], 
+                  "&&", 
+                  RowBox[{"modelperiod", "=!=", "0"}]}], ")"}]}], ")"}], "&&", 
+              RowBox[{"time", "===", "t"}]}], ")"}]}], ",", "\n", "\t", 
+           RowBox[{
+            RowBox[{"dim", "=", 
+             RowBox[{"Length", "[", "j", "]"}]}], ";", "\n", "\t", 
+            RowBox[{"per", "=", 
+             RowBox[{"FinalTime", "[", "variables", "]"}]}], ";", "\n", "\t", 
+            
+            RowBox[{"xsol", "=", 
+             RowBox[{
+              RowBox[{"NDSolve", "[", 
+               RowBox[{
+                RowBox[{"{", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"x", "'"}], "[", "t", "]"}], "\[Equal]", 
+                   RowBox[{"j", ".", 
+                    RowBox[{"x", "[", "t", "]"}]}]}], ",", 
+                  RowBox[{
+                   RowBox[{"x", "[", "0", "]"}], "\[Equal]", 
+                   RowBox[{"IdentityMatrix", "[", "dim", "]"}]}]}], "}"}], 
+                ",", "x", ",", 
+                RowBox[{"{", 
+                 RowBox[{"t", ",", "0", ",", "per"}], "}"}], ",", 
+                RowBox[{"Sequence", "@@", "ndsolveopts"}]}], "]"}], 
+              "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}]}], ";", 
+            "\n", "\t", 
+            RowBox[{"If", "[", 
+             RowBox[{"Global`debug", ",", 
+              RowBox[{"Print", "[", 
+               RowBox[{"func", ",", "\"\<: x[per]/.xsol=\>\"", ",", 
+                RowBox[{
+                 RowBox[{"x", "[", "per", "]"}], "/.", "xsol"}]}], "]"}]}], 
+             "]"}], ";", "\n", "\t", 
+            RowBox[{"If", "[", 
+             RowBox[{"multipliers", ",", "\n", "\t\t", 
+              RowBox[{"res", "=", 
+               RowBox[{"Eigenvalues", "[", 
+                RowBox[{
+                 RowBox[{"x", "[", "per", "]"}], "/.", "xsol"}], "]"}]}], ",",
+               "\n", "\t\t", 
+              RowBox[{"res", "=", 
+               RowBox[{
+                RowBox[{"Log", "[", 
+                 RowBox[{"Chop", "[", 
+                  RowBox[{"Eigenvalues", "[", 
+                   RowBox[{
+                    RowBox[{"x", "[", "per", "]"}], "/.", "xsol"}], "]"}], 
+                  "]"}], "]"}], "/", "per"}]}]}], "\n", "\t", "]"}]}], "\n", 
+           ",", "\n", "\t", 
+           RowBox[{"(*", " ", 
+            RowBox[{
+            "ContinuousTime", " ", "or", " ", "DiscreteTime", " ", 
+             "equilibrium"}], " ", "*)"}], "\n", "\t", "Else", ",", "\n", 
+           "\t", 
+           RowBox[{"res", "=", 
+            RowBox[{"Eigenvalues", "[", 
+             RowBox[{"j", "/.", 
+              RowBox[{"t", "\[Rule]", "time"}]}], "]"}]}]}], "\n", "]"}], ";",
+          "\n", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"chop", ",", 
+           RowBox[{"Return", "[", 
+            RowBox[{"Chop", "[", "res", "]"}], "]"}], ",", 
+           RowBox[{"Return", "[", "res", "]"}]}], "]"}], ";"}]}], "\n", "\n", 
+       "]"}]}], "]"}]}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.687881451590589*^9, 3.687881451717087*^9}, {
+   3.688571686492445*^9, 3.688571686517911*^9}, {3.688571758999564*^9, 
+   3.688571759124362*^9}, {3.688571805927868*^9, 3.688571805977295*^9}, {
+   3.688598259792244*^9, 3.688598330430194*^9}, 3.693870062484871*^9, {
+   3.7093369596230583`*^9, 3.709336960038612*^9}, 3.710105961860166*^9, 
+   3.7127802178763657`*^9, {3.712784391975954*^9, 3.7127844137034473`*^9}, 
+   3.712785086146867*^9, {3.712785716407987*^9, 3.7127857221772747`*^9}, 
+   3.712833620413968*^9, {3.7154416133061943`*^9, 3.715441641490888*^9}, {
+   3.7154417472355747`*^9, 3.7154417634409246`*^9}, {3.7154529080318623`*^9, 
+   3.715452969298389*^9}, {3.715453001962796*^9, 3.715453029240954*^9}, {
+   3.7218494806472263`*^9, 3.721849506188443*^9}, 3.7218495917367067`*^9, {
+   3.722084128316791*^9, 3.722084129825014*^9}, {3.724105522816702*^9, 
+   3.724105537013926*^9}, {3.724105573748129*^9, 3.724105578665144*^9}, {
+   3.7325695129217253`*^9, 3.732569514190278*^9}, {3.732570081243393*^9, 
+   3.732570099427299*^9}, {3.7599281212442513`*^9, 3.7599281267645187`*^9}, 
+   3.769527429286891*^9, 3.76976070544016*^9, {3.769861557083302*^9, 
+   3.769861590316348*^9}, {3.7698616823092546`*^9, 3.76986170449503*^9}, {
+   3.769861758126689*^9, 3.7698617625271378`*^9}, 3.770438265033218*^9, 
+   3.794137240640799*^9, 3.7981281327552013`*^9, {3.8001284110930767`*^9, 
+   3.800128414971343*^9}, {3.800465931649267*^9, 3.800465968512073*^9}, {
+   3.8073693426807423`*^9, 3.807369342685987*^9}, {3.807369662321744*^9, 
+   3.807369676881895*^9}, {3.833037761615705*^9, 3.833037795810297*^9}, {
+   3.859592233847024*^9, 3.859592288955173*^9}, {3.859592362713498*^9, 
+   3.859592364374448*^9}, {3.859592443763502*^9, 3.859592493956077*^9}, {
+   3.859592721123015*^9, 3.85959273206767*^9}, 3.859592812374618*^9, {
+   3.859592879077259*^9, 3.859592933654257*^9}, {3.859592995094679*^9, 
+   3.859592997378701*^9}, {3.859593049529784*^9, 3.859593050380872*^9}, {
+   3.859722712599243*^9, 3.859722723142577*^9}, {3.8719186291139193`*^9, 
+   3.871918631100711*^9}, {3.871925972534317*^9, 3.871925974734391*^9}, {
+   3.890145915564148*^9, 3.890145925456986*^9}, 3.8901460249474707`*^9, {
+   3.890146270135344*^9, 3.8901462705092*^9}, 3.8901464337807627`*^9, {
+   3.890146623276553*^9, 
+   3.8901466267803*^9}},ExpressionUUID->"0d8a8b2b-3432-4d88-9ca6-\
+eb22e15efb24"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["EcoJacobian [backup]", "Subsection",
+ CellChangeTimes->{{3.895575292883582*^9, 
+  3.8955752944138823`*^9}},ExpressionUUID->"59cb0c50-7edd-4d1e-a683-\
+e16363f7d3cc"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.769494692292095*^9, 
+  3.769494692848196*^9}},ExpressionUUID->"7d3de15e-dd90-4c19-9561-\
+4a3c3642b373"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"EcoJacobian", "::", "usage"}], " ", "=", " ", "\n", 
+    "\"\<EcoJacobian[\!\(\*StyleBox[\"sol\", \"TI\"]\)] returns the Jacobian \
+matrix of the ecological equations evaluated at \!\(\*StyleBox[\"sol\", \
+\"TI\"]\).\nEcoJacobian[\!\(\*StyleBox[\"attributes\", \"TI\"]\), \
+\!\(\*StyleBox[\"sol\", \"TI\"]\)] uses trait values/interaction coefficients \
+\!\(\*StyleBox[\"attributes\", \"TI\"]\).\>\""}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.769484077814527*^9, 3.7694840790636883`*^9}, {
+  3.807378903885771*^9, 3.807378910580003*^9}, {3.80737931282316*^9, 
+  3.807379323392448*^9}},
+ CellLabel->
+  "In[1662]:=",ExpressionUUID->"074c123c-75c9-40e8-9ceb-bc32dfe1e78d"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsubsection",ExpressionUUID->"a0fa2946-d2f8-4456-b421-b3c6ab37bec0"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Options", "[", "EcoJacobian", "]"}], "=", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"Verbose", "\[Rule]", "False"}], ",", 
+      RowBox[{"Verbosity", "->", "0"}], ",", "\n", 
+      RowBox[{"Time", "\[Rule]", "t"}], ",", 
+      RowBox[{"Fixed", "\[Rule]", 
+       RowBox[{"{", "}"}]}]}], "}"}]}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{
+  3.687881451527573*^9, {3.688571686440872*^9, 3.688571686460191*^9}, {
+   3.731981321233385*^9, 3.731981331551909*^9}, {3.769861654551086*^9, 
+   3.769861654704959*^9}, {3.859651171205041*^9, 3.859651171391889*^9}, {
+   3.859722100119422*^9, 3.859722102233508*^9}, 3.85972270560856*^9, {
+   3.89012807406991*^9, 3.890128074389056*^9}, {3.89012810820054*^9, 
+   3.890128114250332*^9}, {3.890146444342453*^9, 3.890146447448682*^9}, {
+   3.890146582184833*^9, 3.890146590355709*^9}, {3.890147647465007*^9, 
+   3.8901476477718697`*^9}},ExpressionUUID->"2c38d466-f8a1-4e5b-b87a-\
+5ce5ecc39daf"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{"notOptsEcoJacobian", "=", 
+    RowBox[{"Except", "[", 
+     RowBox[{"Alternatives", "@@", 
+      RowBox[{"Replace", "[", 
+       RowBox[{
+        RowBox[{"Options", "[", "EcoJacobian", "]"}], ",", 
+        RowBox[{
+         RowBox[{"h_", "[", 
+          RowBox[{"a_", ",", "_"}], "]"}], ":>", 
+         RowBox[{"h", "[", 
+          RowBox[{"a", ",", "_"}], "]"}]}], ",", "1"}], "]"}]}], "]"}]}], 
+   ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.890147649982163*^9, 
+  3.890147653828004*^9}},ExpressionUUID->"fdc1b77c-f022-4b9b-a38d-\
+38b1eeda90b8"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Aliases", "Subsubsection",ExpressionUUID->"0e8bb78a-cb9a-451b-aaee-e0dec0789f57"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{"(*", " ", 
+   RowBox[{"break", " ", "up", " ", "combined", " ", "traitsandpops"}], " ", 
+   "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"EcoJacobian", "[", 
+     RowBox[{
+      RowBox[{"in_List", ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"(", 
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{"Print", "[", "\"\<breaking\>\"", "]"}], ";"}], "*)"}], "\n", 
+     RowBox[{"EcoJacobian", "[", 
+      RowBox[{
+       RowBox[{"ExtractParameters", "[", "in", "]"}], ",", 
+       RowBox[{"ExtractAttributes", "[", "in", "]"}], ",", 
+       RowBox[{"ExtractVarCovs", "[", "in", "]"}], ",", 
+       RowBox[{"ExtractVariables", "[", "in", "]"}], ",", "opts"}], "]"}], 
+     ")"}]}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.7127802306821003`*^9, 3.71278023163732*^9}, {
+   3.769860889371685*^9, 3.769860898625585*^9}, {3.890088762767192*^9, 
+   3.8900887857559834`*^9}, {3.890088825582732*^9, 3.8900888418951406`*^9}, {
+   3.8900889470940847`*^9, 3.890088957136177*^9}, {3.8901267099939337`*^9, 
+   3.890126710376408*^9}, {3.89012675925627*^9, 3.89012677188067*^9}, {
+   3.890147666024979*^9, 3.890147669484149*^9}, {3.895556083668763*^9, 
+   3.895556095879417*^9}, 
+   3.8955566991026297`*^9},ExpressionUUID->"a0507b9a-da5f-484e-966e-\
+d65221ed43b9"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.7694936745853653`*^9, 
+  3.769493676072991*^9}},ExpressionUUID->"9a6e5784-7470-4a9e-b062-\
+221e294f78a7"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{"(*", " ", 
+   RowBox[{"make", " ", "listable", " ", "across", " ", "pops"}], " ", "*)"}],
+   "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"EcoJacobian", "[", 
+     RowBox[{
+      RowBox[{"pars", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "ParametersQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"attributes", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "AttributesQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"Gsin", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "GsQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"variables_", "?", "ListOfVariablesQ"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"EcoJacobian", "[", 
+        RowBox[{"attributes", ",", "Gsin", ",", "#", ",", "opts"}], "]"}], 
+       "&"}], "/@", "variables"}], ")"}]}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.715424827153945*^9, 3.715424831022787*^9}, {
+   3.715425215204941*^9, 3.715425235563982*^9}, {3.759928071960331*^9, 
+   3.759928075487185*^9}, 3.7981281327414913`*^9, {3.800465667387295*^9, 
+   3.8004656757467003`*^9}, 3.8073693384496326`*^9, {3.807369650795566*^9, 
+   3.807369651662064*^9}, {3.80738083923206*^9, 3.807380839709502*^9}, {
+   3.833036840307715*^9, 3.833036894124531*^9}, {3.833037314545958*^9, 
+   3.833037323225292*^9}, {3.871918356367071*^9, 3.871918363698841*^9}, 
+   3.890128287652781*^9, {3.89014599446552*^9, 
+   3.890145995599505*^9}},ExpressionUUID->"ca8e6d56-9089-4d37-8818-\
+d8e891868149"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"EcoJacobian", "[", 
+     RowBox[{
+      RowBox[{"pars", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "ParametersQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"attributesin", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "AttributesQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"Gsin", ":", 
+       RowBox[{"(", 
+        RowBox[{"_", "?", "GsQ"}], ")"}], ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"variables", ":", "notOptsEcoJacobian", ":", 
+       RowBox[{"{", "}"}]}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\n", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "\n", 
+       RowBox[{"(*", " ", "options", " ", "*)"}], "\n", 
+       RowBox[{"verbose", ",", "time", ",", "fixed", ",", "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{"other", " ", "variables"}], " ", "*)"}], "\n", "attributes",
+         ",", "fixedvars", ",", "Gs", ",", "eqns", ",", "unks", ",", "jmat"}],
+        "}"}], ",", "\n", "\n", 
+      RowBox[{"Block", "[", 
+       RowBox[{
+        RowBox[{"{", 
+         RowBox[{"\[ScriptCapitalN]", ",", "verbosity", ",", 
+          RowBox[{"func", "=", "\"\<EcoJacobian\>\""}]}], "}"}], ",", "\n", 
+        "\n", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"modelloaded", "\[NotEqual]", "True"}], ",", 
+           RowBox[{
+            RowBox[{"Message", "[", 
+             RowBox[{"EcoEvoGeneral", "::", "nomodel"}], "]"}], ";", 
+            RowBox[{"Return", "[", "$Failed", "]"}]}]}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"set", " ", "verbosity"}], " ", "*)"}], "\n", "\n", 
+         RowBox[{"verbose", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Verbose", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoJacobian", "]"}]}], "}"}], "]"}]}],
+            "]"}]}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"verbose", ",", "\n", "\t", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Max", "[", 
+             RowBox[{"1", ",", 
+              RowBox[{"Evaluate", "[", 
+               RowBox[{"Verbosity", "/.", 
+                RowBox[{"Flatten", "[", 
+                 RowBox[{"{", 
+                  RowBox[{"opts", ",", 
+                   RowBox[{"Options", "[", "EcoJacobian", "]"}]}], "}"}], 
+                 "]"}]}], "]"}]}], "]"}]}], ",", "\n", "\t", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Evaluate", "[", 
+             RowBox[{"Verbosity", "/.", 
+              RowBox[{"Flatten", "[", 
+               RowBox[{"{", 
+                RowBox[{"opts", ",", 
+                 RowBox[{"Options", "[", "EcoJacobian", "]"}]}], "}"}], 
+               "]"}]}], "]"}]}]}], "\n", "]"}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"IntegerQ", "[", "Global`$verbosity", "]"}], ",", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Max", "[", 
+             RowBox[{"Global`$verbosity", ",", "verbosity"}], "]"}]}]}], 
+          "]"}], ";", "\n", "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"handle", " ", "options"}], " ", "*)"}], "\n", "\n", 
+         RowBox[{"fixed", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Fixed", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoJacobian", "]"}]}], "}"}], "]"}]}],
+            "]"}]}], ";", "\n", 
+         RowBox[{"time", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Time", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoJacobian", "]"}]}], "}"}], "]"}]}],
+            "]"}]}], ";", "\n", "\n", 
+         RowBox[{"fixedvars", "=", 
+          RowBox[{"fixed", "\[LeftDoubleBracket]", 
+           RowBox[{"All", ",", "1"}], "\[RightDoubleBracket]"}]}], ";", "\n", 
+         "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"fix", " ", "attributes"}], " ", "*)"}], "\n", 
+         RowBox[{"attributes", "=", 
+          RowBox[{"FixAttributes", "[", "attributesin", "]"}]}], ";", "\n", 
+         "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{
+          "figure", " ", "out", " ", "number", " ", "of", " ", "species", " ",
+            "in", " ", "guilds"}], " ", "*)"}], "\n", 
+         RowBox[{"Set\[ScriptCapitalN]", "[", "attributes", "]"}], ";", "\n", 
+         
+         RowBox[{"VPrint", "[", 
+          RowBox[{"3", ",", "\"\<\[ScriptCapitalN]=\>\"", ",", 
+           RowBox[{"Table", "[", 
+            RowBox[{
+             RowBox[{"\[ScriptCapitalN]", "[", "gu", "]"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"gu", ",", "guilds"}], "}"}]}], "]"}]}], "]"}], ";", 
+         "\n", "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"expand", " ", "Gs"}], " ", "*)"}], "\n", 
+         RowBox[{"VPrint", "[", 
+          RowBox[{"3", ",", "\"\<Gsin=\>\"", ",", "Gsin"}], "]"}], ";", "\n", 
+         
+         RowBox[{"If", "[", 
+          RowBox[{"moments", ",", "\n", "\t", 
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Join", "[", 
+               RowBox[{"Gsin", ",", 
+                RowBox[{"ExtractVarCovs", "[", "attributesin", "]"}]}], "]"}],
+               "===", 
+              RowBox[{"{", "}"}]}], ",", 
+             RowBox[{"Gs", "=", "ZeroGs"}], ",", 
+             RowBox[{"Gs", "=", 
+              RowBox[{"ExpandGs", "[", 
+               RowBox[{"Gsin", ",", 
+                RowBox[{"Table", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"\[FormalCapitalN]", "[", "gu", "]"}], "\[Rule]", 
+                   RowBox[{"\[ScriptCapitalN]", "[", "gu", "]"}]}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"gu", ",", "guilds"}], "}"}]}], "]"}]}], "]"}]}]}],
+             "]"}], ",", "\n", "\t", 
+           RowBox[{"Gs", "=", 
+            RowBox[{"{", "}"}]}]}], "\n", "]"}], ";", "\n", "\n", 
+         RowBox[{"(*", 
+          RowBox[{
+           RowBox[{"Gs", "=", 
+            RowBox[{"ExpandGs", "[", 
+             RowBox[{"Gsin", ",", 
+              RowBox[{"Table", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"\[FormalCapitalN]", "[", "gu", "]"}], "\[Rule]", 
+                 RowBox[{"\[ScriptCapitalN]", "[", "gu", "]"}]}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"gu", ",", "guilds"}], "}"}]}], "]"}]}], "]"}]}], 
+           ";"}], "*)"}], "\n", 
+         RowBox[{"VPrint", "[", 
+          RowBox[{"3", ",", "\"\<Gs=\>\"", ",", "Gs"}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"eqns", "=", 
+          RowBox[{
+           RowBox[{
+            RowBox[{
+             RowBox[{
+              RowBox[{"EcoEqns", "[", 
+               RowBox[{"attributes", ",", "opts"}], "]"}], "/.", "RHS"}], "/.",
+              "Gs"}], "/.", "pars"}], "/.", 
+           RowBox[{"t", "\[Rule]", "time"}]}]}], ";", "\n", 
+         RowBox[{"VPrint", "[", 
+          RowBox[{"1", ",", "\"\<eqns=\>\"", ",", "eqns"}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"unks", "=", 
+          RowBox[{"OrderedComplement", "[", 
+           RowBox[{"AllVariables", ",", "fixedvars"}], "]"}]}], ";", "\n", 
+         RowBox[{"VPrint", "[", 
+          RowBox[{"1", ",", "\"\<unks=\>\"", ",", "unks"}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"set", " ", "up", " ", "jacobian"}], " ", "*)"}], "\n", 
+         RowBox[{"jmat", "=", 
+          RowBox[{"D", "[", 
+           RowBox[{"eqns", ",", 
+            RowBox[{"{", "unks", "}"}]}], "]"}]}], ";", "\n", 
+         RowBox[{"VPrint", "[", 
+          RowBox[{"3", ",", "\"\<jmat=\>\"", ",", "jmat"}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"Which", "[", "\n", "\t", 
+          RowBox[{"(*", " ", 
+           RowBox[{"DiscreteTime", " ", "cycle"}], " ", "*)"}], "\n", "\t", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"variables", "\[NotEqual]", 
+             RowBox[{"{", "}"}]}], "&&", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"variables", "\[LeftDoubleBracket]", 
+                RowBox[{"1", ",", "2", ",", "0"}], "\[RightDoubleBracket]"}], 
+               "===", "TemporalData"}], "||", 
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{"modeltype", "\[Equal]", "\"\<DiscreteTime\>\""}], "&&", 
+                RowBox[{"modelperiod", "=!=", "0"}]}], ")"}]}], ")"}], "&&", 
+            RowBox[{"time", "===", "t"}]}], ",", "\n", "\t", 
+           RowBox[{
+            RowBox[{"Return", "[", 
+             RowBox[{"TimeSeries", "[", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"Table", "[", 
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"t\[Prime]", ",", 
+                    RowBox[{
+                    RowBox[{"jmat", "/.", "AddVariablets"}], "/.", 
+                    RowBox[{"t", "\[Rule]", "t\[Prime]"}]}]}], "}"}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"t\[Prime]", ",", 
+                    RowBox[{
+                    RowBox[{"variables", "\[LeftDoubleBracket]", 
+                    RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "[", 
+                    "\"\<Times\>\"", "]"}]}], "}"}]}], "]"}], "/.", 
+                "variables"}], "/.", "attributes"}], "]"}], "]"}], ";"}], 
+           "\n", ",", "\n", "\t", 
+           RowBox[{"(*", " ", 
+            RowBox[{"ContinuousTime", " ", "cycle"}], " ", "*)"}], "\n", "\t", 
+           RowBox[{
+            RowBox[{"variables", "\[NotEqual]", 
+             RowBox[{"{", "}"}]}], "&&", 
+            RowBox[{"(", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"variables", "\[LeftDoubleBracket]", 
+                RowBox[{"1", ",", "2", ",", "0"}], "\[RightDoubleBracket]"}], 
+               "===", "InterpolatingFunction"}], "||", 
+              RowBox[{"(", 
+               RowBox[{
+                RowBox[{"modeltype", "\[Equal]", "\"\<ContinuousTime\>\""}], "&&", 
+                RowBox[{"modelperiod", "=!=", "0"}]}], ")"}]}], ")"}], "&&", 
+            RowBox[{"time", "===", "t"}]}], ",", "\n", "\t", 
+           RowBox[{
+            RowBox[{"Return", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{"jmat", "/.", "AddVariablets"}], "/.", "variables"}], "/.",
+               "attributes"}], "]"}], ";"}], "\n", ",", "\n", "\t", 
+           RowBox[{"(*", " ", 
+            RowBox[{
+            "ContinuousTime", " ", "or", " ", "DiscreteTime", " ", 
+             "equilibrium"}], " ", "*)"}], "\n", "\t", "Else", ",", "\n", 
+           "\t", 
+           RowBox[{
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"time", "===", "t"}], ",", "\n", "\t\t", 
+              RowBox[{"Return", "[", 
+               RowBox[{
+                RowBox[{"jmat", "/.", "variables"}], "/.", "attributes"}], 
+               "]"}], ",", "\n", "\t\t", 
+              RowBox[{"Return", "[", 
+               RowBox[{
+                RowBox[{"jmat", "/.", 
+                 RowBox[{"Slice", "[", 
+                  RowBox[{"variables", ",", "time"}], "]"}]}], "/.", 
+                "attributes"}], "]"}]}], "\n", "\t", "]"}], ";"}]}], "\n", 
+          "]"}], ";"}]}], "\n", "\n", "]"}]}], "]"}]}], ";"}], "*)"}]], "Code",\
+
+ CellChangeTimes->{{3.685713471667655*^9, 3.685713471953993*^9}, {
+   3.685715172269215*^9, 3.685715180225237*^9}, {3.685715275436626*^9, 
+   3.685715288042203*^9}, {3.685720043110549*^9, 3.685720043699584*^9}, 
+   3.685727814948381*^9, {3.685919068540296*^9, 3.685919071074188*^9}, {
+   3.685919495275399*^9, 3.685919510214314*^9}, {3.6878814511239223`*^9, 
+   3.6878814514840813`*^9}, {3.68857168631444*^9, 3.688571686418085*^9}, {
+   3.688571758808372*^9, 3.688571758977655*^9}, {3.688571805836503*^9, 
+   3.688571805906938*^9}, {3.688597747830966*^9, 3.688597751716827*^9}, {
+   3.6885979680467863`*^9, 3.688597986884429*^9}, {3.688598027110915*^9, 
+   3.688598048728488*^9}, {3.6961148154182053`*^9, 3.6961148447702312`*^9}, {
+   3.709336751999728*^9, 3.709336752901269*^9}, 3.710105961178062*^9, {
+   3.712779673043494*^9, 3.7127796738548117`*^9}, {3.712779816576673*^9, 
+   3.712779842015938*^9}, 3.712785819940733*^9, {3.715365128204183*^9, 
+   3.715365137231598*^9}, {3.715367051751781*^9, 3.7153670695142727`*^9}, {
+   3.715367135448979*^9, 3.715367136695031*^9}, {3.715385827773836*^9, 
+   3.715385838262583*^9}, {3.715385904406534*^9, 3.715385912427199*^9}, {
+   3.715385952628813*^9, 3.7153859710160847`*^9}, {3.715386110544334*^9, 
+   3.715386147858574*^9}, {3.71542288958562*^9, 3.7154228931085863`*^9}, {
+   3.7154231475090857`*^9, 3.715423171912822*^9}, {3.71673856635833*^9, 
+   3.716738581883312*^9}, {3.716853578431396*^9, 3.7168535890239077`*^9}, {
+   3.7168537616233263`*^9, 3.716853785719054*^9}, {3.721849261808951*^9, 
+   3.721849273017808*^9}, {3.7218494065763073`*^9, 3.7218494108899603`*^9}, 
+   3.721849597115556*^9, {3.722083967658794*^9, 3.722083969435639*^9}, {
+   3.7220841017746887`*^9, 3.72208410322605*^9}, 3.731979949446031*^9, {
+   3.731981097236431*^9, 3.7319811129938383`*^9}, {3.7319811450091333`*^9, 
+   3.73198117999973*^9}, {3.7319812559727592`*^9, 3.731981314927001*^9}, {
+   3.732015116553176*^9, 3.73201512718889*^9}, 3.732016302108934*^9, {
+   3.732016383605422*^9, 3.732016389979628*^9}, {3.732048239407701*^9, 
+   3.73204823996686*^9}, 3.7320486771074123`*^9, {3.732049294363253*^9, 
+   3.732049296593276*^9}, {3.7320493464220037`*^9, 3.732049359178586*^9}, {
+   3.7320494024047422`*^9, 3.732049403766077*^9}, 3.732273413515592*^9, 
+   3.732568565652829*^9, 3.7325687346541033`*^9, {3.7325689429536753`*^9, 
+   3.732568948290044*^9}, {3.7599280783731337`*^9, 3.759928102812776*^9}, 
+   3.761377919374161*^9, {3.761377972621154*^9, 3.761377972626865*^9}, {
+   3.76728285895673*^9, 3.767282879017313*^9}, {3.7672829467168837`*^9, 
+   3.767282979895051*^9}, {3.76728303120091*^9, 3.767283034161628*^9}, {
+   3.767283083982153*^9, 3.7672830874923143`*^9}, {3.767283131912772*^9, 
+   3.767283142940757*^9}, {3.767283218487135*^9, 3.767283229313492*^9}, {
+   3.7672835701492033`*^9, 3.767283596086255*^9}, {3.767283874451271*^9, 
+   3.7672838788035*^9}, {3.767284081745742*^9, 3.7672840821277313`*^9}, 
+   3.769182447233816*^9, 3.769760705426908*^9, {3.769861726270475*^9, 
+   3.7698617270739326`*^9}, 3.770438265025422*^9, 3.770471445141488*^9, {
+   3.770721435002513*^9, 3.77072143544186*^9}, 3.794137240635201*^9, 
+   3.798128132746873*^9, {3.800186438317952*^9, 3.800186441520095*^9}, {
+   3.8001880707078323`*^9, 3.8001880948829813`*^9}, {3.800188242845222*^9, 
+   3.800188248272614*^9}, {3.800188290373461*^9, 3.800188309828966*^9}, 
+   3.800272321275289*^9, {3.80046569846973*^9, 3.800465747589779*^9}, {
+   3.800465874913538*^9, 3.800465897408147*^9}, {3.807369339074234*^9, 
+   3.80736934010505*^9}, {3.807369652730403*^9, 3.807369660232484*^9}, {
+   3.817930121232477*^9, 3.817930127030357*^9}, 3.8179302270411253`*^9, 
+   3.833036900381192*^9, {3.833037010217873*^9, 3.833037036090315*^9}, {
+   3.8330377730091333`*^9, 3.8330377733308907`*^9}, {3.833038571882781*^9, 
+   3.8330385843113403`*^9}, {3.85959167176523*^9, 3.859591809174556*^9}, {
+   3.859591843626226*^9, 3.859591889267309*^9}, {3.859591939618794*^9, 
+   3.859591952462694*^9}, {3.859592223672594*^9, 3.859592223932197*^9}, {
+   3.859592403985387*^9, 3.859592437750658*^9}, {3.859653725069249*^9, 
+   3.859653725595149*^9}, {3.859722070742579*^9, 3.8597220715188103`*^9}, {
+   3.859722567742352*^9, 3.859722595998556*^9}, {3.871918368602602*^9, 
+   3.871918373146278*^9}, {3.87191840491516*^9, 3.871918410785671*^9}, {
+   3.871918452495129*^9, 3.871918468977686*^9}, {3.871942545331127*^9, 
+   3.8719425617358017`*^9}, 3.871942642541711*^9, {3.890087957807407*^9, 
+   3.890087971164735*^9}, {3.890088177214851*^9, 3.8900881827874002`*^9}, {
+   3.890089790259857*^9, 3.8900899088907957`*^9}, {3.890128268682686*^9, 
+   3.890128278711464*^9}, {3.890145998726283*^9, 3.890146005947891*^9}, {
+   3.8901466035340967`*^9, 3.8901466066549187`*^9}, {3.890146917773753*^9, 
+   3.890146937267041*^9}, {3.89555634976303*^9, 3.895556353859775*^9}, {
+   3.895557430040098*^9, 
+   3.8955574307487183`*^9}},ExpressionUUID->"8d8e9aac-37a7-4bfd-9d25-\
+8e37474ec24b"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{1160, 764},
+WindowMargins->{{Automatic, 0}, {Automatic, 50}},
+Magnification->1.25,
+FrontEndVersion->"13.2 for Mac OS X ARM (64-bit) (January 30, 2023)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"dd11d009-3f20-4db8-b068-a700617e1071"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 171, 3, 67, "Subsection",ExpressionUUID->"6b5a93e6-0f5f-44a3-9ba4-45bd5eb189be"],
+Cell[CellGroupData[{
+Cell[776, 29, 156, 3, 56, "Subsubsection",ExpressionUUID->"0e943b3f-afd3-497c-8db8-16a24fb9ef1b"],
+Cell[935, 34, 774, 15, 114, "Code",ExpressionUUID->"f8b56000-881f-427f-b3db-220d679848be"]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[1746, 54, 87, 0, 45, "Subsubsection",ExpressionUUID->"ba7acdbd-b0d8-461c-be73-7dee6547c6fa"],
+Cell[1836, 56, 1324, 28, 90, "Code",ExpressionUUID->"53dcc12b-aacf-4249-8318-c8a2b6dc2f73"],
+Cell[3163, 86, 609, 17, 65, "Code",ExpressionUUID->"9041bbd2-8cf4-4e54-b50a-a321507576b1"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[3809, 108, 87, 0, 56, "Subsubsection",ExpressionUUID->"d9127618-5618-4afd-95c6-4277352d195a"],
+Cell[3899, 110, 1419, 31, 114, "Code",ExpressionUUID->"8d90087d-90fb-4cba-b294-773088aff1ba"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5355, 146, 163, 3, 56, "Subsubsection",ExpressionUUID->"e1b24388-41f2-4323-b531-ac4b74f83643"],
+Cell[5521, 151, 1718, 39, 90, "Code",ExpressionUUID->"93e02de9-6db5-4e44-a2fe-536fe4046493"],
+Cell[7242, 192, 13449, 296, 1468, "Code",ExpressionUUID->"0d8a8b2b-3432-4d88-9ca6-eb22e15efb24"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[20740, 494, 170, 3, 46, "Subsection",ExpressionUUID->"59cb0c50-7edd-4d1e-a683-e16363f7d3cc"],
+Cell[CellGroupData[{
+Cell[20935, 501, 156, 3, 56, "Subsubsection",ExpressionUUID->"7d3de15e-dd90-4c19-9561-4a3c3642b373"],
+Cell[21094, 506, 742, 14, 114, "Code",ExpressionUUID->"074c123c-75c9-40e8-9ceb-bc32dfe1e78d"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21873, 525, 87, 0, 56, "Subsubsection",ExpressionUUID->"a0fa2946-d2f8-4456-b421-b3c6ab37bec0"],
+Cell[21963, 527, 1001, 21, 90, "Code",ExpressionUUID->"2c38d466-f8a1-4e5b-b87a-5ce5ecc39daf"],
+Cell[22967, 550, 602, 17, 65, "Code",ExpressionUUID->"fdc1b77c-f022-4b9b-a38d-38b1eeda90b8"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23606, 572, 87, 0, 56, "Subsubsection",ExpressionUUID->"0e8bb78a-cb9a-451b-aaee-e0dec0789f57"],
+Cell[23696, 574, 1363, 31, 114, "Code",ExpressionUUID->"a0507b9a-da5f-484e-966e-d65221ed43b9"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[25096, 610, 163, 3, 56, "Subsubsection",ExpressionUUID->"9a6e5784-7470-4a9e-b062-221e294f78a7"],
+Cell[25262, 615, 1614, 38, 90, "Code",ExpressionUUID->"ca8e6d56-9089-4d37-8818-d8e891868149"],
+Cell[26879, 655, 16602, 344, 1806, "Code",ExpressionUUID->"8d8e9aac-37a7-4bfd-9d25-8e37474ec24b"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
