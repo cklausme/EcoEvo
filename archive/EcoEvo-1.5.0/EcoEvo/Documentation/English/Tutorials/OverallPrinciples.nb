@@ -1,0 +1,504 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     16215,        495]
+NotebookOptionsPosition[     11776,        363]
+NotebookOutlinePosition[     14620,        435]
+CellTagsIndexPosition[     14577,        432]
+WindowTitle->Overall Principles
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[GridBox[{
+   {Cell["ECOEVO PACKAGE TUTORIAL", "PacletNameCell"], Cell[TextData[Cell[
+    BoxData[
+     ActionMenuBox[
+      FrameBox[
+       InterpretationBox[Cell[TextData[{
+         "URL",
+         StyleBox[" \[FilledDownTriangle]", "AnchorBarArrow",
+          StripOnInput->False]
+        }]],
+        TextCell[
+         Row[{"URL", 
+           Style[" \[FilledDownTriangle]", "AnchorBarArrow"]}]]],
+       StripOnInput->False], {"\<\"EcoEvo/tutorial/OverallPrinciples\"\>":>
+      None, "\<\"Copy Wolfram Documentation Center URL\"\>":>
+      Module[{DocumentationSearch`Private`nb$}, 
+       DocumentationSearch`Private`nb$ = NotebookPut[
+          Notebook[{
+            Cell["EcoEvo/tutorial/OverallPrinciples"]}, Visible -> False]]; 
+       SelectionMove[DocumentationSearch`Private`nb$, All, Notebook]; 
+       FrontEndTokenExecute[DocumentationSearch`Private`nb$, "Copy"]; 
+       NotebookClose[DocumentationSearch`Private`nb$]; Null]},
+      Appearance->None,
+      MenuAppearance->Automatic,
+      MenuStyle->"URLMenu"]],
+     LineSpacing->{1.4, 0}]], "AnchorBar"]}
+  }]], "AnchorBarGrid",
+ GridBoxOptions->{GridBoxItemSize->{"Columns" -> {
+     Scaled[0.65], {
+      Scaled[0.34]}}, "ColumnsIndexed" -> {}, "Rows" -> {{1.}}, 
+   "RowsIndexed" -> {}}},
+ CellID->1],
+
+Cell[CellGroupData[{
+
+Cell["Overall Principles", "Title",
+ CellID->509267359,
+ $CellContext`ExpressionUUID -> "a70a898d-5e18-489f-8a57-2cabba1f6524"],
+
+Cell["\<\
+The purpose of the EcoEvo package is to streamline the analysis of ecological \
+and eco-evolutionary models.  Some of the design principles are described \
+below.\
+\>", "Text",
+ CellID->1534169418,
+ $CellContext`ExpressionUUID -> "c7677c06-0b39-4dfc-9f2f-52f5f5e8b817"],
+
+Cell[CellGroupData[{
+
+Cell["General", "Subsection",
+ CellID->1989512163,
+ $CellContext`ExpressionUUID -> "50ac3a78-dcc5-4b74-b3f0-330893fb7324"],
+
+Cell[TextData[{
+ "Once a model is set for analysis with ",
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["SetModel"]],"paclet:EcoEvo/ref/SetModel"},
+   "RefLink",
+   BaseStyle->{"InlineFormula"}]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "aa6df221-b034-4c1c-9900-d47be1bf2581"],
+ ", equations don't need to be re-entered as arguments of each function."
+}], "Text",
+ CellID->1758160239,
+ $CellContext`ExpressionUUID -> "a1a2d5c2-f102-4b2e-8fd4-af44ea4d766a"],
+
+Cell["\<\
+The same functions work on different model types (ContinuousTime, \
+DiscreteTime, periodic, etc.).\
+\>", "Text",
+ CellID->231275468,
+ $CellContext`ExpressionUUID -> "c52705f1-558b-434c-866e-eda416e9be81"],
+
+Cell[TextData[{
+ ButtonBox["Rule lists",
+  BaseStyle->"Link",
+  ButtonData->"paclet:EcoEvo/guide/EcoEvo#978350796"],
+ " are used as both input to and output of various functions (e.g. as initial \
+conditions and as equilibria)."
+}], "Text",
+ CellID->1837189271,
+ $CellContext`ExpressionUUID -> "2cb3a4c5-0dbf-4213-8fe8-ce5ed670c998"],
+
+Cell[TextData[{
+ "Simulation output is in the form of temporal rule lists, which can be \
+plotted with ",
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["PlotDynamics"]],"paclet:EcoEvo/ref/PlotDynamics"},
+   "RefLink",
+   BaseStyle->{"InlineFormula"}]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "5408222c-d5c3-46b8-9386-cd3b421c98d4"],
+ ", used as input to various functions (in which case they are appropriately \
+averaged), or turned into numerical rule lists using ",
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["Slice"]],"paclet:EcoEvo/ref/Slice"},
+   "RefLink",
+   BaseStyle->{"InlineFormula"}]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "6fa1412e-136d-4a66-b0f8-dd8b5c302284"],
+ " and ",
+ Cell[BoxData[
+  TemplateBox[{Cell[
+     TextData["FinalSlice"]],"paclet:EcoEvo/ref/FinalSlice"},
+   "RefLink",
+   BaseStyle->{"InlineFormula"}]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "124dc811-a3b1-49ef-aa76-b93311786f61"],
+ ". "
+}], "Text",
+ CellID->1048570528,
+ $CellContext`ExpressionUUID -> "24694138-8a03-4ae1-b868-1f9d11fadaf1"],
+
+Cell["\<\
+Many functions will work analytically if numerical values aren't given.\
+\>", "Text",
+ CellID->402938217,
+ $CellContext`ExpressionUUID -> "cdc7ade4-5247-4253-9f47-5584154bf62f"],
+
+Cell[TextData[{
+ "Functions that start with Solve use ",
+ ButtonBox["Solve",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/Solve"],
+ ", those that start with NSolve use ",
+ ButtonBox["NSolve",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/NSolve"],
+ ", and those that start with Find use ",
+ ButtonBox["FindRoot",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/FindRoot"],
+ " or possibly ",
+ ButtonBox["FixedPoint",
+  BaseStyle->"Link",
+  ButtonData->"paclet:ref/FixedPoint"],
+ "."
+}], "Text",
+ CellID->562667237,
+ $CellContext`ExpressionUUID -> "3514f7d8-552b-43d6-b0cb-17e2bc46b02f"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsection",
+ CellID->1717301342,
+ $CellContext`ExpressionUUID -> "cd940867-3146-46e5-8aa2-67287598587b"],
+
+Cell["\<\
+Most functions take optional arguments at the end of the function call.\
+\>", "Text",
+ CellID->715377576,
+ $CellContext`ExpressionUUID -> "4b4ddba2-552c-4033-b278-0cb84f441185"],
+
+Cell[TextData[{
+ "Functions that call other functions can pass options using *Opts.  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " EcoSim calls NDSolve, so to pass options to NDSolve, use \
+NDSolveOpts\[Rule]",
+ StyleBox["ndsolveoptions", "TI"],
+ " in EcoSim.  These can be nested."
+}], "Text",
+ CellID->47704691,
+ $CellContext`ExpressionUUID -> "fd6eaa46-5b5f-4b53-bd2f-1c076e686949"],
+
+Cell["\<\
+Most functions have the option Verbose.  Setting Verbose\[Rule]True prints \
+out extra information about what the function is actually doing.  Setting \
+VerboseAll\[Rule]True sets Verbose for all functions within.\
+\>", "Text",
+ CellID->1588772180,
+ $CellContext`ExpressionUUID -> "ffdf1769-7870-403f-8298-03c75d7f9ff7"],
+
+Cell["Functions with multiple methods have the option Method.", "Text",
+ CellID->1600172207,
+ $CellContext`ExpressionUUID -> "00ea6255-f10d-4fbd-8f83-86a85cd983c5"],
+
+Cell["\<\
+Potentially time-consuming numerical functions have the option Monitor to \
+show a progress monitor.\
+\>", "Text",
+ CellID->2059752718,
+ $CellContext`ExpressionUUID -> "db36aa97-6dff-4ebb-86d4-9c94b39a2e5a"],
+
+Cell["\<\
+Many functions have the option Fixed, which fixes variables at the given \
+values.\
+\>", "Text",
+ CellID->1286586422,
+ $CellContext`ExpressionUUID -> "11052219-ef06-4b15-bc67-c58997afa628"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Populations", "Subsection",
+ CellID->1375805180,
+ $CellContext`ExpressionUUID -> "a75ad2f3-7b44-4543-9712-dc8a868f1405"],
+
+Cell["\<\
+Populations that are omitted in initial values are assumed to be Fixed at \
+zero.\
+\>", "Text",
+ CellID->913812942,
+ $CellContext`ExpressionUUID -> "e64b47c5-53b0-4094-bc62-d1792fc97727"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Guilds", "Subsection",
+ CellID->517697797,
+ $CellContext`ExpressionUUID -> "8d78e588-d26f-4c24-ab46-87155da87973"],
+
+Cell["Guilds are open-ended with respect to the number of species.", "Text",
+ CellID->1951756563,
+ $CellContext`ExpressionUUID -> "51426786-2bdb-4d45-b809-2085cad41713"],
+
+Cell[TextData[{
+ "When setting up model equations, ",
+ Cell[BoxData[
+  SubscriptBox["\[ScriptCapitalN]", "guild"]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "6a9ed137-b8c2-4b43-a154-309214d14f4e"],
+ " is a placeholder for the number of species in guild ",
+ StyleBox["guild", "TI"],
+ ".  \[ScriptCapitalN] (script N) can be entered with the shortcut \
+\[EscapeKey]-scN-\[EscapeKey]."
+}], "Text",
+ CellID->1793539306,
+ $CellContext`ExpressionUUID -> "1eaa2c2a-7d34-40a6-94c8-1b2e8ac08193"],
+
+Cell[TextData[{
+ "Species number is denoted using subscripts (ctrl-minus).  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", "1"}], ",", 
+    RowBox[{
+     SubscriptBox["x", "2"], "\[Rule]", "2"}]}], "}"}]],
+  $CellContext`ExpressionUUID -> "94d7c4cf-f21d-402f-8f23-03be33acf1ca"]
+}], "Text",
+ CellID->2052850748,
+ $CellContext`ExpressionUUID -> "277fb916-d1f0-4767-ada4-750f40a89268"],
+
+Cell[TextData[{
+ "The number of species in a particular function call is inferred from the \
+traits and/or population values given.  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " using the traits defined above in a function would temporarily get ",
+ Cell[BoxData[
+  SubscriptBox["\[ScriptCapitalN]", "guild"]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "5f6d7a44-d995-4519-9baf-483cc7548ec8"],
+ " equal to 2."
+}], "Text",
+ CellID->600376508,
+ $CellContext`ExpressionUUID -> "a2956024-f212-4963-8092-53eee1bc70f7"],
+
+Cell[TextData[{
+ "When setting up traits or populations, ",
+ Cell[BoxData[
+  SubscriptBox["\[ScriptCapitalN]", "guild"]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "42f105b2-581d-43fc-90a3-c217dbb61cf6"],
+ "\[Rule]",
+ StyleBox["n", "TI"],
+ " makes a \"blank\" set of ",
+ StyleBox["n", "TI"],
+ " species in guild ",
+ StyleBox["guild", "TI"],
+ ".  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " trait specification {",
+ Cell[BoxData[
+  SubscriptBox["\[ScriptCapitalN]", "guild"]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "7b3abd2b-210f-4ebd-933f-0ad97af39b39"],
+ "\[Rule]2} would be treated as ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", 
+     SubscriptBox["x", "1"]}], ",", 
+    RowBox[{
+     SubscriptBox["x", "2"], "\[Rule]", 
+     SubscriptBox["x", "2"]}]}], "}"}]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "55ad9506-7469-4de8-98bf-637dc6ecae82"],
+ " if there was a single trait x and population specification {",
+ Cell[BoxData[
+  SubscriptBox["\[ScriptCapitalN]", "guild"]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "5c2059b3-e3a5-4c2a-9c10-62325e556d95"],
+ "\[Rule]2} would be treated as ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", 
+     SubscriptBox["n", "1"]}], ",", 
+    RowBox[{
+     SubscriptBox["n", "2"], "\[Rule]", 
+     SubscriptBox["n", "2"]}]}], "}"}]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "b1e36537-e781-4c29-978b-2b15c1f1b74a"],
+ "."
+}], "Text",
+ CellID->1133081649,
+ $CellContext`ExpressionUUID -> "a0ed8986-389d-4bb5-a389-d1658c57efea"],
+
+Cell[TextData[{
+ "Functions that take both traits and population rule lists can take a \
+combined rule list of traits and population values.  ",
+ StyleBox["E.g.",
+  FontSlant->"Italic"],
+ " ",
+ Cell[BoxData[
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", "1"}], ",", 
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", "1"}]}], "}"}]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "50952b2a-e05d-4e55-bc94-1d87886a2602"],
+ " would be split into ",
+ Cell[BoxData[
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["x", "1"], "\[Rule]", " ", "1"}], "}"}], ",", 
+   RowBox[{"{", 
+    RowBox[{
+     SubscriptBox["n", "1"], "\[Rule]", "1"}], "}"}]}]], "InlineFormula",
+  $CellContext`ExpressionUUID -> "8e2d63b0-2a02-4d19-b91e-84026ce40870"],
+ "."
+}], "Text",
+ CellID->456710004,
+ $CellContext`ExpressionUUID -> "fd6c37a6-5184-4c05-b103-cb577bbe049f"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[" ", "FooterCell"]
+},
+Saveable->False,
+ScreenStyleEnvironment->"Working",
+WindowTitle->"Overall Principles",
+TaggingRules->{
+ "ModificationHighlight" -> False, "ColorType" -> "TutorialColor", 
+  "LinkTrails" -> GridBox[{{
+      RowBox[{
+        ButtonBox[
+        "EcoEvo", ButtonData -> "paclet:EcoEvo/guide/EcoEvo", 
+         BaseStyle -> {"Link", "DockedLinkTrail"}]}]}}, ColumnAlignments -> 
+    Left], "ExampleCounter" -> 1, "NeedPlatMsgIn" -> None, "RootCaptions" -> 
+  "", "Metadata" -> {
+   "built" -> "{2020, 8, 26, 21, 59, 30.550835}", 
+    "history" -> {"1.0", "", "", ""}, "context" -> "EcoEvo`", 
+    "keywords" -> {}, "specialkeywords" -> {}, 
+    "tutorialcollectionlinks" -> {}, "index" -> True, "label" -> 
+    "EcoEvo Package Tutorial", "language" -> "en", "paclet" -> 
+    "EcoEvo Package", "status" -> "None", "summary" -> 
+    "The purpose of the EcoEvo package is to streamline the analysis of \
+ecological and eco-evolutionary models. Some of the design principles are \
+described below. Once a model is set for analysis with SetModel, equations \
+don't need to be re-entered as arguments of each function. The same functions \
+work on different model types (ContinuousTime, DiscreteTime, periodic, \
+etc.).", "synonyms" -> {}, "tabletags" -> 
+    DocumentationBuild`Make`Private`tabletaggingrules$85404, "title" -> 
+    "Overall Principles", "titlemodifier" -> "", "windowtitle" -> 
+    "Overall Principles", "type" -> "Tutorial", "uri" -> 
+    "EcoEvo/tutorial/OverallPrinciples"}},
+FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
+2014)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[
+    StyleDefinitions -> FrontEnd`FileName[{"Wolfram"}, "Reference.nb"]]], 
+   Cell[
+    StyleData["Input"], CellContext -> Notebook], 
+   Cell[
+    StyleData["Output"], CellContext -> Notebook], 
+   Cell[
+    StyleData["TutorialMoreAboutSection"], 
+    CellGroupingRules -> {"SectionGrouping", 30}], 
+   Cell[
+    StyleData["RelatedTutorialsSection"], 
+    CellGroupingRules -> {"SectionGrouping", 30}], 
+   Cell[
+    StyleData["TutorialRelatedLinksSection"], 
+    CellGroupingRules -> {"SectionGrouping", 30}], 
+   Cell[
+    StyleData["NotesSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["PrimaryExamplesSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["ExampleSection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData["ExampleSubsection"], ShowGroupOpener -> True], 
+   Cell[
+    StyleData[
+    "GuideTutorialsSection", StyleDefinitions -> 
+     StyleData["SeeAlsoSection"]]]}, Visible -> False, FrontEndVersion -> 
+  "10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, 2014)", 
+  StyleDefinitions -> "Default.nb"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[590, 21, 1289, 31, 70, "AnchorBarGrid",
+ CellID->1],
+Cell[CellGroupData[{
+Cell[1904, 56, 127, 2, 70, "Title",
+ CellID->509267359],
+Cell[2034, 60, 279, 6, 70, "Text",
+ CellID->1534169418],
+Cell[CellGroupData[{
+Cell[2338, 70, 122, 2, 70, "Subsection",
+ CellID->1989512163],
+Cell[2463, 74, 471, 11, 70, "Text",
+ CellID->1758160239],
+Cell[2937, 87, 214, 5, 70, "Text",
+ CellID->231275468],
+Cell[3154, 94, 333, 8, 70, "Text",
+ CellID->1837189271],
+Cell[3490, 104, 1069, 27, 70, "Text",
+ CellID->1048570528],
+Cell[4562, 133, 187, 4, 70, "Text",
+ CellID->402938217],
+Cell[4752, 139, 587, 20, 70, "Text",
+ CellID->562667237]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5376, 164, 122, 2, 70, "Subsection",
+ CellID->1717301342],
+Cell[5501, 168, 187, 4, 70, "Text",
+ CellID->715377576],
+Cell[5691, 174, 387, 10, 70, "Text",
+ CellID->47704691],
+Cell[6081, 186, 330, 6, 70, "Text",
+ CellID->1588772180],
+Cell[6414, 194, 164, 2, 70, "Text",
+ CellID->1600172207],
+Cell[6581, 198, 217, 5, 70, "Text",
+ CellID->2059752718],
+Cell[6801, 205, 199, 5, 70, "Text",
+ CellID->1286586422]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7037, 215, 126, 2, 70, "Subsection",
+ CellID->1375805180],
+Cell[7166, 219, 197, 5, 70, "Text",
+ CellID->913812942]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7400, 229, 120, 2, 70, "Subsection",
+ CellID->517697797],
+Cell[7523, 233, 169, 2, 70, "Text",
+ CellID->1951756563],
+Cell[7695, 237, 496, 11, 70, "Text",
+ CellID->1793539306],
+Cell[8194, 250, 483, 15, 70, "Text",
+ CellID->2052850748],
+Cell[8680, 267, 523, 12, 70, "Text",
+ CellID->600376508],
+Cell[9206, 281, 1617, 47, 70, "Text",
+ CellID->1133081649],
+Cell[10826, 330, 896, 27, 70, "Text",
+ CellID->456710004]
+}, Open  ]]
+}, Open  ]],
+Cell[11749, 361, 23, 0, 70, "FooterCell"]
+}
+]
+*)
+
+(* End of internal cache information *)

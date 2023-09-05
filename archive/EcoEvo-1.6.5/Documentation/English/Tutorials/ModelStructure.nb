@@ -1,0 +1,907 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.3' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     29932,        899]
+NotebookOptionsPosition[     24786,        710]
+NotebookOutlinePosition[     25249,        728]
+CellTagsIndexPosition[     25206,        725]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[TextData[{
+ "New in: ",
+ Cell["1.0", "HistoryData",
+  CellTags->"New",
+  ExpressionUUID -> "26d5e633-6dc2-4b6c-af69-730d8dfea75d"],
+ " | Modified in: ",
+ Cell["1.6.0 ", "HistoryData",
+  CellTags->"Modified",
+  ExpressionUUID -> "e081195f-0fc3-4387-8246-9c7188749a49"],
+ " | Obsolete in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Obsolete",
+  ExpressionUUID -> "f4965484-21b4-438f-831e-3d7862d5c442"],
+ " | Excised in: ",
+ Cell[" ", "HistoryData",
+  CellTags->"Excised",
+  ExpressionUUID -> "3b5af3f9-6c49-466e-8dad-810703287e41"]
+}], "History",
+ CellChangeTimes->{{3.7101121677515907`*^9, 3.710112168078206*^9}, {
+  3.830097050302979*^9, 3.8300970510212727`*^9}},
+ CellID->76253579,
+ ExpressionUUID -> "e9c1e830-6ad4-4e10-9552-d2a73098206e"],
+
+Cell[CellGroupData[{
+
+Cell["Categorization", "CategorizationSection",
+ CellID->1693648641,
+ ExpressionUUID -> "429a9da9-6303-4e8f-ad49-d4a4d89d11ee"],
+
+Cell["Tutorial", "Categorization",
+ CellChangeTimes->{{3.777476461207428*^9, 3.777476463112903*^9}},
+ CellLabel->"Entity Type",
+ CellID->256968302,
+ ExpressionUUID -> "5a9b2013-fafa-40c1-9a74-7c276b39e543"],
+
+Cell["EcoEvo Package", "Categorization",
+ CellChangeTimes->{3.726874487623251*^9},
+ CellLabel->"Paclet Name",
+ CellID->276637597,
+ ExpressionUUID -> "07a4b5d6-1376-4d7f-a559-d8389bb5c234"],
+
+Cell["EcoEvo`", "Categorization",
+ CellChangeTimes->{3.726874487641863*^9},
+ CellLabel->"Context",
+ CellID->145997024,
+ ExpressionUUID -> "2a8c0c97-3bda-4be8-8271-bd07c1eb8ad9"],
+
+Cell["EcoEvo/tutorial/ModelStructure", "Categorization",
+ CellChangeTimes->{
+  3.726874487654846*^9, 3.775305405078794*^9, {3.7774726759310217`*^9, 
+   3.7774726768734713`*^9}, {3.7774733233747807`*^9, 
+   3.7774733252849417`*^9}, {3.777476475037258*^9, 3.777476475325095*^9}, {
+   3.7774765342670527`*^9, 3.777476536546877*^9}},
+ CellLabel->"URI",
+ CellID->916476059,
+ ExpressionUUID -> "cdf0ccc5-8fa6-41c0-a589-114c7aab8565"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Keywords", "KeywordsSection",
+ CellID->477174294,
+ ExpressionUUID -> "36c6bd08-ff83-40a5-a98b-c339621fdd6f"],
+
+Cell["XXXX", "Keywords",
+ CellID->1164421360,
+ ExpressionUUID -> "c60e0b45-f354-4928-9024-3cd4913ea0d4"],
+
+Cell["Syntax Templates", "TemplatesSection",
+ CellID->1872225408,
+ ExpressionUUID -> "73df0e92-0ce1-47db-8926-77e787529243"],
+
+Cell[BoxData[""], "Template",
+ CellLabel->"Additional Function Template",
+ CellID->1562036412,
+ ExpressionUUID -> "cf4a5248-c051-4d6f-873c-fa52096ee6eb"],
+
+Cell[BoxData[""], "Template",
+ CellLabel->"Arguments Pattern",
+ CellID->158391909,
+ ExpressionUUID -> "534b6d85-fa23-44b7-a17d-d5e9711d54b6"],
+
+Cell[BoxData[""], "Template",
+ CellLabel->"Local Variables",
+ CellID->1360575930,
+ ExpressionUUID -> "b919b933-96e6-40d1-8bd8-22747c2bd1d2"],
+
+Cell[BoxData[""], "Template",
+ CellLabel->"Color Equal Signs",
+ CellID->793782254,
+ ExpressionUUID -> "3d9438da-58d2-4b33-952e-d48f6f723473"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Details", "DetailsSection",
+ CellID->1345657494,
+ ExpressionUUID -> "ed1d37a7-cb11-49e1-9897-9a0aacfe4a62"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Lead",
+ CellID->670882175,
+ ExpressionUUID -> "99569d4a-d943-4fcd-8cdb-2984aa6956af"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Developers",
+ CellID->1315215101,
+ ExpressionUUID -> "662db3ce-997a-4140-a785-8af3d4ec93c3"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Authors",
+ CellID->8391405,
+ ExpressionUUID -> "65b6cb74-5966-4f48-9c3f-0ff8c2d042cd"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Feature Name",
+ CellID->3610269,
+ ExpressionUUID -> "97971a56-7ebf-4d25-a1ae-1e20cb3b01a5"],
+
+Cell["XXXX", "Details",
+ CellLabel->"QA",
+ CellID->401364205,
+ ExpressionUUID -> "3d404e70-76e8-4371-a5b7-7cea5c7feb28"],
+
+Cell["XXXX", "Details",
+ CellLabel->"DA",
+ CellID->350204745,
+ ExpressionUUID -> "a6de0862-c6b0-46fe-bdbb-103e59b19b6e"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Docs",
+ CellID->732958810,
+ ExpressionUUID -> "024b01b6-024c-4d08-a3f8-9fe023c8f808"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Features Page Notes",
+ CellID->222905350,
+ ExpressionUUID -> "d1f28586-4e5a-45ae-9e50-af33370f9320"],
+
+Cell["XXXX", "Details",
+ CellLabel->"Comments",
+ CellID->771023936,
+ ExpressionUUID -> "0b311ab5-e28c-40f6-9884-4b489d1d1ed3"]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["Model Structure", "Title",
+ CellID->509267359,ExpressionUUID->"e40819a3-49cb-40c2-8df0-9f50bf4f23d4"],
+
+Cell["There are three types of entities in an EcoEvo model:", "Text",
+ CellChangeTimes->{{3.736545380966024*^9, 3.7365453979108353`*^9}},
+ CellID->1534169418,ExpressionUUID->"329d3756-49cb-4c6a-bce0-b884a1fe4cc2"],
+
+Cell[BoxData[GridBox[{
+   {
+    RowBox[{"Auxiliary", " ", "variables", " ", 
+     RowBox[{"(", "auxs", ")"}]}], Cell["Abiotic variables", "TableText",
+     ExpressionUUID -> "bf428769-72c0-4307-919b-b4642cf75e73"]},
+   {
+    RowBox[{"Populations", " ", 
+     RowBox[{"(", "pops", ")"}]}], Cell["\<\
+Biotic variables, possibly structured into multiple components\
+\>", "TableText",
+     ExpressionUUID -> "c0a907c4-a73f-4d61-a6f6-22fdeee6b5d4"]},
+   {"Guilds", Cell["\<\
+Like populations, but with an open-ended number of species and possibly with \
+one or more traits or interactions\
+\>", "TableText",
+     ExpressionUUID -> "29f3a705-9cf8-4192-a001-e4aeb6a2a474"]}
+  }]], "DefinitionBox",
+ CellChangeTimes->{{3.736546221013863*^9, 3.7365462281320963`*^9}, {
+   3.736546422575264*^9, 3.736546497826745*^9}, {3.736546771713043*^9, 
+   3.736546840776161*^9}, 3.736589594363241*^9, 3.736589631434985*^9, {
+   3.807402913531138*^9, 3.807402923080538*^9}, {3.807403257454699*^9, 
+   3.80740325955865*^9}},
+ CellID->2096742444,
+ ExpressionUUID -> "9978360e-5b20-4b00-99be-9cc85e3eb9c5"],
+
+Cell["\<\
+In addition, ModelType defines the type of model \[LongDash] ContinuousTime \
+(default) or DiscreteTime \[LongDash] and Period give the period of external \
+forcing \[Dash] \[Infinity] for an unforced model (default), a positive real \
+number for a periodically forced model, and 0 for an aperiodically forced one.\
+\>", "Text",
+ CellChangeTimes->{{3.736546898305991*^9, 3.736546947718116*^9}, {
+  3.736548159287622*^9, 3.736548170839038*^9}, {3.7365893231097193`*^9, 
+  3.736589365139544*^9}, {3.736589409972782*^9, 3.736589453858508*^9}},
+ CellID->1560556915,
+ ExpressionUUID -> "7836f5ac-e2cf-40c0-8558-b51e1baf4607"],
+
+Cell[TextData[{
+ "The active model to be studied is set with ",
+ Cell[BoxData[
+  ButtonBox["SetModel",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/SetModel"]], "InlineFormula",ExpressionUUID->
+  "14ee5381-2c22-4247-8114-2d3f048cf46f"],
+ " and can be unset with ",
+ Cell[BoxData[
+  ButtonBox["UnsetModel",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/UnsetModel"]], "InlineFormula",
+  ExpressionUUID->"987d4e82-50c8-4dee-a7f7-e5a5c8de3440"],
+ ".  Information on the current model can be seen with ",
+ Cell[BoxData[
+  ButtonBox["ModelInfo",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/ModelInfo"]], "InlineFormula",
+  ExpressionUUID->"34ff6f4c-1089-42c3-97f2-0197db334516"],
+ "."
+}], "Text",
+ CellChangeTimes->{{3.737038623928203*^9, 3.737038666483184*^9}, {
+  3.770623172881998*^9, 3.770623192991106*^9}},
+ CellID->1644429961,ExpressionUUID->"388665af-24a3-4fed-a513-d89e1cce7361"],
+
+Cell["\<\
+Together, auxs, pops and guilds are called \"variables\" and traits and \
+interactions are called \"attributes\".\
+\>", "Text",
+ CellChangeTimes->{{3.807402955458832*^9, 3.8074029739214497`*^9}, {
+  3.807403248680007*^9, 3.807403278111384*^9}},
+ CellID->1727987996],
+
+Cell["As of v1.6.0, [t] is omitted in defining all equations.", "Text",
+ CellChangeTimes->{{3.830097084575268*^9, 3.8300971014858017`*^9}},
+ CellID->2045980972],
+
+Cell[CellGroupData[{
+
+Cell["Auxiliary variables", "Subsection",
+ CellChangeTimes->{{3.736546872364389*^9, 3.7365468786153183`*^9}, 
+   3.7365895897742453`*^9},
+ CellID->544840492,ExpressionUUID->"20fc939c-0c9f-4fe2-b323-91720399e151"],
+
+Cell["\<\
+Auxiliary variables are for abiotic variables such as nutrients.  Each \
+auxiliary variable requires a Variable and an Equation, and optionally \
+accepts a Range (default = Interval[{0,\[Infinity]}]).\
+\>", "Text",
+ CellChangeTimes->{{3.736589466468705*^9, 3.736589470138131*^9}, {
+  3.736589597472787*^9, 3.736589691247984*^9}, {3.737023079427*^9, 
+  3.7370230990253353`*^9}, {3.737037618271654*^9, 3.737037626021693*^9}},
+ CellID->1885503418,ExpressionUUID->"f24acf02-ffda-4b99-9ef9-80bf7e67d5d2"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+An example of an auxiliary variable to model a nutrient in a chemostat:\
+\>", "Text",
+ CellChangeTimes->{{3.737023029346355*^9, 3.737023063267775*^9}, 
+   3.737038023690187*^9},
+ CellID->4844606,ExpressionUUID->"bf5ed2b7-3ad1-4862-aec7-26b1bf2e318f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Aux", "[", "R", "]"}], "\[Rule]", 
+  RowBox[{"{", 
+   RowBox[{"Equation", "\[RuleDelayed]", 
+    RowBox[{"a", 
+     RowBox[{"(", 
+      RowBox[{"Rin", "-", "R"}], ")"}]}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.737023067924267*^9, 3.73702311577868*^9}, {
+  3.770623196386015*^9, 3.770623198985125*^9}, {3.830097062329023*^9, 
+  3.830097062705377*^9}},
+ CellID->997361999,
+ ExpressionUUID -> "44f0fd95-ed0b-4ed5-b1bc-46ad46d4f717"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Populations", "Subsection",
+ CellChangeTimes->{{3.737029491867304*^9, 3.737029494591998*^9}},
+ CellID->1349396302,
+ ExpressionUUID -> "d5dcabe8-e729-4642-ad97-05347a9f9ad3"],
+
+Cell[TextData[{
+ "Populations are for biological species.  They can consist of one or more \
+Components, each of which requires a Variable and an Equation, and optionally \
+accepts a Range (default = Interval[{0,\[Infinity]}]).  If there is only one \
+component, it doesn't need to be specified explicitly.  Components have a \
+Type, which can be either \"Extensive\" (default) for number of individuals \
+or \"Intensive\" (measured on a per individual basis).  Invasion rate can be \
+calculated for populations with ",
+ Cell[BoxData[
+  ButtonBox["Inv",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/Inv"]], "InlineFormula",ExpressionUUID->
+  "8a614d89-f4e9-48f1-bc7d-01bb3ad2d0dc"],
+ " and unspecified populations are assumed to be equal to zero in ",
+ Cell[BoxData[
+  ButtonBox["EcoSim",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/EcoSim"]], "InlineFormula",ExpressionUUID->
+  "3de6cec9-2723-4cf3-b95e-0622e8d48d26"],
+ ", ",
+ Cell[BoxData[
+  ButtonBox["SolveEcoEq",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/SolveEcoEq"]], "InlineFormula",
+  ExpressionUUID->"75e19345-357c-4132-b29f-7cbe73cdd2cb"],
+ ", ",
+ Cell[BoxData[
+  ButtonBox["NSolveEcoEq",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/NSolveEcoEq"]], "InlineFormula",
+  ExpressionUUID->"34c12b08-9240-40b0-a225-ee67e56a360d"],
+ ", and ",
+ Cell[BoxData[
+  ButtonBox["FindEcoEq",
+   BaseStyle->"Link",
+   ButtonData->"paclet:EcoEvo/ref/FindEcoEq"]], "InlineFormula",
+  ExpressionUUID->"10940bad-1fb6-414d-ae35-73b85f1019b2"],
+ "."
+}], "Text",
+ CellChangeTimes->{{3.737029496560122*^9, 3.7370295039516497`*^9}, {
+  3.7370295487394342`*^9, 3.737029556099847*^9}, {3.737030534769733*^9, 
+  3.737030560512631*^9}, {3.737030799026181*^9, 3.737030808717684*^9}, {
+  3.737037462682722*^9, 3.7370374661212606`*^9}, {3.737037501451665*^9, 
+  3.737037537227539*^9}, {3.7370375793029613`*^9, 3.7370376019814777`*^9}, {
+  3.737037632798685*^9, 3.7370376405432034`*^9}, {3.7370376908966417`*^9, 
+  3.737037738659246*^9}, {3.7370378930221567`*^9, 3.737037970414222*^9}, {
+  3.737038123021447*^9, 3.7370381711204653`*^9}, {3.737038607078271*^9, 
+  3.737038608357703*^9}},
+ CellID->118441052,ExpressionUUID->"99c283b4-6bc2-42fa-a80c-c8f05547b4e3"],
+
+Cell["Equations can be defined in place or with variables.", "Text",
+ CellChangeTimes->{{3.737039677155353*^9, 3.737039687593967*^9}},
+ CellID->867090134,ExpressionUUID->"7f7b9d4e-b071-42c0-8288-88648f975fa8"],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+An example of a unstructured population that grows logistically:\
+\>", "Text",
+ CellChangeTimes->{{3.737037681610653*^9, 3.7370376888722277`*^9}, {
+   3.737037973705256*^9, 3.73703799168906*^9}, 3.737038026346615*^9},
+ CellID->1395408876,ExpressionUUID->"a605318a-f852-40db-9592-37e9cafedb5f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Pop", "[", "n", "]"}], "\[Rule]", 
+  RowBox[{"{", 
+   RowBox[{"Equation", "\[RuleDelayed]", 
+    RowBox[{"r", " ", "n", 
+     RowBox[{"(", 
+      RowBox[{"1", "-", 
+       RowBox[{"n", "/", "k"}]}], ")"}]}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.73703799478648*^9, 3.737038009249713*^9}, {
+  3.770623215289691*^9, 3.770623217857799*^9}, {3.8300972531318617`*^9, 
+  3.8300972607077312`*^9}},
+ CellID->571859342,
+ ExpressionUUID -> "28c40cc5-9e55-484a-a225-1ea4970a223d"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+An example of a structured population (named pop) with juveniles and adults \
+(dj & da to be defined elsewhere):\
+\>", "Text",
+ CellChangeTimes->{{3.737038014745698*^9, 3.737038030835293*^9}, {
+  3.737038174575399*^9, 3.737038204664016*^9}, {3.7370385857006083`*^9, 
+  3.737038590828857*^9}, {3.7370396919056797`*^9, 3.737039702209051*^9}, {
+  3.770623225882059*^9, 3.770623229105524*^9}},
+ CellID->1148731986,
+ ExpressionUUID -> "df25df39-39fe-4750-8414-a930f67b3a49"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Pop", "[", "pop", "]"}], "\[Rule]", 
+  RowBox[{"{", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Component", "[", "j", "]"}], "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{"Equation", "\[RuleDelayed]", "dj"}], "}"}]}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"Component", "[", "a", "]"}], "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{"Equation", "\[RuleDelayed]", "da"}], "}"}]}]}], 
+   "\[IndentingNewLine]", "}"}]}]], "Input",
+ CellChangeTimes->{{3.737038208721698*^9, 3.737038244794208*^9}, {
+  3.770623221121345*^9, 3.770623238409849*^9}, {3.830097265955434*^9, 
+  3.830097268743916*^9}},
+ CellID->1520879378,
+ ExpressionUUID -> "33f4051f-1b66-4805-b17f-8fc61bdeddbc"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+An example of a structured population with a variable nutrient quota (Droop \
+equation):\
+\>", "Text",
+ CellChangeTimes->{{3.737038295578129*^9, 3.737038316723775*^9}},
+ CellID->1608381022,ExpressionUUID->"801fc13b-4ebc-4006-bcda-9a811aa3b013"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Pop", "[", "pop", "]"}], "\[Rule]", 
+  RowBox[{"{", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"Component", "[", "n", "]"}], "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{"Equation", "\[RuleDelayed]", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"\[Mu]", 
+           RowBox[{"(", 
+            RowBox[{"1", "-", 
+             RowBox[{"qmin", "/", "q"}]}], ")"}]}], "-", "m"}], ")"}], 
+        "n"}]}], "}"}]}], ",", 
+    RowBox[{
+     RowBox[{"Component", "[", "q", "]"}], "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"Equation", "\[RuleDelayed]", 
+        RowBox[{
+         RowBox[{"v", " ", 
+          RowBox[{"R", "/", 
+           RowBox[{"(", 
+            RowBox[{"R", "+", "k"}], ")"}]}]}], "-", 
+         RowBox[{"\[Mu]", 
+          RowBox[{"(", 
+           RowBox[{"q", "-", "qmin"}], ")"}]}]}]}], ",", 
+       RowBox[{"Type", "\[Rule]", "\"\<Intensive\>\""}]}], "}"}]}]}], 
+   "\[IndentingNewLine]", "}"}]}]], "Input",
+ CellChangeTimes->{{3.73703831788466*^9, 3.737038370243202*^9}, {
+  3.737038471364564*^9, 3.737038563180984*^9}, {3.770623242106249*^9, 
+  3.77062325228316*^9}, {3.83009727102033*^9, 3.8300972915641823`*^9}},
+ CellID->1474597015,
+ ExpressionUUID -> "d17390be-c7ad-4509-bf89-d73b946a6502"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Guilds", "Subsection",
+ CellChangeTimes->{{3.737038598414133*^9, 3.737038598956403*^9}},
+ CellID->774951276,ExpressionUUID->"b956dfba-639f-49ff-8953-f04de02108bb"],
+
+Cell[TextData[{
+ "Guilds are for sets of species subject to evolution or community assembly, \
+that all share the same fitness-generating function (",
+ StyleBox["sensu",
+  FontSlant->"Italic"],
+ " Vincent & Brown 2005).  They have unstructured or structured components as \
+populations have, but also can have a number of traits or interactions.  They \
+are open-ended in the number of species, which are indexed with subscripts. \
+",
+ Cell[BoxData[
+  StyleBox[
+   SubscriptBox["\[ScriptCapitalN]", "guild"], "TI"]], "InlineFormula",
+  ExpressionUUID -> "f9cd4aa2-021a-47b9-82d4-dcca7e9c8353"],
+ " is a placeholder for the number of species in guild ",
+ StyleBox["guild", "TI"],
+ ".  \[ScriptCapitalN] (script N) can be entered with the shortcut \
+\[EscapeKey]-scN-\[EscapeKey]."
+}], "Text",
+ CellChangeTimes->{{3.737038699289646*^9, 3.7370387009571*^9}, {
+  3.737038792193089*^9, 3.737038854566082*^9}, {3.737039006743621*^9, 
+  3.737039039357991*^9}, {3.737039197871624*^9, 3.737039202902646*^9}, {
+  3.737039407073059*^9, 3.7370395524577017`*^9}, {3.737040202004435*^9, 
+  3.737040267933094*^9}, {3.770817769099166*^9, 3.77081780113967*^9}, {
+  3.7708180215671797`*^9, 3.770818044480556*^9}, {3.807402935920339*^9, 
+  3.807402938704154*^9}, {3.830097733614254*^9, 3.830097736244719*^9}},
+ CellID->1460922534,
+ ExpressionUUID -> "97ecc9e4-4a7e-4499-b4b2-fece3e786a7e"],
+
+Cell["\<\
+The focal species must be referred to with subscript \[FormalI] (\"formal \
+i\"), which can be entered with the shortcut \[EscapeKey]-$i-\[EscapeKey].  \
+Other indices can use any symbol, but formal letters are a good choice.\
+\>", "Text",
+ CellChangeTimes->{{3.737039670033617*^9, 3.7370396711537447`*^9}, {
+  3.7370397087140617`*^9, 3.737039730305056*^9}, {3.737040286830242*^9, 
+  3.7370403026010227`*^9}, {3.7706232656017942`*^9, 3.770623267312789*^9}, {
+  3.830097309343897*^9, 3.8300973995285473`*^9}},
+ CellID->982289642,
+ ExpressionUUID -> "e13c94fe-8a35-4c5a-9b3d-37dac73de842"],
+
+Cell["\<\
+Traits are given through a list of traits, optionally with ranges as \
+inequalities.\
+\>", "Text",
+ CellChangeTimes->{{3.830097479573024*^9, 3.83009751292203*^9}},
+ CellID->1316609266],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+An example of a unstructured guild with one trait (Lotka-Volterra \
+competition):\
+\>", "Text",
+ CellChangeTimes->{{3.737039652318177*^9, 3.737039656089634*^9}, {
+  3.737039734425418*^9, 3.7370397628902893`*^9}},
+ CellID->634413793,ExpressionUUID->"f1ac0d1a-22cf-4484-9fb6-b6d2ee148a94"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Guild", "[", "n", "]"}], "\[Rule]", 
+  RowBox[{"{", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Equation", "\[RuleDelayed]", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"k", "[", 
+         SubscriptBox["x", "\[FormalI]"], "]"}], "-", 
+        RowBox[{"Sum", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"a", "[", 
+            RowBox[{
+             SubscriptBox["x", "\[FormalI]"], ",", 
+             SubscriptBox["x", "\[FormalJ]"]}], "]"}], 
+           SubscriptBox["n", "\[FormalJ]"]}], ",", 
+          RowBox[{"{", 
+           RowBox[{"j", ",", 
+            SubscriptBox["\[ScriptCapitalN]", "n"]}], "}"}]}], "]"}]}], ")"}], 
+      SubscriptBox["n", "\[FormalI]"]}]}], ",", "\[IndentingNewLine]", 
+    RowBox[{"Traits", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"-", "1"}], "\[LessEqual]", "x", "\[LessEqual]", "1"}], 
+      "}"}]}]}], "\[IndentingNewLine]", "}"}]}]], "Input",
+ CellChangeTimes->{{3.7370401136833057`*^9, 3.7370401255382137`*^9}, {
+  3.737040169966178*^9, 3.737040170308259*^9}, {3.7706232732426357`*^9, 
+  3.770623280706852*^9}, {3.8300974037330303`*^9, 3.830097492275464*^9}},
+ CellID->315195208,
+ ExpressionUUID -> "cda492d0-fcff-4b3e-a4ee-2637cac44625"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Interactions", "Subsection",
+ CellChangeTimes->{{3.8074030025519*^9, 3.807403005768886*^9}},
+ CellID->1390918122],
+
+Cell["\<\
+Interactions are like traits, but describe how two individuals (in the same \
+or different guilds) interact. \
+\>", "Text",
+ CellChangeTimes->{{3.8074030106749887`*^9, 3.8074030502039003`*^9}, {
+  3.807403114725559*^9, 3.807403147004881*^9}, {3.807437411880275*^9, 
+  3.807437485623117*^9}},
+ CellID->255134865],
+
+Cell[CellGroupData[{
+
+Cell["Interactions between species in one guild:", "Text",
+ CellID->221196394],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Interaction", "[", "a", "]"}], "\[Rule]", 
+  RowBox[{"{", 
+   RowBox[{"Guilds", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"n", ",", "n"}], "}"}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.7370401136833057`*^9, 3.7370401255382137`*^9}, {
+  3.737040169966178*^9, 3.737040170308259*^9}, {3.7706232732426357`*^9, 
+  3.770623280706852*^9}, {3.807403084792694*^9, 3.8074030991894817`*^9}},
+ CellID->1010334847,
+ ExpressionUUID -> "cda492d0-fcff-4b3e-a4ee-2637cac44625"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Between two guilds:", "Text",
+ CellChangeTimes->{{3.807403126549752*^9, 3.8074031523734627`*^9}},
+ CellID->1709352321],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Interaction", "[", "a", "]"}], "\[Rule]", 
+  RowBox[{"{", 
+   RowBox[{"Guilds", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"n", ",", "p"}], "}"}]}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.7370401136833057`*^9, 3.7370401255382137`*^9}, {
+   3.737040169966178*^9, 3.737040170308259*^9}, {3.7706232732426357`*^9, 
+   3.770623280706852*^9}, {3.807403084792694*^9, 3.8074030991894817`*^9}, 
+   3.807403134560419*^9},
+ CellID->1731102090,
+ ExpressionUUID -> "cda492d0-fcff-4b3e-a4ee-2637cac44625"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[TextData[{
+ "Interaction coefficients between species ",
+ StyleBox["i", "TI"],
+ " and ",
+ StyleBox["j", "TI"],
+ " are written with a two-part subscript:"
+}], "Text",
+ CellChangeTimes->{{3.807403159934908*^9, 3.8074032242380657`*^9}},
+ CellID->1902494149],
+
+Cell[BoxData[
+ SubscriptBox["a", 
+  RowBox[{"i", ",", "j"}]]], "Input",
+ CellChangeTimes->{{3.737040186604354*^9, 3.737040187948473*^9}, 
+   3.770623284834402*^9, {3.7708178149646177`*^9, 3.770817818488166*^9}, {
+   3.8074031984347467`*^9, 3.8074032033428783`*^9}},
+ CellID->586663798,
+ ExpressionUUID -> "537f40fd-5f8e-46cd-94cc-646003363f51"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Parameters", "Subsection",
+ CellChangeTimes->{{3.8074030025519*^9, 3.807403005768886*^9}, {
+  3.830097688355768*^9, 3.8300976898039513`*^9}},
+ CellID->676506634],
+
+Cell[CellGroupData[{
+
+Cell["\<\
+Parameters are given as a list, optionally with ranges as inequalities, which \
+are added to $Assumptions.\
+\>", "Text",
+ CellChangeTimes->{{3.8300976985691032`*^9, 3.8300977583567*^9}},
+ CellID->242043609],
+
+Cell[BoxData[
+ RowBox[{"Parameters", "\[RuleDelayed]", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"k", "\[GreaterEqual]", "0"}], ",", 
+    RowBox[{
+     RowBox[{"-", "1"}], "\[LessEqual]", "c", "\[LessEqual]", "1"}], ",", 
+    "x"}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.7370401136833057`*^9, 3.7370401255382137`*^9}, {
+  3.737040169966178*^9, 3.737040170308259*^9}, {3.7706232732426357`*^9, 
+  3.770623280706852*^9}, {3.807403084792694*^9, 3.8074030991894817`*^9}, {
+  3.830097774482555*^9, 3.83009779813398*^9}},
+ CellID->784942714,
+ ExpressionUUID -> "cda492d0-fcff-4b3e-a4ee-2637cac44625"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["More About", "TutorialMoreAboutSection",
+ CellID->23220180,ExpressionUUID->"e2324101-03f2-4efd-aafa-e7591c2c00a6"],
+
+Cell["XXXX", "TutorialMoreAbout",
+ CellID->1567025153,ExpressionUUID->"6c899138-01c7-45b4-b260-a72a7c1be285"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Related Tutorials", "RelatedTutorialsSection",
+ CellID->415694126,ExpressionUUID->"b87afe55-ea18-4afc-bd56-7cb1c952cf5a"],
+
+Cell[TextData[{
+ ButtonBox["Example Models",
+  BaseStyle->"Link",
+  ButtonData->"paclet:EcoEvo/tutorial/ExampleModels"],
+ " ",
+ StyleBox["\[LongDash]",
+  FontWeight->"Plain"],
+ " ",
+ StyleBox["worked examples where different EcoEvo models are set up and \
+analyzed ",
+  FontWeight->"Plain"]
+}], "RelatedTutorials",
+ CellChangeTimes->{{3.73704086995329*^9, 3.737040917595619*^9}},
+ CellID->1720175761,ExpressionUUID->"106ee279-94c8-4135-8360-4b37038e4526"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Related Wolfram Education Group Courses", "TutorialRelatedLinksSection",
+ CellID->415694148,ExpressionUUID->"ba9e69e0-15ab-47a2-899e-d63eb4a3a95d"],
+
+Cell["XXXX", "TutorialRelatedLinks",
+ CellID->415694149,ExpressionUUID->"ba623ea1-b75a-4009-9e32-98a6fa2d4b1f"]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{967, 1030},
+WindowMargins->{{0, Automatic}, {Automatic, 0}},
+Magnification:>1.25 Inherited,
+FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
+2014)",
+StyleDefinitions->FrontEnd`FileName[{"Wolfram"}, "TutorialPageStyles.nb", 
+  CharacterEncoding -> "UTF-8"]
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 746, 21, 30, "History",
+ CellID->76253579],
+Cell[CellGroupData[{
+Cell[1329, 45, 127, 2, 34, "CategorizationSection",
+ CellID->1693648641],
+Cell[1459, 49, 206, 4, 36, "Categorization",
+ CellID->256968302],
+Cell[1668, 55, 188, 4, 36, "Categorization",
+ CellID->276637597],
+Cell[1859, 61, 177, 4, 36, "Categorization",
+ CellID->145997024],
+Cell[2039, 67, 427, 8, 36, "Categorization",
+ CellID->916476059]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2503, 80, 114, 2, 34, "KeywordsSection",
+ CellID->477174294],
+Cell[2620, 84, 104, 2, 76, "Keywords",
+ CellID->1164421360],
+Cell[2727, 88, 124, 2, 90, "TemplatesSection",
+ CellID->1872225408],
+Cell[2854, 92, 153, 3, 140, "Template",
+ CellID->1562036412],
+Cell[3010, 97, 141, 3, 140, "Template",
+ CellID->158391909],
+Cell[3154, 102, 140, 3, 140, "Template",
+ CellID->1360575930],
+Cell[3297, 107, 141, 3, 140, "Template",
+ CellID->793782254]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[3475, 115, 113, 2, 21, "DetailsSection",
+ CellID->1345657494],
+Cell[3591, 119, 122, 3, 126, "Details",
+ CellID->670882175],
+Cell[3716, 124, 129, 3, 126, "Details",
+ CellID->1315215101],
+Cell[3848, 129, 123, 3, 126, "Details",
+ CellID->8391405],
+Cell[3974, 134, 128, 3, 126, "Details",
+ CellID->3610269],
+Cell[4105, 139, 120, 3, 126, "Details",
+ CellID->401364205],
+Cell[4228, 144, 120, 3, 126, "Details",
+ CellID->350204745],
+Cell[4351, 149, 122, 3, 126, "Details",
+ CellID->732958810],
+Cell[4476, 154, 137, 3, 126, "Details",
+ CellID->222905350],
+Cell[4616, 159, 126, 3, 126, "Details",
+ CellID->771023936]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[4779, 167, 107, 1, 114, "Title",
+ CellID->509267359],
+Cell[4889, 170, 213, 2, 27, "Text",
+ CellID->1534169418],
+Cell[5105, 174, 1081, 23, 124, "DefinitionBox",
+ CellID->2096742444],
+Cell[6189, 199, 630, 10, 66, "Text",
+ CellID->1560556915],
+Cell[6822, 211, 915, 23, 51, "Text",
+ CellID->1644429961],
+Cell[7740, 236, 275, 6, 27, "Text",
+ CellID->1727987996],
+Cell[8018, 244, 160, 2, 27, "Text",
+ CellID->2045980972],
+Cell[CellGroupData[{
+Cell[8203, 250, 212, 3, 48, "Subsection",
+ CellID->544840492],
+Cell[8418, 255, 509, 8, 47, "Text",
+ CellID->1885503418],
+Cell[CellGroupData[{
+Cell[8952, 267, 260, 5, 27, "Text",
+ CellID->4844606],
+Cell[9215, 274, 469, 12, 29, "Input",
+ CellID->997361999]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9733, 292, 179, 3, 48, "Subsection",
+ CellID->1349396302],
+Cell[9915, 297, 2237, 48, 129, "Text",
+ CellID->118441052],
+Cell[12155, 347, 209, 2, 27, "Text",
+ CellID->867090134],
+Cell[CellGroupData[{
+Cell[12389, 353, 303, 5, 27, "Text",
+ CellID->1395408876],
+Cell[12695, 360, 509, 13, 29, "Input",
+ CellID->571859342]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[13241, 378, 479, 9, 47, "Text",
+ CellID->1148731986],
+Cell[13723, 389, 744, 19, 87, "Input",
+ CellID->1520879378]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14504, 413, 254, 5, 27, "Text",
+ CellID->1608381022],
+Cell[14761, 420, 1313, 36, 87, "Input",
+ CellID->1474597015]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[16123, 462, 169, 2, 48, "Subsection",
+ CellID->774951276],
+Cell[16295, 466, 1370, 26, 111, "Text",
+ CellID->1460922534],
+Cell[17668, 494, 597, 10, 48, "Text",
+ CellID->982289642],
+Cell[18268, 506, 194, 5, 27, "Text",
+ CellID->1316609266],
+Cell[CellGroupData[{
+Cell[18487, 515, 297, 6, 27, "Text",
+ CellID->634413793],
+Cell[18787, 523, 1276, 32, 135, "Input",
+ CellID->315195208]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[20112, 561, 119, 2, 48, "Subsection",
+ CellID->1390918122],
+Cell[20234, 565, 321, 7, 27, "Text",
+ CellID->255134865],
+Cell[CellGroupData[{
+Cell[20580, 576, 78, 1, 27, "Text",
+ CellID->221196394],
+Cell[20661, 579, 500, 11, 29, "Input",
+ CellID->1010334847]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21198, 595, 124, 2, 27, "Text",
+ CellID->1709352321],
+Cell[21325, 599, 528, 12, 29, "Input",
+ CellID->1731102090]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[21890, 616, 259, 8, 28, "Text",
+ CellID->1902494149],
+Cell[22152, 626, 344, 7, 32, "Input",
+ CellID->586663798]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[22545, 639, 167, 3, 48, "Subsection",
+ CellID->676506634],
+Cell[CellGroupData[{
+Cell[22737, 646, 216, 5, 27, "Text",
+ CellID->242043609],
+Cell[22956, 653, 595, 13, 29, "Input",
+ CellID->784942714]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23600, 672, 120, 1, 90, "TutorialMoreAboutSection",
+ CellID->23220180],
+Cell[23723, 675, 109, 1, 25, "TutorialMoreAbout",
+ CellID->1567025153]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23869, 681, 127, 1, 90, "RelatedTutorialsSection",
+ CellID->415694126],
+Cell[23999, 684, 455, 13, 44, "RelatedTutorials",
+ CellID->1720175761]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[24491, 702, 153, 1, 90, "TutorialRelatedLinksSection",
+ CellID->415694148],
+Cell[24647, 705, 111, 1, 25, "TutorialRelatedLinks",
+ CellID->415694149]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
