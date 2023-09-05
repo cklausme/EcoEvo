@@ -1814,15 +1814,14 @@ Options[ExtremumValues]={SameThreshold->10^-4};
 
 MaximumValue::usage=
 "MaximumValue[\!\(\*
+StyleBox[\"f\", \"TI\"]\)] finds the global maximum value of temporal rule list \!\(\*
+StyleBox[\"f\", \"TI\"]\).
+MaximumValue[\!\(\*
 StyleBox[\"f\", \"TI\"]\), {\!\(\*
 StyleBox[\"tmin\", \"TI\"]\), \!\(\*
-StyleBox[\"tmax\", \"TI\"]\)}] finds global maximum value of temporal rule list \!\(\*
-StyleBox[\"f\", \"TI\"]\) between \!\(\*
+StyleBox[\"tmax\", \"TI\"]\)}] looks between \!\(\*
 StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
 StyleBox[\"tmax\", \"TI\"]\).
-MaximumValue[\!\(\*
-StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
-StyleBox[\"f\", \"TI\"]\).
 MaximumValue[\!\(\*
 StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\).";
@@ -1858,15 +1857,14 @@ MaximumValue[pd_ParametricDynamics,{tmin_?NumericQ,tmax_?NumericQ},opts___?Optio
 
 MinimumValue::usage=
 "MinimumValue[\!\(\*
+StyleBox[\"f\", \"TI\"]\)] finds the global minimum value of temporal rule list \!\(\*
+StyleBox[\"f\", \"TI\"]\).
+MinimumValue[\!\(\*
 StyleBox[\"f\", \"TI\"]\), {\!\(\*
 StyleBox[\"tmin\", \"TI\"]\), \!\(\*
-StyleBox[\"tmax\", \"TI\"]\)}] finds global maximum value of temporal rule list \!\(\*
-StyleBox[\"f\", \"TI\"]\) between \!\(\*
+StyleBox[\"tmax\", \"TI\"]\)}] looks between \!\(\*
 StyleBox[\"tmin\", \"TI\"]\) and \!\(\*
 StyleBox[\"tmax\", \"TI\"]\).
-MinimumValue[\!\(\*
-StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\(\*
-StyleBox[\"f\", \"TI\"]\).
 MinimumValue[\!\(\*
 StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\).";
@@ -2342,12 +2340,14 @@ RuleListMultiply[a_?RuleListQ,b_?RuleListQ]:=Normal[Merge[{a,b},Apply[Times]]];
 RuleListDivide::usage=
 "RuleListDivide[\!\(\*
 StyleBox[\"rulelist1\", \"TI\"]\), \!\(\*
-StyleBox[\"rulelist2\", \"TI\"]\)] divides corresponding elements of rulelists.
+StyleBox[\"rulelist2\", \"TI\"]\)] divides corresponding elements of \!\(\*
+StyleBox[\"rulelist1\", \"TI\"]\) by \!\(\*
+StyleBox[\"rulelist2\", \"TI\"]\).
 RuleListDivide[\!\(\*
 StyleBox[\"rulelist\", \"TI\"]\), \!\(\*
 StyleBox[\"x\", \"TI\"]\)] or RuleListDivide[\!\(\*
 StyleBox[\"x\", \"TI\"]\), \!\(\*
-StyleBox[\"rulelist\", \"TI\"]\)] RuleListDivides elements of rulelist \!\(\*
+StyleBox[\"rulelist\", \"TI\"]\)] divides elements of rulelist \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\) by number \!\(\*
 StyleBox[\"x\", \"TI\"]\) or vice versa.";
 
@@ -3143,15 +3143,15 @@ plotstyle=Evaluate[PlotStyle/.Flatten[{opts,Options[PlotTrajectory]}]];
 If[plotstyle===Automatic,plotstyle=ColorData[97,"ColorList"]];
 If[!ListQ[plotstyle],plotstyle={plotstyle}];
 
-axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[RuleListPlot]}]];
-plotrange=Evaluate[PlotRange/.Flatten[{opts,Options[RuleListPlot]}]];
+axeslabel=Evaluate[AxesLabel/.Flatten[{opts,Options[PlotTrajectory]}]];
+plotrange=Evaluate[PlotRange/.Flatten[{opts,Options[PlotTrajectory]}]];
 
-parametricplotopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ParametricPlot]];
-parametricplot3dopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ParametricPlot3D]];
-listplotopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ListPlot]];
-listlineplotopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ListLinePlot]];
-listpointplot3dopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[ListPointPlot3D]];
-listlineplot3dopts=FilterRules[Flatten[{opts,Options[RuleListPlot]}],Options[MyListLinePlot3D]];
+parametricplotopts=FilterRules[Flatten[{opts,Options[PlotTrajectory]}],Options[ParametricPlot]];
+parametricplot3dopts=FilterRules[Flatten[{opts,Options[PlotTrajectory]}],Options[ParametricPlot3D]];
+listplotopts=FilterRules[Flatten[{opts,Options[PlotTrajectory]}],Options[ListPlot]];
+listlineplotopts=FilterRules[Flatten[{opts,Options[PlotTrajectory]}],Options[ListLinePlot]];
+listpointplot3dopts=FilterRules[Flatten[{opts,Options[PlotTrajectory]}],Options[ListPointPlot3D]];
+listlineplot3dopts=FilterRules[Flatten[{opts,Options[PlotTrajectory]}],Options[MyListLinePlot3D]];
 
 (* figure out number of species in guilds *)
 (*Set\[ScriptCapitalN][ExtractTraits[solsin\[LeftDoubleBracket]1\[RightDoubleBracket]],ExtractVariables[solsin\[LeftDoubleBracket]1\[RightDoubleBracket]]];
@@ -6987,7 +6987,7 @@ Return[SortRuleList[res,AllVariables]];
 Options[EcoSim]={Verbose->False,Verbosity->0,
 Method->Automatic,NDSolveOpts->{},Logged->False,Fixed->{},WhenEvents->{},InterpolationOrder->7,InterpolationPoints->1000,
 EqStop->False,EqThreshold->10^-8,TimeScale->1,TMin->0,OutputTMin->Automatic,Output->"Dynamics",TMin->0,RandomSeeding->None,
-MinPop->None,WhenEventOpts->{}};
+MinPop->None,WhenEventOpts->{},ZeroGrowthBy->None};
 
 
 EcoSimTable::usage = "EcoSimTable[\!\(\*
@@ -8651,6 +8651,9 @@ StyleBox[\"attributes\", \"TI\"]\).";
 (* make listable across variables *)
 EcoStableQ[par:(_?ParametersQ):{},attributes:(_?AttributesQ):{},Gsin:(_?GsQ):{},variables_?ListOfVariablesQ,opts___?OptionQ]:=
 (EcoStableQ[par,attributes,Gsin,#,opts]&/@variables);
+(* break up traitsandpops *)
+EcoStableQ[par:(_?ParametersQ):{},traitsandpops_?AttributesAndVariablesQ,Gsin:(_?GsQ):{},opts___?OptionQ]:=EcoStableQ[
+	par,ExtractAttributes[traitsandpops],Gsin,ExtractVariables[traitsandpops],opts];
 
 
 EcoStableQ[parsin:(_?ParametersQ):{},attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},variablesin:(_?VariablesQ):{},opts___?OptionQ]:=
