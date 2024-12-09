@@ -1,0 +1,799 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     34337,        791]
+NotebookOptionsPosition[     31681,        733]
+NotebookOutlinePosition[     32804,        770]
+CellTagsIndexPosition[     32761,        767]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<TemporalVariance\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+   3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+   3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, 
+   3.911137803402939*^9},ExpressionUUID->"2eefe8f2-de40-4f68-a07f-\
+a949a13294c3"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.769493720563191*^9, 
+  3.769493721054977*^9}},ExpressionUUID->"057ea6c1-d4bd-4f2f-879d-\
+6620025b80a2"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TemporalVariance", "::", "usage"}], "=", "\n", 
+   "\"\<TemporalVariance[\!\(\*StyleBox[\"f\", \"TI\"]\), \
+\!\(\*StyleBox[\"var\", \"TI\"]\)] gives the variance of \
+\!\(\*StyleBox[\"f\", \"TI\"]\) with respect to \!\(\*StyleBox[\"var\", \
+\"TI\"]\)\!\(\*StyleBox[\" \", \"TI\"]\)(default \!\(\*StyleBox[\"var\", \"TI\
+\"]\)=\!\(\*StyleBox[\"t\", \"TI\"]\)).\n\
+TemporalVariance[\!\(\*StyleBox[\"f\", \"TI\"]\), {\!\(\*StyleBox[\"var\", \
+\"TI\"]\), \!\(\*StyleBox[\"varmin\", \"TI\"]\), \!\(\*StyleBox[\"varmax\", \
+\"TI\"]\)}] ranges from \!\(\*StyleBox[\"varmin\", \"TI\"]\) to \
+\!\(\*StyleBox[\"varmax\", \"TI\"]\).\n\
+TemporalVariance[\!\(\*StyleBox[\"rulelist\", \"TI\"]\)] threads over \
+\!\(\*StyleBox[\"rulelist\", \"TI\"]\).\>\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.7691843036545067`*^9, 3.769184304700852*^9}, {
+  3.784795966996243*^9, 3.784795969593032*^9}},
+ CellLabel->
+  "In[1211]:=",ExpressionUUID->"0b6cdca0-bcbe-402f-8396-fd45f0427948"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.7694936745853653`*^9, 
+  3.769493676072991*^9}},ExpressionUUID->"aef6bb57-aae0-4654-af06-\
+453d3cace02c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "ParametricDynamicss"}], " ", "*)"}], 
+  "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TemporalVariance", "[", 
+     RowBox[{"pd_ParametricDynamics", ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"Which", "[", "\n", "\t", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+      ",", "\n", "\t", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"var", "->", 
+         RowBox[{"AssociationToArray", "[", 
+          RowBox[{
+           RowBox[{"TemporalVariance", "/@", 
+            RowBox[{"pd", "[", 
+             RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+        RowBox[{"{", 
+         RowBox[{"var", ",", 
+          RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+      "\n", ",", "\n", "\t", 
+      RowBox[{
+       RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Continuous\>\""}],
+       ",", "\n", "\t", 
+      RowBox[{"RuleListInterpolation", "[", 
+       RowBox[{"TemporalVariance", "/@", 
+        RowBox[{"pd", "[", 
+         RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], "\n", "]"}]}], 
+   ";"}]}]], "Code",
+ CellChangeTimes->{{3.89446559406924*^9, 3.894465601144361*^9}, {
+  3.894465656555798*^9, 3.894465659691379*^9}, {3.895290847288097*^9, 
+  3.8952908619125633`*^9}, {3.8952908946855307`*^9, 3.895290895271555*^9}, {
+  3.895291224273573*^9, 
+  3.895291243437976*^9}},ExpressionUUID->"a6b0daa4-07ee-40a7-93ce-\
+288f351c8b84"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "main", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TemporalVariance", "[", 
+     RowBox[{"f_", ",", 
+      RowBox[{"{", 
+       RowBox[{"var_", ",", "varmin_", ",", "varmax_"}], "}"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "integrateopts", ",", "nintegrateopts", ",", "avgopts", ",", "method", 
+        ",", "avg"}], "}"}], ",", "\n", "\t", 
+      RowBox[{
+       RowBox[{"method", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"Method", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "TemporalVariance", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"InterpolatingFunctionFunctionQ", "[", "f", "]"}], 
+          "\[Equal]", "True"}], ",", 
+         RowBox[{"method", "=", "\"\<NIntegrate\>\""}]}], "]"}], ";", "\n", 
+       "\t", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"TemporalDataFunctionQ", "[", "f", "]"}], "\[Equal]", 
+          "True"}], ",", 
+         RowBox[{"method", "=", "\"\<Sum\>\""}]}], "]"}], ";", "\n", "\t", 
+       RowBox[{"integrateopts", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"IntegrateOpts", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "TemporalVariance", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"nintegrateopts", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"NIntegrateOpts", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "TemporalVariance", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"avgopts", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"TemporalMeanOpts", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "TemporalVariance", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"avg", "=", 
+        RowBox[{"TemporalMean", "[", 
+         RowBox[{"f", ",", 
+          RowBox[{"{", 
+           RowBox[{"var", ",", "varmin", ",", "varmax"}], "}"}], ",", 
+          RowBox[{"Method", "\[Rule]", "method"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"Which", "[", "\n", "\t\t", 
+        RowBox[{
+         RowBox[{"method", "\[Equal]", "\"\<Integrate\>\""}], ",", 
+         "\[IndentingNewLine]", "\t\t", 
+         RowBox[{"Return", "[", 
+          RowBox[{
+           RowBox[{"Integrate", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{"f", "-", "avg"}], ")"}], "^", "2"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"var", ",", "varmin", ",", "varmax"}], "}"}], ",", 
+             RowBox[{"Evaluate", "[", 
+              RowBox[{"Sequence", "@@", "integrateopts"}], "]"}]}], "]"}], 
+           "/", 
+           RowBox[{"(", 
+            RowBox[{"varmax", "-", "varmin"}], ")"}]}], "]"}], ",", "\n", 
+         "\t\t", 
+         RowBox[{"method", "\[Equal]", "\"\<NIntegrate\>\""}], ",", "\n", 
+         "\t\t", 
+         RowBox[{"Return", "[", 
+          RowBox[{
+           RowBox[{"NIntegrate", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{"f", "-", "avg"}], ")"}], "^", "2"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"var", ",", "varmin", ",", "varmax"}], "}"}], ",", 
+             RowBox[{"Evaluate", "[", 
+              RowBox[{"Sequence", "@@", "nintegrateopts"}], "]"}]}], "]"}], 
+           "/", 
+           RowBox[{"(", 
+            RowBox[{"varmax", "-", "varmin"}], ")"}]}], "]"}], ",", "\n", 
+         "\t\t", 
+         RowBox[{"method", "\[Equal]", "\"\<Sum\>\""}], ",", "\n", "\t\t", 
+         RowBox[{"Return", "[", 
+          RowBox[{
+           RowBox[{"Sum", "[", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"(", 
+               RowBox[{"f", "-", "avg"}], ")"}], "^", "2"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"var", ",", "varmin", ",", "varmax"}], "}"}]}], "]"}], 
+           "/", 
+           RowBox[{"(", 
+            RowBox[{"varmax", "-", "varmin", "+", "1"}], ")"}]}], "]"}], ",", 
+         "\n", "\t\t", "Else", ",", "\n", "\t\t", 
+         RowBox[{
+          RowBox[{"Message", "[", 
+           RowBox[{"General", "::", "badmtd"}], "]"}], ";", 
+          RowBox[{"Return", "[", "$Failed", "]"}], ";"}]}], "\n", "\t", "]"}],
+        ";"}]}], "\[IndentingNewLine]", "]"}]}], ";"}]}]], "Code",
+ CellChangeTimes->{{3.690287863246601*^9, 3.690287918330853*^9}, {
+   3.690287949953002*^9, 3.690287984470213*^9}, {3.690288202492288*^9, 
+   3.690288203165351*^9}, {3.690288269859326*^9, 3.690288279058405*^9}, {
+   3.69028838310036*^9, 3.6902883884881496`*^9}, {3.690289459451592*^9, 
+   3.6902895415673*^9}, {3.690289607356846*^9, 3.6902896177143087`*^9}, {
+   3.6902896562246523`*^9, 3.690289728915841*^9}, {3.690289944640999*^9, 
+   3.690289958237813*^9}, 3.6902902294882517`*^9, {3.690318605667149*^9, 
+   3.690318614784339*^9}, {3.690318795337082*^9, 3.69031879563405*^9}, {
+   3.6903800751157827`*^9, 3.690380109483981*^9}, {3.690398022786777*^9, 
+   3.6903980246116047`*^9}, {3.690400360478425*^9, 3.690400374657851*^9}, {
+   3.690412835627973*^9, 3.690412850939123*^9}, {3.693593369645336*^9, 
+   3.6935933713013573`*^9}, {3.6941250129095163`*^9, 3.694125014179628*^9}, {
+   3.694125059357633*^9, 3.6941250633158817`*^9}, {3.69412516588358*^9, 
+   3.6941251802240763`*^9}, {3.694125211555581*^9, 3.694125235176145*^9}, {
+   3.694129023741926*^9, 3.694129024560474*^9}, {3.694129438354104*^9, 
+   3.6941294565046377`*^9}, 3.710105937832038*^9, 3.7116415864973373`*^9, 
+   3.7116427477564573`*^9, 3.711643501723898*^9, 3.7689241291337843`*^9, {
+   3.7689320979964857`*^9, 3.768932098362067*^9}, {3.768970546771709*^9, 
+   3.76897057561931*^9}, {3.7689715588296347`*^9, 3.7689715663953047`*^9}, {
+   3.76897296104355*^9, 3.768972962376038*^9}, {3.768973483649396*^9, 
+   3.76897349283584*^9}, 3.768976334026267*^9, {3.768977376752125*^9, 
+   3.7689774050390177`*^9}, {3.769089429918887*^9, 3.7690894360986357`*^9}, {
+   3.769090240441593*^9, 3.769090255073748*^9}, 3.769522713968618*^9, {
+   3.7847958943032093`*^9, 3.784795896196136*^9}, {3.784795970556892*^9, 
+   3.784795975272562*^9}, 3.794137240377955*^9},
+ CellLabel->
+  "In[1212]:=",ExpressionUUID->"0769eb6a-9477-410a-8dc8-53ab14b2b01e"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"work", " ", "on", " ", "InterpolatingFunctions"}], " ", "*)"}], 
+  "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TemporalVariance", "[", 
+     RowBox[{"f_InterpolatingFunctions", ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"RuleListInterpolation", "[", 
+     RowBox[{"MapAt", "[", 
+      RowBox[{"TemporalVariance", ",", 
+       RowBox[{"Normal", "[", "f", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"All", ",", "2"}], "}"}]}], "]"}], "]"}]}], ";"}]}]], "Code",
+ CellChangeTimes->{{3.8876515602414494`*^9, 3.887651577383028*^9}, {
+  3.887651727980072*^9, 3.8876517586652517`*^9}, {3.8876524937861156`*^9, 
+  3.887652502662766*^9}},ExpressionUUID->"2798d94a-fc12-4379-96b5-\
+2195947494aa"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "RuleLists"}], " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TemporalVariance", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "RuleListQ"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"(", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Print", "[", "\"\<rulelist1\>\"", "]"}], ";"}], "*)"}], 
+      RowBox[{"f", "/.", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"Var", "[", "x", "]"}], "\[Rule]", 
+          RowBox[{"TemporalVariance", "[", 
+           RowBox[{"val", ",", "opts"}], "]"}]}], ")"}]}]}], ")"}]}], ";"}], 
+   "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TemporalVariance", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "RuleListQ"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"var_Symbol", ",", 
+         RowBox[{"varmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"varmax_", "?", "NumericQ"}]}], "}"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"(", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Print", "[", "\"\<rulelist2\>\"", "]"}], ";"}], "*)"}], "\n", 
+      RowBox[{"f", "/.", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{"Var", "[", "x", "]"}], "\[Rule]", 
+          RowBox[{"TemporalVariance", "[", 
+           RowBox[{"val", ",", 
+            RowBox[{"{", 
+             RowBox[{"var", ",", "varmin", ",", "varmax"}], "}"}], ",", 
+            "opts"}], "]"}]}], ")"}]}]}], ")"}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.768832281802766*^9, 3.768832331476403*^9}, {
+   3.768832622600795*^9, 3.768832633791518*^9}, {3.7688328831693153`*^9, 
+   3.768832907853252*^9}, {3.768832938078471*^9, 3.768832961202097*^9}, {
+   3.768833498509152*^9, 3.768833506546966*^9}, {3.768833644706731*^9, 
+   3.768833664562096*^9}, {3.76883373383224*^9, 3.768833735027413*^9}, {
+   3.768837748789187*^9, 3.768837788489131*^9}, 3.7688378229988403`*^9, {
+   3.7688393681313753`*^9, 3.76883936946539*^9}, {3.7688394073977413`*^9, 
+   3.768839408544999*^9}, {3.768905280181653*^9, 3.768905342174307*^9}, {
+   3.768905454568213*^9, 3.768905458856352*^9}, {3.768905509839073*^9, 
+   3.768905513470085*^9}, {3.768920859511714*^9, 3.76892088492864*^9}, {
+   3.768924824369542*^9, 3.768924827579837*^9}, {3.768925132164144*^9, 
+   3.768925145154291*^9}, {3.768972981726612*^9, 3.7689729912589397`*^9}, {
+   3.769179306720381*^9, 3.769179311628037*^9}, {3.784795977256949*^9, 
+   3.784795980508895*^9}, {3.7847961112841787`*^9, 3.7847961157711487`*^9}},
+ CellLabel->
+  "In[1213]:=",ExpressionUUID->"705ad888-5e07-4179-823a-ffbf4922774c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "InterpolatingFunctionFunctions", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TemporalVariance", "[", 
+     RowBox[{
+      RowBox[{"if_", "?", "InterpolatingFunctionFunctionQ"}], ",", 
+      RowBox[{"var_", ":", "t"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{
+       "nintegrateopts", ",", "avgopts", ",", "ifdomains", ",", 
+        "numifdomains", ",", "varmin", ",", "varmax"}], "}"}], ",", 
+      "\[IndentingNewLine]", "\t", 
+      RowBox[{
+       RowBox[{"nintegrateopts", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"NIntegrateOpts", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "TemporalVariance", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"avgopts", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"TemporalMeanOpts", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "TemporalVariance", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ";", "\n", "\t\t", "\n", "\t", 
+       RowBox[{"ifdomains", "=", 
+        RowBox[{"Map", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{
+            RowBox[{"#", "[", "\"\<Domain\>\"", "]"}], "\[LeftDoubleBracket]",
+             "1", "\[RightDoubleBracket]"}], "&"}], ",", 
+          RowBox[{"Cases", "[", 
+           RowBox[{
+           "if", ",", "_InterpolatingFunction", ",", "\[Infinity]", ",", 
+            RowBox[{"Heads", "\[Rule]", "True"}]}], "]"}]}], "]"}]}], ";", 
+       "\n", "\t", 
+       RowBox[{"numifdomains", "=", 
+        RowBox[{"Length", "[", 
+         RowBox[{"Union", "[", "ifdomains", "]"}], "]"}]}], ";", "\n", "\t", 
+       "\n", "\t", 
+       RowBox[{"Which", "[", "\n", "\t\t", 
+        RowBox[{
+         RowBox[{"numifdomains", "\[Equal]", "0"}], ",", "\n", "\t\t", 
+         RowBox[{"Message", "[", 
+          RowBox[{"TemporalVariance", "::", "norange"}], "]"}], ",", "\n", 
+         "\t\t", 
+         RowBox[{"numifdomains", ">", "1"}], ",", "\n", "\t\t", 
+         RowBox[{"Message", "[", 
+          RowBox[{"TemporalVariance", "::", "unkrange"}], "]"}], ",", "\n", 
+         "\t\t", "Else", ",", "\n", "\t\t", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"varmin", ",", "varmax"}], "}"}], "=", 
+           RowBox[{
+           "ifdomains", "\[LeftDoubleBracket]", "1", 
+            "\[RightDoubleBracket]"}]}], ";", "\[IndentingNewLine]", "\t\t", 
+          RowBox[{"Return", "[", 
+           RowBox[{"TemporalVariance", "[", 
+            RowBox[{"if", ",", 
+             RowBox[{"{", 
+              RowBox[{"var", ",", "varmin", ",", "varmax"}], "}"}], ",", 
+             RowBox[{"Method", "\[Rule]", "\"\<NIntegrate\>\""}], ",", 
+             RowBox[{"NIntegrateOpts", "\[Rule]", "nintegrateopts"}]}], "]"}],
+            "]"}]}]}], "\[IndentingNewLine]", "\t", "]"}], ";"}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}]}]], "Code",
+ CellChangeTimes->{{3.6902825860308123`*^9, 3.690282586336006*^9}, 
+   3.690283427926217*^9, {3.690283959951191*^9, 3.690284042220743*^9}, {
+   3.690284123103416*^9, 3.690284123307719*^9}, {3.690285634420931*^9, 
+   3.690285634452784*^9}, {3.69028571252498*^9, 3.690285751449379*^9}, {
+   3.69028620701888*^9, 3.6902862180093393`*^9}, {3.69028624866474*^9, 
+   3.690286296379609*^9}, 3.690286633705567*^9, 3.690286809121889*^9, {
+   3.690286953016643*^9, 3.6902870061667233`*^9}, {3.690287109693028*^9, 
+   3.6902871491447287`*^9}, {3.690289789036126*^9, 3.690289798076704*^9}, {
+   3.6902899269860277`*^9, 3.690289933491602*^9}, {3.690317773704399*^9, 
+   3.6903177826181583`*^9}, {3.6903185842783012`*^9, 3.690318601029388*^9}, {
+   3.690318738423196*^9, 3.6903187465110197`*^9}, {3.690318792250821*^9, 
+   3.6903187928456793`*^9}, {3.69038008312903*^9, 3.6903801012837276`*^9}, {
+   3.690381040207081*^9, 3.69038104061723*^9}, {3.690400328062758*^9, 
+   3.690400344618637*^9}, {3.690400379873869*^9, 3.690400400260622*^9}, {
+   3.690400512422421*^9, 3.690400522871809*^9}, {3.690400617467576*^9, 
+   3.6904006178373823`*^9}, {3.690400863113646*^9, 3.690400871160748*^9}, {
+   3.6904010165196257`*^9, 3.690401017186185*^9}, {3.690403154456511*^9, 
+   3.690403158253292*^9}, 3.690403190188095*^9, {3.694123758796323*^9, 
+   3.694123760157484*^9}, 3.694129025995729*^9, {3.694129275361885*^9, 
+   3.694129291005376*^9}, {3.6941294248762074`*^9, 3.6941294297189007`*^9}, {
+   3.7101059385591927`*^9, 3.710105939150214*^9}, 3.71164158651703*^9, 
+   3.711642747772388*^9, 3.711643501743761*^9, 3.768924129139351*^9, {
+   3.7689730034896727`*^9, 3.768973004079047*^9}, {3.7690893471348553`*^9, 
+   3.769089355552808*^9}, 3.769522713975627*^9, 3.784795899301661*^9, {
+   3.7847959812131157`*^9, 3.784795986406193*^9}, {3.794137240381765*^9, 
+   3.794137240383789*^9}},
+ CellLabel->
+  "In[1215]:=",ExpressionUUID->"646d2b5e-f6f9-41ff-92a3-892caf83f8a8"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Aliases", "Subsubsection",
+ CellChangeTimes->{{3.887652511866194*^9, 
+  3.887652513671445*^9}},ExpressionUUID->"8f24325a-8510-4bbd-8ef6-\
+31f558fb0988"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "InterpolatingFunctions", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TemporalVariance", "[", 
+      RowBox[{"f_InterpolatingFunction", ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"(", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Print", "[", "\"\<raw IF\>\"", "]"}], ";"}], "*)"}], 
+      RowBox[{"TemporalVariance", "[", 
+       RowBox[{
+        RowBox[{"f", "[", "t", "]"}], ",", "opts"}], "]"}], ")"}]}], ";"}], 
+   "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TemporalVariance", "[", 
+      RowBox[{"f_InterpolatingFunction", ",", 
+       RowBox[{"{", 
+        RowBox[{"var_Symbol", ",", 
+         RowBox[{"varmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"varmax_", "?", "NumericQ"}]}], "}"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\t", 
+     RowBox[{"(", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Print", "[", "\"\<IF2\>\"", "]"}], ";"}], "*)"}], 
+      RowBox[{"TemporalVariance", "[", 
+       RowBox[{
+        RowBox[{"f", "[", "t", "]"}], ",", 
+        RowBox[{"{", 
+         RowBox[{"var", ",", "varmin", ",", "varmax"}], "}"}], ",", "opts"}], 
+       "]"}], ")"}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.768832281802766*^9, 3.768832331476403*^9}, {
+   3.7688360874460907`*^9, 3.768836098653079*^9}, {3.7688394165449457`*^9, 
+   3.768839417455431*^9}, {3.768904643816844*^9, 3.768904647268787*^9}, {
+   3.7689052310401993`*^9, 3.768905277011986*^9}, {3.7689207569295692`*^9, 
+   3.768920766752754*^9}, 3.768924838199293*^9, {3.768925191111698*^9, 
+   3.76892520187668*^9}, {3.768972817106908*^9, 3.768972820304393*^9}, {
+   3.768976343408691*^9, 3.768976366928795*^9}, 3.769054734345091*^9, {
+   3.7847959873115377`*^9, 3.784795989324785*^9}},
+ CellLabel->
+  "In[1216]:=",ExpressionUUID->"b55eaa50-1be8-46c3-ace2-4ff1fabda70b"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "TemporalData", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"TemporalVariance", "[", 
+      RowBox[{"f_TemporalData", ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", "n", "}"}], ",", "\n", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"Print", "[", "\"\<td\>\"", "]"}], ";"}], "*)"}], "\n", "\t", 
+       RowBox[{
+        RowBox[{"n", "=", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{
+             RowBox[{"f", "[", "\"\<LastTimes\>\"", "]"}], "-", 
+             RowBox[{"f", "[", "\"\<FirstTimes\>\"", "]"}]}], ")"}], "[", 
+           RowBox[{"[", "1", "]"}], "]"}], "+", "1"}]}], ";", "\n", "\t", 
+        RowBox[{
+         RowBox[{"Variance", "[", "f", "]"}], "*", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"n", "-", "1"}], ")"}], "/", "n"}]}]}]}], "\n", "]"}]}], 
+    ";"}], "\n", "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"TemporalVariance", "[", 
+      RowBox[{"f_TemporalData", ",", 
+       RowBox[{"{", 
+        RowBox[{"var_Symbol", ",", 
+         RowBox[{"varmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"varmax_", "?", "NumericQ"}]}], "}"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", "n", "}"}], ",", "\n", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"Print", "[", "\"\<td2\>\"", "]"}], ";"}], "*)"}], "\n", 
+       "\t", 
+       RowBox[{
+        RowBox[{"n", "=", 
+         RowBox[{"varmax", "-", "varmin", "+", "1"}]}], ";", "\n", "\t", 
+        RowBox[{
+         RowBox[{"Variance", "[", 
+          RowBox[{"TimeSeriesWindow", "[", 
+           RowBox[{"f", ",", 
+            RowBox[{"{", 
+             RowBox[{"varmin", ",", "varmax"}], "}"}]}], "]"}], "]"}], "*", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"n", "-", "1"}], ")"}], "/", "n"}]}]}]}], "\n", "]"}]}], 
+    ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.768904652479669*^9, 3.768904678681436*^9}, {
+   3.768904743030691*^9, 3.768904747190234*^9}, {3.7689052019982147`*^9, 
+   3.768905202416562*^9}, {3.768920744258587*^9, 3.768920749653892*^9}, 
+   3.76892484454923*^9, {3.76892520404871*^9, 3.768925229678919*^9}, {
+   3.768971966924591*^9, 3.768971985068715*^9}, {3.769090273433362*^9, 
+   3.769090368258415*^9}, {3.76909040052238*^9, 3.769090407785018*^9}, {
+   3.769090451978217*^9, 3.769090459347036*^9}, {3.7690908775509777`*^9, 
+   3.769090883369114*^9}, {3.769090981368639*^9, 3.7690909950364447`*^9}, {
+   3.769100257123624*^9, 3.769100264611047*^9}, {3.769100605947752*^9, 
+   3.7691006170888233`*^9}, {3.7847959905143833`*^9, 3.78479601279414*^9}},
+ CellLabel->
+  "In[1218]:=",ExpressionUUID->"86861291-aa26-4a8e-8fce-3fc2138099e0"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "TemporalDataFunctions", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TemporalVariance", "[", 
+     RowBox[{
+      RowBox[{"f_", "?", "TemporalDataFunctionQ"}], ",", 
+      RowBox[{"var_Symbol", ":", "t"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"domains", ",", "numdomains", ",", "varmin", ",", "varmax"}], 
+       "}"}], ",", "\n", "\t", "\n", "\t", 
+      RowBox[{
+       RowBox[{"domains", "=", 
+        RowBox[{"Map", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"#", "[", "\"\<FirstTimes\>\"", "]"}], 
+              "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], ",", 
+             RowBox[{
+              RowBox[{"#", "[", "\"\<LastTimes\>\"", "]"}], 
+              "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}]}], "}"}],
+            "&"}], ",", 
+          RowBox[{"Cases", "[", 
+           RowBox[{"f", ",", "_TemporalData", ",", "\[Infinity]", ",", 
+            RowBox[{"Heads", "\[Rule]", "True"}]}], "]"}]}], "]"}]}], ";", 
+       "\n", "\t", 
+       RowBox[{"numdomains", "=", 
+        RowBox[{"Length", "[", 
+         RowBox[{"Union", "[", "domains", "]"}], "]"}]}], ";", "\n", "\n", 
+       "\t", 
+       RowBox[{"Which", "[", "\n", "\t\t", 
+        RowBox[{
+         RowBox[{"numdomains", "\[Equal]", "0"}], ",", "\n", "\t\t", 
+         RowBox[{"Message", "[", 
+          RowBox[{"TemporalVariance", "::", "norange"}], "]"}], ",", "\n", 
+         "\t\t", 
+         RowBox[{"numdomains", ">", "1"}], ",", "\n", "\t\t", 
+         RowBox[{"Message", "[", 
+          RowBox[{"TemporalVariance", "::", "unkrange"}], "]"}], ",", "\n", 
+         "\t\t", "Else", ",", "\n", "\t\t", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"varmin", ",", "varmax"}], "}"}], "=", 
+           RowBox[{
+           "domains", "\[LeftDoubleBracket]", "1", 
+            "\[RightDoubleBracket]"}]}], ";", "\[IndentingNewLine]", "\t\t", 
+          RowBox[{"Return", "[", 
+           RowBox[{"TemporalVariance", "[", 
+            RowBox[{"f", ",", 
+             RowBox[{"{", 
+              RowBox[{"var", ",", "varmin", ",", "varmax"}], "}"}], ",", 
+             "opts"}], "]"}], "]"}]}]}], "\n", "\t", "]"}], ";"}]}], 
+     "\[IndentingNewLine]", "]"}]}], ";"}]}]], "Code",
+ CellChangeTimes->{{3.690288357462304*^9, 3.6902883580090103`*^9}, {
+   3.690289582493618*^9, 3.690289584258432*^9}, {3.690317796159708*^9, 
+   3.6903177985636187`*^9}, {3.690318804083301*^9, 3.690318805137845*^9}, {
+   3.6903881916382313`*^9, 3.690388278197209*^9}, {3.690388413809268*^9, 
+   3.690388435179152*^9}, {3.690388499184197*^9, 3.690388520277877*^9}, {
+   3.6903886012184143`*^9, 3.6903886091307983`*^9}, 3.690388883757769*^9, {
+   3.690388971530364*^9, 3.690388980552248*^9}, 3.690389033272348*^9, {
+   3.6903900638460484`*^9, 3.690390067774722*^9}, 3.690390408603043*^9, {
+   3.6903988456005583`*^9, 3.690398884077207*^9}, {3.690399713988106*^9, 
+   3.6903997926007833`*^9}, {3.690402777064375*^9, 3.690402781794685*^9}, {
+   3.6904031240208187`*^9, 3.69040314721561*^9}, {3.690403195892778*^9, 
+   3.690403201823271*^9}, {3.690407479108864*^9, 3.690407498882142*^9}, {
+   3.690410326161085*^9, 3.690410330362163*^9}, {3.690412874849804*^9, 
+   3.6904128821499443`*^9}, {3.690476552255224*^9, 3.690476552468194*^9}, 
+   3.690476677930087*^9, {3.694128204130086*^9, 3.694128226254518*^9}, {
+   3.694128551527742*^9, 3.6941285523522778`*^9}, {3.694129003236915*^9, 
+   3.694129008309512*^9}, {3.6941292947892437`*^9, 3.6941292964816093`*^9}, {
+   3.710105935857864*^9, 3.7101059370138187`*^9}, 3.711641586477942*^9, 
+   3.7116427477448606`*^9, 3.7116435017079563`*^9, {3.768832758447291*^9, 
+   3.768832764965494*^9}, {3.768837777593522*^9, 3.768837778887732*^9}, 
+   3.7689241291234007`*^9, {3.768925176680003*^9, 3.76892518627526*^9}, {
+   3.768932051521277*^9, 3.7689320524238453`*^9}, {3.769087616890835*^9, 
+   3.769087628068468*^9}, {3.769087993195689*^9, 3.769088106756604*^9}, {
+   3.7690890231245947`*^9, 3.769089040580469*^9}, {3.7690890857980747`*^9, 
+   3.7690890920087137`*^9}, {3.769089183812051*^9, 3.7690891840013943`*^9}, {
+   3.769089374308374*^9, 3.769089379050879*^9}, {3.769100629750411*^9, 
+   3.769100630654978*^9}, {3.769175489107079*^9, 3.769175491733735*^9}, {
+   3.784796016474285*^9, 3.7847960192174683`*^9}, {3.794137240386901*^9, 
+   3.794137240388637*^9}},
+ CellLabel->
+  "In[1220]:=",ExpressionUUID->"e6ff9756-6cac-4bc7-8f6c-2d75fae7fa4b"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "fallthrough", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TemporalVariance", "[", 
+     RowBox[{
+      RowBox[{"f_", "?", "NumericQ"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"(", 
+     RowBox[{"(*", 
+      RowBox[{
+       RowBox[{"Print", "[", "\"\<otherwise\>\"", "]"}], ";"}], "*)"}], "0", 
+     ")"}]}], ";"}]}]], "Code",
+ CellChangeTimes->{{3.7688355114150057`*^9, 3.768835518981251*^9}, {
+   3.768835960055153*^9, 3.7688359908633966`*^9}, {3.768836026145281*^9, 
+   3.768836039111224*^9}, {3.768836342078354*^9, 3.768836391825111*^9}, {
+   3.768836519741185*^9, 3.7688365314438467`*^9}, 3.76883658809653*^9, {
+   3.768836775918283*^9, 3.7688367889720917`*^9}, {3.768836897941394*^9, 
+   3.768836902671323*^9}, 3.768837017689007*^9, {3.7688373926741323`*^9, 
+   3.768837457728087*^9}, {3.768837534266614*^9, 3.768837550581992*^9}, {
+   3.7688381174470253`*^9, 3.76883817671975*^9}, {3.768838210458063*^9, 
+   3.7688382379335814`*^9}, {3.768839419760922*^9, 3.768839420102852*^9}, {
+   3.76892072561456*^9, 3.768920732773628*^9}, 3.7689241291278*^9, 
+   3.768924851866302*^9, {3.768925240425166*^9, 3.768925246061204*^9}, {
+   3.76897282455011*^9, 3.768972829516733*^9}, {3.769178925519332*^9, 
+   3.769178927456957*^9}, 3.784796020964776*^9},
+ CellLabel->
+  "In[1221]:=",ExpressionUUID->"a28b7234-f9ea-4dc7-8937-3bc7d7b411c4"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsubsection",
+ CellChangeTimes->{{3.769493728415483*^9, 
+  3.76949372910131*^9}},ExpressionUUID->"c2a06834-bd7c-4523-8de3-\
+b1ff3f3ec6aa"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "TemporalVariance", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"IntegrateOpts", "\[Rule]", 
+      RowBox[{"{", "}"}]}], ",", 
+     RowBox[{"NIntegrateOpts", "\[Rule]", 
+      RowBox[{"{", "}"}]}], ",", 
+     RowBox[{"TemporalMeanOpts", "\[Rule]", 
+      RowBox[{"{", "}"}]}], ",", 
+     RowBox[{"Method", "\[Rule]", "\"\<Integrate\>\""}]}], "}"}]}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.690285754694715*^9, 3.6902857723199673`*^9}, 
+   3.690286509899975*^9, 3.690286813150622*^9, {3.6902870532833443`*^9, 
+   3.6902870695436563`*^9}, 3.6902905754284143`*^9, 3.690290606660974*^9, {
+   3.690380087890491*^9, 3.690380095834154*^9}, {3.690380174155045*^9, 
+   3.690380175192892*^9}, 3.694129031017063*^9, 3.784795901250319*^9, 
+   3.784796021981744*^9},
+ CellLabel->
+  "In[1222]:=",ExpressionUUID->"0fbe3a77-6c75-4b6a-8f3c-10391b4e5d68"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"09cc45b2-8a09-403e-8bc7-ec397b3c400e"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 449, 7, 90, "Code",ExpressionUUID->"2eefe8f2-de40-4f68-a07f-a949a13294c3"],
+Cell[CellGroupData[{
+Cell[1032, 31, 156, 3, 56, "Subsubsection",ExpressionUUID->"057ea6c1-d4bd-4f2f-879d-6620025b80a2"],
+Cell[1191, 36, 1008, 18, 138, "Code",ExpressionUUID->"0b6cdca0-bcbe-402f-8396-fd45f0427948"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2236, 59, 163, 3, 56, "Subsubsection",ExpressionUUID->"aef6bb57-aae0-4654-af06-453d3cace02c"],
+Cell[2402, 64, 1562, 40, 234, "Code",ExpressionUUID->"a6b0daa4-07ee-40a7-93ce-288f351c8b84"],
+Cell[3967, 106, 6750, 149, 522, "Code",ExpressionUUID->"0769eb6a-9477-410a-8dc8-53ab14b2b01e"],
+Cell[10720, 257, 783, 19, 90, "Code",ExpressionUUID->"2798d94a-fc12-4379-96b5-2195947494aa"],
+Cell[11506, 278, 2883, 66, 138, "Code",ExpressionUUID->"705ad888-5e07-4179-823a-ffbf4922774c"],
+Cell[14392, 346, 5110, 103, 474, "Code",ExpressionUUID->"646d2b5e-f6f9-41ff-92a3-892caf83f8a8"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[19539, 454, 158, 3, 56, "Subsubsection",ExpressionUUID->"8f24325a-8510-4bbd-8ef6-31f558fb0988"],
+Cell[19700, 459, 1910, 45, 138, "Code",ExpressionUUID->"b55eaa50-1be8-46c3-ace2-4ff1fabda70b"],
+Cell[21613, 506, 2864, 70, 330, "Code",ExpressionUUID->"86861291-aa26-4a8e-8fce-3fc2138099e0"],
+Cell[24480, 578, 4645, 91, 426, "Code",ExpressionUUID->"e6ff9756-6cac-4bc7-8f6c-2d75fae7fa4b"],
+Cell[29128, 671, 1427, 28, 90, "Code",ExpressionUUID->"a28b7234-f9ea-4dc7-8937-3bc7d7b411c4"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30592, 704, 157, 3, 56, "Subsubsection",ExpressionUUID->"c2a06834-bd7c-4523-8de3-b1ff3f3ec6aa"],
+Cell[30752, 709, 913, 21, 65, "Code",ExpressionUUID->"0fbe3a77-6c75-4b6a-8f3c-10391b4e5d68"]
+}, Open  ]]
+}
+]
+*)
+

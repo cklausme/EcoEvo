@@ -1,0 +1,1229 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     47841,       1221]
+NotebookOptionsPosition[     42689,       1124]
+NotebookOutlinePosition[     43812,       1161]
+CellTagsIndexPosition[     43769,       1158]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<ExtremumValues\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<MinimumValues\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<MaximumValues\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+  3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+  3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, {
+  3.911139859937952*^9, 
+  3.911139872886746*^9}},ExpressionUUID->"f41f17c4-341d-4a91-bd96-\
+69f08160fde4"],
+
+Cell[CellGroupData[{
+
+Cell["ExtremumValues", "Subsection",
+ CellChangeTimes->{{3.7794652632280617`*^9, 3.7794652719701223`*^9}, {
+   3.77946532775737*^9, 3.7794653285125093`*^9}, 
+   3.7795137598647738`*^9},ExpressionUUID->"1d9fc89e-9bf3-4ded-8003-\
+4abb6024fb28"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.779465276447298*^9, 
+  3.779465277534028*^9}},ExpressionUUID->"181374b8-6289-4576-abee-\
+e1336ceb2df7"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ExtremumValues", "::", "usage"}], "=", "\[IndentingNewLine]", 
+   "\"\<ExtremumValues[\!\(\*StyleBox[\"f\", \"TI\"]\), \
+{\!\(\*StyleBox[\"tmin\", \"TI\"]\), \!\(\*StyleBox[\"tmax\", \"TI\"]\)}] \
+finds local extremum values of temporal rule list \!\(\*StyleBox[\"f\", \
+\"TI\"]\) between \!\(\*StyleBox[\"tmin\", \"TI\"]\) and \
+\!\(\*StyleBox[\"tmax\", \"TI\"]\).\nExtremumValues[\!\(\*StyleBox[\"f\", \
+\"TI\"]\)] looks over entire domain of \!\(\*StyleBox[\"f\", \"TI\"]\).\n\
+ExtremumValues[\!\(\*StyleBox[\"rulelist\", \"TI\"]\)] threads over \
+\!\(\*StyleBox[\"rulelist\", \"TI\"]\).\>\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.779465737419361*^9, 3.77946574515506*^9}, {
+   3.779466128475945*^9, 3.779466206400531*^9}, {3.7794742923410387`*^9, 
+   3.779474296039365*^9}, 3.7795137907065773`*^9},
+ CellLabel->
+  "In[1299]:=",ExpressionUUID->"307151d7-deb5-4e55-936f-7eda99964672"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.7794652796007338`*^9, 
+  3.779465283004031*^9}},ExpressionUUID->"dbe06e1d-7f41-41c5-8694-\
+1dd25f3a2c84"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ExtremumValues", "[", 
+    RowBox[{
+     RowBox[{"x", ":", 
+      RowBox[{"(", 
+       RowBox[{"_InterpolatingFunction", "|", "_TemporalData"}], ")"}]}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "samethreshold", "}"}], ",", "\n", 
+     RowBox[{
+      RowBox[{"samethreshold", "=", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"SameThreshold", "/.", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "ExtremumValues", "]"}]}], "}"}], "]"}]}],
+         "]"}]}], ";", "\n", "\n", "\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"samethreshold", "\[NotEqual]", "0"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{"DeleteDuplicates", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"FindExtrema", "[", "x", "]"}], "\[LeftDoubleBracket]", 
+             RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", 
+               RowBox[{"#1", "-", "#2"}], "]"}], "<", "samethreshold"}], 
+             "&"}]}], "]"}], "]"}], "]"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{
+           RowBox[{"FindExtrema", "[", "x", "]"}], "\[LeftDoubleBracket]", 
+           RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], "]"}], 
+         "]"}]}], "\n", "\t", "]"}], ";"}]}], "\n", "]"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.779446014672192*^9, 3.7794460246639633`*^9}, {
+   3.7794462249945383`*^9, 3.7794463060393887`*^9}, {3.77944633605056*^9, 
+   3.7794463380178003`*^9}, {3.779446373063902*^9, 3.779446529868115*^9}, {
+   3.779447476253941*^9, 3.779447489828906*^9}, {3.779447539954302*^9, 
+   3.779447567197826*^9}, {3.779447606642088*^9, 3.7794476417107477`*^9}, {
+   3.7794476804595537`*^9, 3.779447682007965*^9}, {3.7794479009223003`*^9, 
+   3.779447909615203*^9}, {3.779448036759409*^9, 3.779448052414361*^9}, {
+   3.7794480981236362`*^9, 3.779448106969417*^9}, {3.7794483523052177`*^9, 
+   3.779448353964149*^9}, {3.779450689557281*^9, 3.779450758278904*^9}, {
+   3.779450856637107*^9, 3.779450879000852*^9}, {3.779450912592733*^9, 
+   3.779450926465225*^9}, {3.779471493037971*^9, 3.7794715238710117`*^9}, {
+   3.779471936668314*^9, 3.7794719388220177`*^9}, {3.779472073775051*^9, 
+   3.779472081026062*^9}, {3.779473810479401*^9, 3.7794738279170847`*^9}, {
+   3.779473872195552*^9, 3.779473901830482*^9}, 3.779514163635394*^9, {
+   3.779515864384431*^9, 3.779515868165081*^9}, {3.77951590611026*^9, 
+   3.7795159111583652`*^9}, {3.779516285856783*^9, 3.779516291647059*^9}},
+ CellLabel->
+  "In[1300]:=",ExpressionUUID->"efde32b2-7790-4279-8e80-7adbe64f9700"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ExtremumValues", "[", 
+    RowBox[{
+     RowBox[{"x", ":", 
+      RowBox[{"(", 
+       RowBox[{"_InterpolatingFunction", "|", "_TemporalData"}], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+       RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "samethreshold", "}"}], ",", "\n", 
+     RowBox[{
+      RowBox[{"samethreshold", "=", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"SameThreshold", "/.", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "ExtremumValues", "]"}]}], "}"}], "]"}]}],
+         "]"}]}], ";", "\n", "\n", "\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"samethreshold", "\[NotEqual]", "0"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{"DeleteDuplicates", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"FindExtrema", "[", 
+              RowBox[{"x", ",", 
+               RowBox[{"{", 
+                RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], 
+             "\[LeftDoubleBracket]", 
+             RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", 
+               RowBox[{"#1", "-", "#2"}], "]"}], "<", "samethreshold"}], 
+             "&"}]}], "]"}], "]"}], "]"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{
+           RowBox[{"FindExtrema", "[", 
+            RowBox[{"x", ",", 
+             RowBox[{"{", 
+              RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], 
+           "\[LeftDoubleBracket]", 
+           RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], "]"}], 
+         "]"}]}], "\n", "\t", "]"}], ";"}]}], "\n", "]"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.77944810900189*^9, 3.779448122727264*^9}, {
+   3.7794483359733753`*^9, 3.779448343108032*^9}, {3.779450765360924*^9, 
+   3.779450784263646*^9}, {3.77945084922596*^9, 3.7794509082891073`*^9}, {
+   3.779451023612252*^9, 3.779451027609367*^9}, {3.7794720693306026`*^9, 
+   3.7794720784132357`*^9}, {3.7794738139803343`*^9, 3.779473905048131*^9}, 
+   3.7795141589337263`*^9, {3.779515870773279*^9, 3.779515872229162*^9}, {
+   3.779515913989811*^9, 3.7795159174055147`*^9}, {3.779516270505846*^9, 
+   3.779516279959919*^9}},
+ CellLabel->
+  "In[1301]:=",ExpressionUUID->"f77d6a8e-28f1-40a3-9a1a-f8b816d741b4"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "TemporalRuleLists"}], " ", "*)"}], 
+  "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "TemporalRuleListQ"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"f", "/.", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+       RowBox[{"(", 
+        RowBox[{"x", "\[Rule]", 
+         RowBox[{"ExtremumValues", "[", 
+          RowBox[{"val", ",", "opts"}], "]"}]}], ")"}]}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "TemporalRuleListQ"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\t", 
+     RowBox[{"f", "/.", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+       RowBox[{"(", 
+        RowBox[{"x", "\[Rule]", 
+         RowBox[{"ExtremumValues", "[", 
+          RowBox[{"val", ",", 
+           RowBox[{"{", 
+            RowBox[{"tmin", ",", "tmax"}], "}"}], ",", "opts"}], "]"}]}], 
+        ")"}]}]}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{
+  3.7794481150263147`*^9, {3.779465427324288*^9, 3.7794654325244007`*^9}, {
+   3.779465549772387*^9, 3.779465552039796*^9}, {3.779465708141487*^9, 
+   3.779465711880681*^9}, {3.779522755340581*^9, 3.779522765307817*^9}},
+ CellLabel->
+  "In[1302]:=",ExpressionUUID->"ed355361-b958-41e1-9d8b-d2e965a7adcd"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"non", "-", "TemporalRuleLists"}], " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"ExtremumValues", "[", 
+     RowBox[{"f_", "?", "RuleListQ"}], "]"}], ":=", 
+    RowBox[{"f", "/.", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+      RowBox[{"(", 
+       RowBox[{"x", "\[Rule]", 
+        RowBox[{"{", "val", "}"}]}], ")"}]}]}]}], ";"}]}]], "Code",
+ CellChangeTimes->{{3.779465555204845*^9, 3.779465568103063*^9}, 
+   3.779465713467475*^9, {3.7794740892166023`*^9, 3.77947409125858*^9}, {
+   3.7795223032337627`*^9, 3.779522320018395*^9}, {3.779522581947488*^9, 
+   3.779522586594717*^9}, 3.779522750512911*^9},
+ CellLabel->
+  "In[1304]:=",ExpressionUUID->"efc09618-5f0f-486c-a1a3-8ae56e51235f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Lists", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"ExtremumValues", "[", "l_List", "]"}], ":=", 
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{"TimeSeries", "[", "l", "]"}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{"l_List", ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}]}], "]"}], ":=", 
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{
+       RowBox[{"TimeSeries", "[", "l", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.7795153242938232`*^9, 3.779515327918063*^9}, {
+  3.779515537740718*^9, 3.779515558887944*^9}, {3.779522210954329*^9, 
+  3.7795222180016537`*^9}, {3.779522311295166*^9, 3.779522328836541*^9}, {
+  3.779522548404911*^9, 3.779522555683331*^9}},
+ CellLabel->
+  "In[1305]:=",ExpressionUUID->"f9f20da0-e281-46ee-98f6-c39a454ca9e5"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Numeric", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{"x_", "?", "NumericQ"}], "]"}], ":=", 
+     RowBox[{"{", "x", "}"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{
+       RowBox[{"x_", "?", "NumericQ"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}]}], "]"}], ":=", 
+     RowBox[{"{", "x", "}"}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.7795153242938232`*^9, 3.779515327918063*^9}, {
+  3.779515537740718*^9, 3.779515558887944*^9}, {3.779522210954329*^9, 
+  3.7795222180016537`*^9}, {3.779522311295166*^9, 3.779522352530569*^9}, {
+  3.779522388827567*^9, 3.779522400258958*^9}},
+ CellLabel->
+  "In[1307]:=",ExpressionUUID->"28143c36-da02-4f65-af32-c4514681f723"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "ParametricDynamics"}], " ", "*)"}], 
+  "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{"pd_ParametricDynamics", ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"Which", "[", "\n", "\t", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+       ",", "\n", "\t", 
+       RowBox[{"Table", "[", 
+        RowBox[{
+         RowBox[{"var", "->", 
+          RowBox[{"AssociationToArray", "[", 
+           RowBox[{
+            RowBox[{"ExtremumValues", "/@", 
+             RowBox[{"pd", "[", 
+              RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+         RowBox[{"{", 
+          RowBox[{"var", ",", 
+           RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+       "\n", ",", "\n", "\t", 
+       RowBox[{
+        RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", 
+        "\"\<Continuous\>\""}], ",", "\n", "\t", 
+       RowBox[{"RuleListInterpolation", "[", 
+        RowBox[{"ExtremumValues", "/@", 
+         RowBox[{"pd", "[", 
+          RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], "\n", "]"}]}], ";"}], 
+   "\n", "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"ExtremumValues", "[", 
+      RowBox[{"pd_ParametricDynamics", ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"Which", "[", "\n", "\t", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+       ",", "\n", "\t", 
+       RowBox[{"Table", "[", 
+        RowBox[{
+         RowBox[{"var", "->", 
+          RowBox[{"AssociationToArray", "[", 
+           RowBox[{
+            RowBox[{"ExtremumValues", "/@", 
+             RowBox[{"pd", "[", 
+              RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+         RowBox[{"{", 
+          RowBox[{"var", ",", 
+           RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+       "\n", ",", "\n", "\t", 
+       RowBox[{
+        RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", 
+        "\"\<Continuous\>\""}], ",", "\n", "\t", 
+       RowBox[{"RuleListInterpolation", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"ExtremumValues", "[", 
+           RowBox[{"#", ",", 
+            RowBox[{"{", 
+             RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], "&"}], "/@", 
+         RowBox[{"pd", "[", 
+          RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], "\n", "]"}]}], 
+    ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.89478625604419*^9, 3.894786264577774*^9}, {
+   3.89522433124725*^9, 3.895224365565145*^9}, {3.895224907947567*^9, 
+   3.895224937770258*^9}, {3.895228078077889*^9, 3.8952281203947477`*^9}, {
+   3.895230583081451*^9, 3.895230586677578*^9}, {3.895230633134698*^9, 
+   3.8952306798499117`*^9}, 
+   3.895412884889834*^9},ExpressionUUID->"794d4c2d-f4c6-4fe8-97d3-\
+00bf97d7529d"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsubsection",
+ CellChangeTimes->{{3.7794652909884233`*^9, 
+  3.779465291779591*^9}},ExpressionUUID->"b2b2cf2a-8c89-4544-b7eb-\
+42a9344b9068"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "ExtremumValues", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{"SameThreshold", "\[Rule]", 
+     RowBox[{"10", "^", 
+      RowBox[{"-", "4"}]}]}], "}"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.779447916479889*^9, 3.779447952527731*^9}, {
+  3.779448453982057*^9, 3.779448463396509*^9}, {3.7794653088691387`*^9, 
+  3.779465319862438*^9}},
+ CellLabel->
+  "In[1309]:=",ExpressionUUID->"2341138c-4813-4501-894d-f68966fe1489"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["MinimumValues", "Subsection",
+ CellChangeTimes->{{3.7794652632280617`*^9, 3.7794652719701223`*^9}, {
+  3.77946532775737*^9, 3.7794653285125093`*^9}, {3.7795137535223703`*^9, 
+  3.779513756417238*^9}},ExpressionUUID->"6b32c6e2-297f-436a-bd9b-\
+9ba8ec725bcc"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.779465276447298*^9, 
+  3.779465277534028*^9}},ExpressionUUID->"b4ad4ba5-4af6-45a5-b00b-\
+a2415b5d52bd"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"MinimumValues", "::", "usage"}], "=", "\[IndentingNewLine]", 
+   "\"\<MinimumValues[\!\(\*StyleBox[\"f\", \"TI\"]\), {\!\(\*StyleBox[\"tmin\
+\", \"TI\"]\), \!\(\*StyleBox[\"tmax\", \"TI\"]\)}] finds local minimum \
+values of temporal rule list \!\(\*StyleBox[\"f\", \"TI\"]\) between \
+\!\(\*StyleBox[\"tmin\", \"TI\"]\) and \!\(\*StyleBox[\"tmax\", \"TI\"]\).\n\
+MinimumValues[\!\(\*StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\
+\(\*StyleBox[\"f\", \"TI\"]\).\nMinimumValues[\!\(\*StyleBox[\"rulelist\", \
+\"TI\"]\)] threads over \!\(\*StyleBox[\"rulelist\", \"TI\"]\).\>\""}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.779465737419361*^9, 3.77946574515506*^9}, {
+  3.779466128475945*^9, 3.779466206400531*^9}, {3.7794742923410387`*^9, 
+  3.779474296039365*^9}, {3.779513764712821*^9, 3.779513766497691*^9}},
+ CellLabel->
+  "In[1288]:=",ExpressionUUID->"ae4c481b-beb0-4688-909a-bbd788559142"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.7794652796007338`*^9, 
+  3.779465283004031*^9}},ExpressionUUID->"4258f6e5-4f47-429a-bb48-\
+2e5872472df2"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"MinimumValues", "[", 
+    RowBox[{
+     RowBox[{"x", ":", 
+      RowBox[{"(", 
+       RowBox[{"_InterpolatingFunction", "|", "_TemporalData"}], ")"}]}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "samethreshold", "}"}], ",", "\n", 
+     RowBox[{
+      RowBox[{"samethreshold", "=", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"SameThreshold", "/.", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "MinimumValues", "]"}]}], "}"}], "]"}]}], 
+        "]"}]}], ";", "\n", "\n", "\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"samethreshold", "\[NotEqual]", "0"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{"DeleteDuplicates", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"FindMinima", "[", "x", "]"}], "\[LeftDoubleBracket]", 
+             RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", 
+               RowBox[{"#1", "-", "#2"}], "]"}], "<", "samethreshold"}], 
+             "&"}]}], "]"}], "]"}], "]"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{
+           RowBox[{"FindMinima", "[", "x", "]"}], "\[LeftDoubleBracket]", 
+           RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], "]"}], 
+         "]"}]}], "\n", "\t", "]"}], ";"}]}], "\n", "]"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.779446014672192*^9, 3.7794460246639633`*^9}, {
+   3.7794462249945383`*^9, 3.7794463060393887`*^9}, {3.77944633605056*^9, 
+   3.7794463380178003`*^9}, {3.779446373063902*^9, 3.779446529868115*^9}, {
+   3.779447476253941*^9, 3.779447489828906*^9}, {3.779447539954302*^9, 
+   3.779447567197826*^9}, {3.779447606642088*^9, 3.7794476417107477`*^9}, {
+   3.7794476804595537`*^9, 3.779447682007965*^9}, {3.7794479009223003`*^9, 
+   3.779447909615203*^9}, {3.779448036759409*^9, 3.779448052414361*^9}, {
+   3.7794480981236362`*^9, 3.779448106969417*^9}, {3.7794483523052177`*^9, 
+   3.779448353964149*^9}, {3.779450689557281*^9, 3.779450758278904*^9}, {
+   3.779450856637107*^9, 3.779450879000852*^9}, {3.779450912592733*^9, 
+   3.779450926465225*^9}, {3.779471493037971*^9, 3.7794715238710117`*^9}, {
+   3.779471936668314*^9, 3.7794719388220177`*^9}, {3.779472073775051*^9, 
+   3.779472081026062*^9}, {3.779473810479401*^9, 3.7794738279170847`*^9}, 
+   3.7795139673313923`*^9, {3.779516362058488*^9, 3.779516364496409*^9}, {
+   3.779516547130723*^9, 3.779516548825933*^9}},
+ CellLabel->
+  "In[1289]:=",ExpressionUUID->"1db3ae77-ce1d-4eaa-90f0-3d990704b12c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"MinimumValues", "[", 
+    RowBox[{
+     RowBox[{"x", ":", 
+      RowBox[{"(", 
+       RowBox[{"_InterpolatingFunction", "|", "_TemporalData"}], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+       RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "samethreshold", "}"}], ",", "\n", 
+     RowBox[{
+      RowBox[{"samethreshold", "=", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"SameThreshold", "/.", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "MinimumValues", "]"}]}], "}"}], "]"}]}], 
+        "]"}]}], ";", "\n", "\n", "\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"samethreshold", "\[NotEqual]", "0"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{"DeleteDuplicates", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"FindMinima", "[", 
+              RowBox[{"x", ",", 
+               RowBox[{"{", 
+                RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], 
+             "\[LeftDoubleBracket]", 
+             RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", 
+               RowBox[{"#1", "-", "#2"}], "]"}], "<", "samethreshold"}], 
+             "&"}]}], "]"}], "]"}], "]"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{
+           RowBox[{"FindMinima", "[", 
+            RowBox[{"x", ",", 
+             RowBox[{"{", 
+              RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], 
+           "\[LeftDoubleBracket]", 
+           RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], "]"}], 
+         "]"}]}], "\n", "\t", "]"}], ";"}]}], "\n", "]"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.77944810900189*^9, 3.779448122727264*^9}, {
+  3.7794483359733753`*^9, 3.779448343108032*^9}, {3.779450765360924*^9, 
+  3.779450784263646*^9}, {3.77945084922596*^9, 3.7794509082891073`*^9}, {
+  3.779451023612252*^9, 3.779451027609367*^9}, {3.7794720693306026`*^9, 
+  3.7794720784132357`*^9}, {3.7794738139803343`*^9, 3.779473853999661*^9}, {
+  3.7795163675846367`*^9, 3.779516369048685*^9}, {3.7795165437792063`*^9, 
+  3.77951654498604*^9}},
+ CellLabel->
+  "In[1290]:=",ExpressionUUID->"e9c5e4c6-f322-4f16-ae95-90cd36a2c260"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "RuleLists"}], " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"MinimumValues", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "TemporalRuleListQ"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"f", "/.", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+       RowBox[{"(", 
+        RowBox[{"x", "\[Rule]", 
+         RowBox[{"MinimumValues", "[", 
+          RowBox[{"val", ",", "opts"}], "]"}]}], ")"}]}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"MinimumValues", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "TemporalRuleListQ"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\t", 
+     RowBox[{"f", "/.", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+       RowBox[{"(", 
+        RowBox[{"x", "\[Rule]", 
+         RowBox[{"MinimumValues", "[", 
+          RowBox[{"val", ",", 
+           RowBox[{"{", 
+            RowBox[{"tmin", ",", "tmax"}], "}"}], ",", "opts"}], "]"}]}], 
+        ")"}]}]}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{
+  3.7794481150263147`*^9, {3.779465427324288*^9, 3.7794654325244007`*^9}, {
+   3.779465549772387*^9, 3.779465552039796*^9}},
+ CellLabel->
+  "In[1291]:=",ExpressionUUID->"12c774f6-d113-4c02-bbe6-4c11f8e51327"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"non", "-", "TemporalRuleLists"}], " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"MinimumValues", "[", 
+     RowBox[{"f_", "?", "RuleListQ"}], "]"}], ":=", 
+    RowBox[{"f", "/.", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+      RowBox[{"(", 
+       RowBox[{"x", "\[Rule]", 
+        RowBox[{"{", "val", "}"}]}], ")"}]}]}]}], ";"}]}]], "Code",
+ CellChangeTimes->{{3.779465555204845*^9, 3.779465568103063*^9}, {
+  3.779474111852515*^9, 3.779474119980494*^9}},
+ CellLabel->
+  "In[1293]:=",ExpressionUUID->"9d075dc9-e317-44eb-90a1-6b3059869fe5"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Lists", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"MinimumValues", "[", "l_List", "]"}], ":=", 
+     RowBox[{"MinimumValues", "[", 
+      RowBox[{"TimeSeries", "[", "l", "]"}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"MinimumValues", "[", 
+      RowBox[{"l_List", ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}]}], "]"}], ":=", 
+     RowBox[{"MinimumValues", "[", 
+      RowBox[{
+       RowBox[{"TimeSeries", "[", "l", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.7795153242938232`*^9, 3.779515327918063*^9}, {
+  3.779515537740718*^9, 3.7795155407761497`*^9}, {3.779522777525309*^9, 
+  3.779522778685217*^9}},
+ CellLabel->
+  "In[1294]:=",ExpressionUUID->"6528cfce-897f-4dd4-816e-c865a958a599"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Numeric", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"MinimumValues", "[", 
+      RowBox[{"x_", "?", "NumericQ"}], "]"}], ":=", 
+     RowBox[{"{", "x", "}"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"MinimumValues", "[", 
+      RowBox[{
+       RowBox[{"x_", "?", "NumericQ"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}]}], "]"}], ":=", 
+     RowBox[{"{", "x", "}"}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.7795153242938232`*^9, 3.779515327918063*^9}, {
+  3.779515537740718*^9, 3.779515558887944*^9}, {3.779522210954329*^9, 
+  3.7795222180016537`*^9}, {3.779522311295166*^9, 3.779522352530569*^9}, {
+  3.779522388827567*^9, 3.779522400258958*^9}, {3.779522794039421*^9, 
+  3.7795227950667753`*^9}},
+ CellLabel->
+  "In[1296]:=",ExpressionUUID->"11a0b5b2-d213-4d1e-9843-0315314df536"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsubsection",
+ CellChangeTimes->{{3.7794652909884233`*^9, 
+  3.779465291779591*^9}},ExpressionUUID->"88af5868-402e-4b4d-a354-\
+860fc96940c6"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "MinimumValues", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{"SameThreshold", "\[Rule]", 
+     RowBox[{"10", "^", 
+      RowBox[{"-", "4"}]}]}], "}"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.779447916479889*^9, 3.779447952527731*^9}, {
+  3.779448453982057*^9, 3.779448463396509*^9}, {3.77946530099091*^9, 
+  3.77946530109521*^9}},
+ CellLabel->
+  "In[1298]:=",ExpressionUUID->"c8fee30f-0eec-456c-80a5-0a958f559064"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["MaximumValues", "Subsection",
+ CellChangeTimes->{{3.7794652632280617`*^9, 3.7794652719701223`*^9}, {
+   3.77946532775737*^9, 3.7794653285125093`*^9}, 
+   3.779513713961588*^9},ExpressionUUID->"a1be7a56-8832-4c05-a095-\
+bdab1c77f619"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.779465276447298*^9, 
+  3.779465277534028*^9}},ExpressionUUID->"d0b2a3f9-4c9f-4301-bd6c-\
+bb8837ccef08"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"MaximumValues", "::", "usage"}], "=", "\[IndentingNewLine]", 
+   "\"\<MaximumValues[\!\(\*StyleBox[\"f\", \"TI\"]\), {\!\(\*StyleBox[\"tmin\
+\", \"TI\"]\), \!\(\*StyleBox[\"tmax\", \"TI\"]\)}] finds local maximum \
+values of temporal rule list \!\(\*StyleBox[\"f\", \"TI\"]\) between \
+\!\(\*StyleBox[\"tmin\", \"TI\"]\) and \!\(\*StyleBox[\"tmax\", \"TI\"]\).\n\
+MaximumValues[\!\(\*StyleBox[\"f\", \"TI\"]\)] looks over entire domain of \!\
+\(\*StyleBox[\"f\", \"TI\"]\).\nMaximumValues[\!\(\*StyleBox[\"rulelist\", \
+\"TI\"]\)] threads over \!\(\*StyleBox[\"rulelist\", \"TI\"]\).\>\""}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.779465737419361*^9, 3.77946574515506*^9}, {
+  3.779466128475945*^9, 3.779466206400531*^9}, {3.7794742923410387`*^9, 
+  3.779474296039365*^9}, {3.779513717657412*^9, 3.77951371794588*^9}},
+ CellLabel->
+  "In[1277]:=",ExpressionUUID->"6e9796e2-fc27-4d39-b53a-37ec3fa44bbe"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.7794652796007338`*^9, 
+  3.779465283004031*^9}},ExpressionUUID->"67171654-93cb-4243-89a0-\
+93f114d5b67f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"MaximumValues", "[", 
+    RowBox[{
+     RowBox[{"x", ":", 
+      RowBox[{"(", 
+       RowBox[{"_InterpolatingFunction", "|", "_TemporalData"}], ")"}]}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "samethreshold", "}"}], ",", "\n", 
+     RowBox[{
+      RowBox[{"samethreshold", "=", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"SameThreshold", "/.", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "MaximumValues", "]"}]}], "}"}], "]"}]}], 
+        "]"}]}], ";", "\n", "\n", "\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"samethreshold", "\[NotEqual]", "0"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{"DeleteDuplicates", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"FindMaxima", "[", "x", "]"}], "\[LeftDoubleBracket]", 
+             RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", 
+               RowBox[{"#1", "-", "#2"}], "]"}], "<", "samethreshold"}], 
+             "&"}]}], "]"}], "]"}], "]"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{
+           RowBox[{"FindMaxima", "[", "x", "]"}], "\[LeftDoubleBracket]", 
+           RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], "]"}], 
+         "]"}]}], "\n", "\t", "]"}], ";"}]}], "\n", "]"}]}], ";"}]], "Code",
+ CellChangeTimes->CompressedData["
+1:eJxTTMoPSmViYGAQBmIQPbPp6vwdGm8cDexFF4Jop8vyu0D0GifHI2DxeYwn
+QPSliQ5guoZ70RkQPfO49QMQ7anQEbYTSKe1WUWA6CWddXEgenrIs0QQ/af7
+ShqILtpnlg2iV23hKwDRDo4OYLqmeW43iN63fnMPiBbxnTEHrN6pdx6IvvLF
+eQmILmeNXwqiI45wHgHR/rfswLT9VcMXu4D0iTcnPoBovWSRvyD6N9uD/yB6
+9Xchlt1AWuHxOVYQzW++UOAokA65Xy0Coq8kiXqA6B++UWDa4qxFJIhuuKoQ
+BaIPMtRx3QbSp0ITuUE0AGCimaY=
+  "],
+ CellLabel->
+  "In[1278]:=",ExpressionUUID->"600fb267-d6bd-4582-94e7-bec136dbb606"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"MaximumValues", "[", 
+    RowBox[{
+     RowBox[{"x", ":", 
+      RowBox[{"(", 
+       RowBox[{"_InterpolatingFunction", "|", "_TemporalData"}], ")"}]}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+       RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "samethreshold", "}"}], ",", "\n", 
+     RowBox[{
+      RowBox[{"samethreshold", "=", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"SameThreshold", "/.", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "MaximumValues", "]"}]}], "}"}], "]"}]}], 
+        "]"}]}], ";", "\n", "\n", "\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"samethreshold", "\[NotEqual]", "0"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{"DeleteDuplicates", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"FindMaxima", "[", 
+              RowBox[{"x", ",", 
+               RowBox[{"{", 
+                RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], 
+             "\[LeftDoubleBracket]", 
+             RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], ",", 
+            RowBox[{
+             RowBox[{
+              RowBox[{"Abs", "[", 
+               RowBox[{"#1", "-", "#2"}], "]"}], "<", "samethreshold"}], 
+             "&"}]}], "]"}], "]"}], "]"}], ",", "\n", "\t\t", 
+        RowBox[{"Return", "[", 
+         RowBox[{"Sort", "[", 
+          RowBox[{
+           RowBox[{"FindMaxima", "[", 
+            RowBox[{"x", ",", 
+             RowBox[{"{", 
+              RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], 
+           "\[LeftDoubleBracket]", 
+           RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], "]"}], 
+         "]"}]}], "\n", "\t", "]"}], ";"}]}], "\n", "]"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.77944810900189*^9, 3.779448122727264*^9}, {
+  3.7794483359733753`*^9, 3.779448343108032*^9}, {3.779450765360924*^9, 
+  3.779450784263646*^9}, {3.77945084922596*^9, 3.7794509082891073`*^9}, {
+  3.779451023612252*^9, 3.779451027609367*^9}, {3.7794720693306026`*^9, 
+  3.7794720784132357`*^9}, {3.779516510098724*^9, 3.779516515769968*^9}},
+ CellLabel->
+  "In[1279]:=",ExpressionUUID->"54eed1e3-4bee-43b9-895d-9db5f40124a1"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "RuleLists"}], " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "TemporalRuleListQ"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"f", "/.", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+       RowBox[{"(", 
+        RowBox[{"x", "\[Rule]", 
+         RowBox[{"MaximumValues", "[", 
+          RowBox[{"val", ",", "opts"}], "]"}]}], ")"}]}]}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{
+       RowBox[{"f_", "?", "TemporalRuleListQ"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\t", 
+     RowBox[{"f", "/.", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+       RowBox[{"(", 
+        RowBox[{"x", "\[Rule]", 
+         RowBox[{"MaximumValues", "[", 
+          RowBox[{"val", ",", 
+           RowBox[{"{", 
+            RowBox[{"tmin", ",", "tmax"}], "}"}], ",", "opts"}], "]"}]}], 
+        ")"}]}]}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{
+  3.7794481150263147`*^9, {3.779465457196691*^9, 3.779465460678917*^9}},
+ CellLabel->
+  "In[1280]:=",ExpressionUUID->"239a348b-98c2-4e2f-bc8b-079b6223162f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"non", "-", "TemporalRuleLists"}], " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"MaximumValues", "[", 
+     RowBox[{"f_", "?", "RuleListQ"}], "]"}], ":=", 
+    RowBox[{"f", "/.", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{"x_", "\[Rule]", "val_"}], ")"}], "\[RuleDelayed]", 
+      RowBox[{"(", 
+       RowBox[{"x", "\[Rule]", 
+        RowBox[{"{", "val", "}"}]}], ")"}]}]}]}], ";"}]}]], "Code",
+ CellChangeTimes->{{3.779465474091296*^9, 3.7794655347840023`*^9}, {
+  3.779474124377572*^9, 3.779474124835277*^9}},
+ CellLabel->
+  "In[1282]:=",ExpressionUUID->"bba52c02-545c-4c30-bbac-b13503461373"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Lists", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"MaximumValues", "[", "l_List", "]"}], ":=", 
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{"TimeSeries", "[", "l", "]"}], "]"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{"l_List", ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}]}], "]"}], ":=", 
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{
+       RowBox[{"TimeSeries", "[", "l", "]"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.7795153242938232`*^9, 3.779515327918063*^9}, 
+   3.779522824366046*^9},
+ CellLabel->
+  "In[1283]:=",ExpressionUUID->"b2bfe12c-4862-4d55-9296-abd055ce0ebe"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", "Numeric", " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{"x_", "?", "NumericQ"}], "]"}], ":=", 
+     RowBox[{"{", "x", "}"}]}], ";"}], "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{
+       RowBox[{"x_", "?", "NumericQ"}], ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}]}], "]"}], ":=", 
+     RowBox[{"{", "x", "}"}]}], ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.7795153242938232`*^9, 3.779515327918063*^9}, {
+  3.779515537740718*^9, 3.779515558887944*^9}, {3.779522210954329*^9, 
+  3.7795222180016537`*^9}, {3.779522311295166*^9, 3.779522352530569*^9}, {
+  3.779522388827567*^9, 3.779522400258958*^9}, {3.779522794039421*^9, 
+  3.779522809025997*^9}},
+ CellLabel->
+  "In[1285]:=",ExpressionUUID->"2bce57c6-d02b-42b8-94e0-cd26bb08452f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "ParametricDynamicss"}], " ", "*)"}], 
+  "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{"pd_ParametricDynamics", ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"If", "[", "\n", "\t", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+       ",", "\n", "\t", 
+       RowBox[{"Table", "[", 
+        RowBox[{
+         RowBox[{"var", "->", 
+          RowBox[{"AssociationToArray", "[", 
+           RowBox[{
+            RowBox[{"MaximumValues", "/@", 
+             RowBox[{"pd", "[", 
+              RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+         RowBox[{"{", 
+          RowBox[{"var", ",", 
+           RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+       "\n", ",", "\n", "\t", 
+       RowBox[{
+        RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", 
+        "\"\<Continuous\>\""}], ",", "\n", "\t", 
+       RowBox[{"RuleListInterpolation", "[", 
+        RowBox[{"MapAt", "[", 
+         RowBox[{"MaximumValues", ",", 
+          RowBox[{"Normal", "[", "pd", "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"All", ",", "2"}], "}"}]}], "]"}], "]"}]}], "\n", "]"}]}], 
+    ";"}], "\n", "\n", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"MaximumValues", "[", 
+      RowBox[{"pd_ParametricDynamics", ",", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"tmin_", "?", "NumericQ"}], ",", 
+         RowBox[{"tmax_", "?", "NumericQ"}]}], "}"}], ",", 
+       RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+     RowBox[{"If", "[", "\n", "\t", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+       ",", "\n", "\t", 
+       RowBox[{"Table", "[", 
+        RowBox[{
+         RowBox[{"var", "->", 
+          RowBox[{"AssociationToArray", "[", 
+           RowBox[{
+            RowBox[{"MaximumValues", "/@", 
+             RowBox[{"pd", "[", 
+              RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+         RowBox[{"{", 
+          RowBox[{"var", ",", 
+           RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+       "\n", ",", "\n", "\t", 
+       RowBox[{
+        RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", 
+        "\"\<Continuous\>\""}], ",", "\n", "\t", 
+       RowBox[{"RuleListInterpolation", "[", 
+        RowBox[{"MapAt", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"MaximumValues", "[", 
+            RowBox[{"#", ",", 
+             RowBox[{"{", 
+              RowBox[{"tmin", ",", "tmax"}], "}"}]}], "]"}], "&"}], ",", 
+          RowBox[{"Normal", "[", "pd", "]"}], ",", 
+          RowBox[{"{", 
+           RowBox[{"All", ",", "2"}], "}"}]}], "]"}], "]"}]}], "\n", "]"}]}], 
+    ";"}]}]}]], "Code",
+ CellChangeTimes->{{3.89478625604419*^9, 3.894786264577774*^9}, {
+  3.89522433124725*^9, 3.895224365565145*^9}, {3.895224907947567*^9, 
+  3.895224937770258*^9}, {3.895224970076684*^9, 
+  3.895224981731848*^9}},ExpressionUUID->"8e29e8c3-c20e-4202-9eb1-\
+14774e1e5cf1"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsubsection",
+ CellChangeTimes->{{3.7794652909884233`*^9, 
+  3.779465291779591*^9}},ExpressionUUID->"245df80a-bb7d-4164-9974-\
+ce599e746350"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "MaximumValues", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{"SameThreshold", "\[Rule]", 
+     RowBox[{"10", "^", 
+      RowBox[{"-", "4"}]}]}], "}"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.779447916479889*^9, 3.779447952527731*^9}, {
+  3.779448453982057*^9, 3.779448463396509*^9}},
+ CellLabel->
+  "In[1287]:=",ExpressionUUID->"91c153b2-5421-41af-8df9-6db0ccec24fb"]
+}, Open  ]]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"33e74383-85ae-4401-9f13-387642dd14b2"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 611, 10, 138, "Code",ExpressionUUID->"f41f17c4-341d-4a91-bd96-69f08160fde4"],
+Cell[CellGroupData[{
+Cell[1194, 34, 242, 4, 67, "Subsection",ExpressionUUID->"1d9fc89e-9bf3-4ded-8003-4abb6024fb28"],
+Cell[CellGroupData[{
+Cell[1461, 42, 156, 3, 56, "Subsubsection",ExpressionUUID->"181374b8-6289-4576-abee-e1336ceb2df7"],
+Cell[1620, 47, 936, 16, 138, "Code",ExpressionUUID->"307151d7-deb5-4e55-936f-7eda99964672"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2593, 68, 163, 3, 56, "Subsubsection",ExpressionUUID->"dbe06e1d-7f41-41c5-8694-1dd25f3a2c84"],
+Cell[2759, 73, 2901, 59, 235, "Code",ExpressionUUID->"efde32b2-7790-4279-8e80-7adbe64f9700"],
+Cell[5663, 134, 2648, 63, 235, "Code",ExpressionUUID->"f77d6a8e-28f1-40a3-9a1a-f8b816d741b4"],
+Cell[8314, 199, 1709, 46, 138, "Code",ExpressionUUID->"ed355361-b958-41e1-9d8b-d2e965a7adcd"],
+Cell[10026, 247, 816, 20, 90, "Code",ExpressionUUID->"efc09618-5f0f-486c-a1a3-8ae56e51235f"],
+Cell[10845, 269, 1074, 27, 114, "Code",ExpressionUUID->"f9f20da0-e281-46ee-98f6-c39a454ca9e5"],
+Cell[11922, 298, 928, 24, 114, "Code",ExpressionUUID->"28143c36-da02-4f65-af32-c4514681f723"],
+Cell[12853, 324, 3123, 81, 426, "Code",ExpressionUUID->"794d4c2d-f4c6-4fe8-97d3-00bf97d7529d"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[16013, 410, 160, 3, 56, "Subsubsection",ExpressionUUID->"b2b2cf2a-8c89-4544-b7eb-42a9344b9068"],
+Cell[16176, 415, 480, 12, 65, "Code",ExpressionUUID->"2341138c-4813-4501-894d-f68966fe1489"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[16705, 433, 263, 4, 67, "Subsection",ExpressionUUID->"6b32c6e2-297f-436a-bd9b-9ba8ec725bcc"],
+Cell[CellGroupData[{
+Cell[16993, 441, 156, 3, 56, "Subsubsection",ExpressionUUID->"b4ad4ba5-4af6-45a5-b00b-a2415b5d52bd"],
+Cell[17152, 446, 952, 16, 138, "Code",ExpressionUUID->"ae4c481b-beb0-4688-909a-bbd788559142"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[18141, 467, 163, 3, 56, "Subsubsection",ExpressionUUID->"4258f6e5-4f47-429a-bb48-2e5872472df2"],
+Cell[18307, 472, 2802, 58, 235, "Code",ExpressionUUID->"1db3ae77-ce1d-4eaa-90f0-3d990704b12c"],
+Cell[21112, 532, 2565, 62, 235, "Code",ExpressionUUID->"e9c5e4c6-f322-4f16-ae95-90cd36a2c260"],
+Cell[23680, 596, 1598, 44, 138, "Code",ExpressionUUID->"12c774f6-d113-4c02-bbe6-4c11f8e51327"],
+Cell[25281, 642, 667, 18, 90, "Code",ExpressionUUID->"9d075dc9-e317-44eb-90a1-6b3059869fe5"],
+Cell[25951, 662, 975, 26, 114, "Code",ExpressionUUID->"6528cfce-897f-4dd4-816e-c865a958a599"],
+Cell[26929, 690, 977, 25, 114, "Code",ExpressionUUID->"11a0b5b2-d213-4d1e-9843-0315314df536"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[27943, 720, 160, 3, 56, "Subsubsection",ExpressionUUID->"88af5868-402e-4b4d-a354-860fc96940c6"],
+Cell[28106, 725, 475, 12, 65, "Code",ExpressionUUID->"c8fee30f-0eec-456c-80a5-0a958f559064"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[28630, 743, 239, 4, 67, "Subsection",ExpressionUUID->"a1be7a56-8832-4c05-a095-bdab1c77f619"],
+Cell[CellGroupData[{
+Cell[28894, 751, 156, 3, 56, "Subsubsection",ExpressionUUID->"d0b2a3f9-4c9f-4301-bd6c-bb8837ccef08"],
+Cell[29053, 756, 951, 16, 138, "Code",ExpressionUUID->"6e9796e2-fc27-4d39-b53a-37ec3fa44bbe"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30041, 777, 163, 3, 56, "Subsubsection",ExpressionUUID->"67171654-93cb-4243-89a0-93f114d5b67f"],
+Cell[30207, 782, 2090, 51, 235, "Code",ExpressionUUID->"600fb267-d6bd-4582-94e7-bec136dbb606"],
+Cell[32300, 835, 2462, 60, 235, "Code",ExpressionUUID->"54eed1e3-4bee-43b9-895d-9db5f40124a1"],
+Cell[34765, 897, 1546, 43, 138, "Code",ExpressionUUID->"239a348b-98c2-4e2f-bc8b-079b6223162f"],
+Cell[36314, 942, 669, 18, 90, "Code",ExpressionUUID->"bba52c02-545c-4c30-bbac-b13503461373"],
+Cell[36986, 962, 901, 25, 114, "Code",ExpressionUUID->"b2bfe12c-4862-4d55-9296-abd055ce0ebe"],
+Cell[37890, 989, 975, 25, 114, "Code",ExpressionUUID->"2bce57c6-d02b-42b8-94e0-cd26bb08452f"],
+Cell[38868, 1016, 3165, 83, 426, "Code",ExpressionUUID->"8e29e8c3-c20e-4202-9eb1-14774e1e5cf1"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[42070, 1104, 160, 3, 56, "Subsubsection",ExpressionUUID->"245df80a-bb7d-4164-9974-ce599e746350"],
+Cell[42233, 1109, 428, 11, 65, "Code",ExpressionUUID->"91c153b2-5421-41af-8df9-6db0ccec24fb"]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+

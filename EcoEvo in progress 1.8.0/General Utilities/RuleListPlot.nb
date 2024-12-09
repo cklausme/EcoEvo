@@ -1,0 +1,1111 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     49215,       1103]
+NotebookOptionsPosition[     47005,       1048]
+NotebookOutlinePosition[     48128,       1085]
+CellTagsIndexPosition[     48085,       1082]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<RuleListPlot\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+   3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+   3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, 
+   3.91114934947127*^9},ExpressionUUID->"662b8384-274a-4f66-9251-\
+4c5f972ed3b8"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsection",
+ CellChangeTimes->{{3.7874999221943903`*^9, 
+  3.7874999226385393`*^9}},ExpressionUUID->"580b57ff-fa7b-43ce-945d-\
+82984af79ee4"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RuleListPlot", "::", "usage"}], "=", "\n", 
+   "\"\<RuleListPlot[\!\(\*StyleBox[\"sol\", \"TI\"]\)] plots a two- or \
+three-dimensional rule list.\nRuleListPlot[\!\(\*StyleBox[\"sol\", \"TI\"]\), \
+\!\(\*StyleBox[\"vars\", \"TI\"]\)] plots \!\(\*StyleBox[\"vars\", \"TI\"]\).\
+\nRuleListPlot[{\!\(\*SubscriptBox[StyleBox[\"sol\", \"TI\"], \"1\"]\), \
+\!\(\*SubscriptBox[StyleBox[\"sol\", \"TI\"], \"2\"]\), \[Ellipsis]}] plots \
+multiple rule lists.\>\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.78749992644551*^9, 3.78749992931301*^9}, {
+   3.78750052832353*^9, 3.7875005287387877`*^9}, {3.7875005697519836`*^9, 
+   3.787500582259738*^9}, {3.787500750821693*^9, 3.787500830910192*^9}, {
+   3.787500885790709*^9, 3.787500892726677*^9}, 3.78767349062764*^9, {
+   3.787680292480987*^9, 3.787680295615917*^9}},
+ CellLabel->
+  "In[1440]:=",ExpressionUUID->"23dc5efb-32f0-4e53-83d1-02008dc8f3d5"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsection",
+ CellChangeTimes->{{3.787500895894462*^9, 
+  3.787500898718338*^9}},ExpressionUUID->"9fd57180-3556-4df5-b2c4-\
+b80f02687613"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RuleListPlot", "[", 
+    RowBox[{
+     RowBox[{"solsin_", "?", "RuleListListQ"}], ",", 
+     RowBox[{"varsin_List", ":", 
+      RowBox[{"{", "All", "}"}]}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\n", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "\n", 
+      RowBox[{
+       RowBox[{"func", "=", 
+        RowBox[{"FuncStyle", "[", "\"\<RuleListPlot\>\"", "]"}]}], ",", "\n", 
+       
+       RowBox[{"(*", " ", "options", " ", "*)"}], "\n", "plotstyle", ",", 
+       "plotmarkers", ",", "axeslabel", ",", "plotrange", ",", "\n", 
+       "stablemarker", ",", "unstablemarker", ",", "indeterminatemarker", ",",
+        "\n", "parametricplotopts", ",", "parametricplot3dopts", ",", 
+       "listplotopts", ",", "listlineplotopts", ",", "listpointplot3dopts", 
+       ",", "listlineplot3dopts", ",", "\n", 
+       RowBox[{"(*", " ", 
+        RowBox[{"other", " ", "variables"}], " ", "*)"}], "\n", "sol", ",", 
+       "sols", ",", "lookup", ",", "vars"}], "}"}], ",", "\n", "\t", "\n", 
+     RowBox[{"Block", "[", 
+      RowBox[{
+       RowBox[{"{", "\[ScriptCapitalN]", "}"}], ",", "\n", "\n", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"modelloaded", "\[NotEqual]", "True"}], ",", 
+           RowBox[{
+            RowBox[{"Message", "[", 
+             RowBox[{"EcoEvoGeneral", "::", "nomodel"}], "]"}], ";", 
+            RowBox[{"Return", "[", "$Failed", "]"}]}]}], "]"}], ";"}], "*)"}],
+        "\n", 
+       RowBox[{
+        RowBox[{"If", "[", 
+         RowBox[{"Global`debug", ",", 
+          RowBox[{"Print", "[", 
+           RowBox[{"\"\<In \>\"", ",", "func"}], "]"}]}], "]"}], ";", "\n", 
+        "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{"handle", " ", "options"}], " ", "*)"}], "\n", "\n", 
+        RowBox[{"plotstyle", "=", 
+         RowBox[{"Evaluate", "[", 
+          RowBox[{"PlotStyle", "/.", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}]}],
+           "]"}]}], ";", "\n", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"plotstyle", "===", "Automatic"}], ",", 
+          RowBox[{"plotstyle", "=", 
+           RowBox[{"ColorData", "[", 
+            RowBox[{"97", ",", "\"\<ColorList\>\""}], "]"}]}]}], "]"}], ";", 
+        "\n", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"!", 
+           RowBox[{"ListQ", "[", "plotstyle", "]"}]}], ",", 
+          RowBox[{"plotstyle", "=", 
+           RowBox[{"{", "plotstyle", "}"}]}]}], "]"}], ";", "\n", "\n", 
+        RowBox[{"stablemarker", "=", 
+         RowBox[{"Evaluate", "[", 
+          RowBox[{"StableMarker", "/.", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}]}],
+           "]"}]}], ";", "\n", 
+        RowBox[{"unstablemarker", "=", 
+         RowBox[{"Evaluate", "[", 
+          RowBox[{"UnstableMarker", "/.", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}]}],
+           "]"}]}], ";", "\n", 
+        RowBox[{"indeterminatemarker", "=", 
+         RowBox[{"Evaluate", "[", 
+          RowBox[{"IndeterminateMarker", "/.", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}]}],
+           "]"}]}], ";", "\n", 
+        RowBox[{"plotmarkers", "=", 
+         RowBox[{
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"PlotMarkers", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], 
+             "]"}]}], "]"}], "/.", "\n", "\t", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"True", "\[Rule]", "stablemarker"}], ",", 
+            RowBox[{"False", "\[Rule]", "unstablemarker"}], ",", 
+            RowBox[{"Indeterminate", "\[Rule]", "indeterminatemarker"}]}], 
+           "}"}]}]}], ";", "\n", 
+        RowBox[{"Which", "[", "\n", "\t", 
+         RowBox[{
+          RowBox[{"plotmarkers", "===", "Automatic"}], ",", "\n", "\t", 
+          RowBox[{"plotmarkers", "=", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<\[FilledCircle]\>\"", ",", "\"\<\[FilledSquare]\>\"", ",", 
+             "\"\<\[FilledDiamond]\>\"", ",", "\"\<\[FilledUpTriangle]\>\"", 
+             ",", "\"\<\[FilledDownTriangle]\>\"", ",", 
+             "\"\<\[EmptyCircle]\>\"", ",", "\"\<\[EmptySquare]\>\"", ",", 
+             "\"\<\[EmptyDiamond]\>\"", ",", "\"\<\[EmptyUpTriangle]\>\"", 
+             ",", "\"\<\[EmptyDownTriangle]\>\""}], "}"}]}], ",", "\n", "\t", 
+          
+          RowBox[{"plotmarkers", "===", "\"\<OpenMarkers\>\""}], ",", "\n", 
+          "\t", 
+          RowBox[{"plotmarkers", "=", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<\[EmptyCircle]\>\"", ",", "\"\<\[EmptySquare]\>\"", ",", 
+             "\"\<\[EmptyDiamond]\>\"", ",", "\"\<\[EmptyUpTriangle]\>\"", 
+             ",", "\"\<\[EmptyDownTriangle]\>\""}], "}"}]}], ",", "\n", "\t", 
+          
+          RowBox[{"plotmarkers", "===", "\"\<FilledMarkers\>\""}], ",", "\n", 
+          "\t", 
+          RowBox[{"plotmarkers", "=", 
+           RowBox[{"{", 
+            RowBox[{
+            "\"\<\[FilledCircle]\>\"", ",", "\"\<\[FilledSquare]\>\"", ",", 
+             "\"\<\[FilledDiamond]\>\"", ",", "\"\<\[FilledUpTriangle]\>\"", 
+             ",", "\"\<\[FilledDownTriangle]\>\""}], "}"}]}]}], "\n", "]"}], 
+        ";", "\n", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", "plotmarkers", "]"}], ";"}], "*)"}], "\n", 
+        "\n", 
+        RowBox[{"axeslabel", "=", 
+         RowBox[{"Evaluate", "[", 
+          RowBox[{"AxesLabel", "/.", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}]}],
+           "]"}]}], ";", "\n", 
+        RowBox[{"plotrange", "=", 
+         RowBox[{"Evaluate", "[", 
+          RowBox[{"PlotRange", "/.", 
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}]}],
+           "]"}]}], ";", "\n", "\n", 
+        RowBox[{"parametricplotopts", "=", 
+         RowBox[{"FilterRules", "[", 
+          RowBox[{
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}], 
+           ",", 
+           RowBox[{"Options", "[", "ParametricPlot", "]"}]}], "]"}]}], ";", 
+        "\n", 
+        RowBox[{"parametricplot3dopts", "=", 
+         RowBox[{"FilterRules", "[", 
+          RowBox[{
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}], 
+           ",", 
+           RowBox[{"Options", "[", "ParametricPlot3D", "]"}]}], "]"}]}], ";", 
+        "\n", 
+        RowBox[{"listplotopts", "=", 
+         RowBox[{"FilterRules", "[", 
+          RowBox[{
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}], 
+           ",", 
+           RowBox[{"Options", "[", "ListPlot", "]"}]}], "]"}]}], ";", "\n", 
+        RowBox[{"listlineplotopts", "=", 
+         RowBox[{"FilterRules", "[", 
+          RowBox[{
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}], 
+           ",", 
+           RowBox[{"Options", "[", "ListLinePlot", "]"}]}], "]"}]}], ";", 
+        "\n", 
+        RowBox[{"listpointplot3dopts", "=", 
+         RowBox[{"FilterRules", "[", 
+          RowBox[{
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}], 
+           ",", 
+           RowBox[{"Options", "[", "ListPointPlot3D", "]"}]}], "]"}]}], ";", 
+        "\n", 
+        RowBox[{"listlineplot3dopts", "=", 
+         RowBox[{"FilterRules", "[", 
+          RowBox[{
+           RowBox[{"Flatten", "[", 
+            RowBox[{"{", 
+             RowBox[{"opts", ",", 
+              RowBox[{"Options", "[", "RuleListPlot", "]"}]}], "}"}], "]"}], 
+           ",", 
+           RowBox[{"Options", "[", "MyListLinePlot3D", "]"}]}], "]"}]}], ";", 
+        "\n", "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{
+         "figure", " ", "out", " ", "number", " ", "of", " ", "species", " ", 
+          "in", " ", "guilds"}], " ", "*)"}], "\n", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Set\[ScriptCapitalN]", "[", 
+           RowBox[{
+            RowBox[{"ExtractTraits", "[", 
+             RowBox[{
+             "solsin", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+              "]"}], ",", 
+            RowBox[{"ExtractVariables", "[", 
+             RowBox[{
+             "solsin", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+              "]"}]}], "]"}], ";", "\n", 
+          RowBox[{"If", "[", 
+           RowBox[{"Global`debug", ",", 
+            RowBox[{"Print", "[", 
+             RowBox[{"func", ",", "\"\<: \[ScriptCapitalN]=\>\"", ",", 
+              RowBox[{"Table", "[", 
+               RowBox[{
+                RowBox[{"\[ScriptCapitalN]", "[", "gu", "]"}], ",", 
+                RowBox[{"{", 
+                 RowBox[{"gu", ",", "guilds"}], "}"}]}], "]"}]}], "]"}]}], 
+           "]"}], ";"}], "*)"}], "\n", "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{"find", " ", "vars", " ", "for", " ", "plotting"}], " ", 
+         "*)"}], "\n", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"varsin", "===", 
+           RowBox[{"{", "All", "}"}]}], ",", "\n", "\t", 
+          RowBox[{"vars", "=", 
+           RowBox[{"solsin", "\[LeftDoubleBracket]", 
+            RowBox[{"1", ",", "All", ",", "1"}], "\[RightDoubleBracket]"}]}], 
+          ",", "\n", "\t", 
+          RowBox[{"vars", "=", "varsin"}]}], "\n", "]"}], ";", "\n", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"\"\<vars=\>\"", ",", "vars"}], "]"}], ";"}], "*)"}], "\n", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{
+            RowBox[{"Length", "[", "vars", "]"}], "\[NotEqual]", "2"}], "&&", 
+           
+           RowBox[{
+            RowBox[{"Length", "[", "vars", "]"}], "\[NotEqual]", "3"}]}], ",", 
+          RowBox[{
+           RowBox[{"Message", "[", 
+            RowBox[{
+             RowBox[{"RuleListPlot", "::", "baddim"}], ",", 
+             RowBox[{"Length", "[", "vars", "]"}]}], "]"}], ";", 
+           RowBox[{"Return", "[", "$Failed", "]"}]}]}], "]"}], ";", "\n", 
+        "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{
+         "split", " ", "up", " ", "subscripted", " ", "variables", " ", 
+          RowBox[{"(", 
+           RowBox[{
+            RowBox[{"gcomps", " ", "&"}], " ", "gtraits"}], ")"}]}], " ", 
+         "*)"}], "\n", 
+        RowBox[{"lookup", "=", 
+         RowBox[{"LookUp", "[", 
+          RowBox[{
+          "vars", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+          "]"}]}], ";", "\n", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"MemberQ", "[", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{"\"\<gcomp\>\"", ",", "\"\<gtrait\>\""}], "}"}], ",", 
+             RowBox[{
+             "lookup", "\[LeftDoubleBracket]", "1", 
+              "\[RightDoubleBracket]"}]}], "]"}], "&&", 
+           RowBox[{
+            RowBox[{"Length", "[", "lookup", "]"}], "\[Equal]", "3"}]}], ",", 
+          "\n", "\t", 
+          RowBox[{"sols", "=", 
+           RowBox[{
+            RowBox[{"Flatten", "[", 
+             RowBox[{
+              RowBox[{
+               RowBox[{
+                RowBox[{"GatherBy", "[", 
+                 RowBox[{"#", ",", 
+                  RowBox[{
+                   RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], 
+                   "&"}]}], "]"}], "&"}], "/@", "solsin"}], ",", "1"}], "]"}],
+             "/.", 
+            RowBox[{"Replace", "[", 
+             RowBox[{"vars", ",", 
+              RowBox[{"var_", "\[Rule]", 
+               RowBox[{"(", 
+                RowBox[{
+                 SubscriptBox["var", "_"], "\[Rule]", "var"}], ")"}]}], ",", 
+              "1"}], "]"}]}]}], ",", "\n", "\t", 
+          RowBox[{"sols", "=", "solsin"}]}], "\n", "]"}], ";", "\n", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", "sols", "]"}], ";"}], "*)"}], "\n", "\n", 
+        RowBox[{"If", "[", 
+         RowBox[{
+          RowBox[{"axeslabel", "===", "Automatic"}], ",", 
+          RowBox[{"axeslabel", "=", "vars"}]}], "]"}], ";", "\n", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"\"\<axeslabel=\>\"", ",", "axeslabel"}], "]"}], ";"}], 
+         "*)"}], "\n", "\n", 
+        RowBox[{"Which", "[", "\n", "\t", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Length", "[", "vars", "]"}], "\[Equal]", "2"}], ",", "\n",
+           "\t", 
+          RowBox[{
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{"plotrange", "===", "Automatic"}], ",", "\n", "\t\t", 
+             RowBox[{"(*", 
+              RowBox[{"plotrange", "=", 
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"If", "[", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", "\"\<gcomp\>\""}], 
+                    "||", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", 
+                    "\"\<pcomp\>\""}]}], ",", 
+                   RowBox[{"{", 
+                    RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}], 
+                 ",", "\n", "\t\t\t", 
+                 RowBox[{"If", "[", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", "\"\<gcomp\>\""}], 
+                    "||", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", 
+                    "\"\<pcomp\>\""}]}], ",", 
+                   RowBox[{"{", 
+                    RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}]}], 
+                "}"}]}], "*)"}], "\n", "\t\t", 
+             RowBox[{"plotrange", "=", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"comptype", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], "===", 
+                   "\"\<Extensive\>\""}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}], ",", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"comptype", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "]"}], "===", 
+                   "\"\<Extensive\>\""}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}]}], 
+               "}"}]}]}], "\n", "\t", "]"}], ";", "\n", "\t", 
+           RowBox[{"(*", 
+            RowBox[{
+             RowBox[{"Print", "[", 
+              RowBox[{"\"\<plotrange=\>\"", ",", "plotrange"}], "]"}], ";"}], 
+            "*)"}], "\n", "\t", 
+           RowBox[{"Return", "[", 
+            RowBox[{"Show", "[", 
+             RowBox[{
+              RowBox[{"Table", "[", "\n", "\t\t", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"sol", "=", 
+                  RowBox[{
+                  "sols", "\[LeftDoubleBracket]", "i", 
+                   "\[RightDoubleBracket]"}]}], ";", "\n", "\t\t", 
+                 RowBox[{"Which", "[", "\n", "\t\t\t", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"Head", "[", 
+                    RowBox[{"sol", "\[LeftDoubleBracket]", 
+                    RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "]"}],
+                     "===", "InterpolatingFunction"}], ",", "\n", "\t\t\t", 
+                   RowBox[{"(*", 
+                    RowBox[{
+                    RowBox[{"Print", "[", 
+                    RowBox[{
+                    "\"\<parametricplotopts=\>\"", ",", 
+                    "parametricplotopts"}], "]"}], ";"}], "*)"}], "\n", 
+                   "\t\t\t", 
+                   RowBox[{"ParametricPlot", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "[", "t", "]"}], ",", 
+                    RowBox[{
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "t", "]"}]}], "}"}], "/.",
+                     "sol"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"t", ",", 
+                    RowBox[{"InitialTime", "[", "sol", "]"}], ",", 
+                    RowBox[{"FinalTime", "[", "sol", "]"}]}], "}"}], ",", 
+                    "\n", "\t\t\t\t", 
+                    RowBox[{"PlotStyle", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotstyle", ",", "i"}], "]"}]}], ",", 
+                    RowBox[{"PlotRange", "\[Rule]", "plotrange"}], ",", 
+                    RowBox[{"Evaluate", "[", 
+                    RowBox[{"Sequence", "@@", "parametricplotopts"}], "]"}]}],
+                     "]"}], ",", "\n", "\t\t\t", 
+                   RowBox[{
+                    RowBox[{"Head", "[", 
+                    RowBox[{"sol", "\[LeftDoubleBracket]", 
+                    RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "]"}],
+                     "===", "List"}], ",", "\n", "\t\t\t", 
+                   RowBox[{"ListLinePlot", "[", 
+                    RowBox[{
+                    RowBox[{"Transpose", "[", 
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"vars", "/.", "sol"}], ")"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"All", ",", "All", ",", "2"}], 
+                    "\[RightDoubleBracket]"}], "]"}], ",", 
+                    RowBox[{"PlotStyle", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotstyle", ",", "i"}], "]"}]}], ",", "\n", 
+                    "\t\t\t\t", 
+                    RowBox[{"PlotRange", "\[Rule]", "plotrange"}], ",", 
+                    RowBox[{"PlotMarkers", "\[Rule]", "None"}], ",", 
+                    RowBox[{"Evaluate", "[", 
+                    RowBox[{"Sequence", "@@", "listlineplotopts"}], "]"}]}], 
+                    "]"}], ",", "\n", "\t\t\t", 
+                   RowBox[{
+                    RowBox[{"Head", "[", 
+                    RowBox[{"sol", "\[LeftDoubleBracket]", 
+                    RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "]"}],
+                     "===", "TemporalData"}], ",", "\n", "\t\t\t", 
+                   RowBox[{"ListLinePlot", "[", 
+                    RowBox[{
+                    RowBox[{"Transpose", "[", 
+                    RowBox[{"Map", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"#", "/.", "sol"}], ")"}], "[", "\"\<Values\>\"", 
+                    "]"}], "&"}], ",", "vars"}], "]"}], "]"}], ",", 
+                    RowBox[{"PlotStyle", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotstyle", ",", "i"}], "]"}]}], ",", "\n", 
+                    "\t\t\t\t", 
+                    RowBox[{"PlotRange", "\[Rule]", "plotrange"}], ",", 
+                    RowBox[{"PlotMarkers", "\[Rule]", "None"}], ",", 
+                    RowBox[{"Evaluate", "[", 
+                    RowBox[{"Sequence", "@@", "listlineplotopts"}], "]"}]}], 
+                    "]"}], ",", "\n", "\t\t\t", "Else", ",", "\n", "\t\t\t", 
+                   RowBox[{"(*", 
+                    RowBox[{
+                    RowBox[{"Print", "[", 
+                    RowBox[{"\"\<listplotopts=\>\"", ",", "listplotopts"}], 
+                    "]"}], ";"}], "*)"}], "\n", "\t\t\t", 
+                   RowBox[{"ListPlot", "[", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"vars", "/.", "sol"}], "}"}], ",", 
+                    RowBox[{"PlotStyle", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotstyle", ",", "i"}], "]"}]}], ",", 
+                    RowBox[{"PlotMarkers", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotmarkers", ",", "i"}], "]"}]}], ",", "\n", 
+                    "\t\t\t\t", 
+                    RowBox[{"PlotRange", "\[Rule]", "plotrange"}], ",", 
+                    RowBox[{"Evaluate", "[", 
+                    RowBox[{"Sequence", "@@", "listplotopts"}], "]"}]}], 
+                    "]"}]}], "\n", "\t\t", "]"}]}], "\n", "\t", ",", 
+                RowBox[{"{", 
+                 RowBox[{"i", ",", 
+                  RowBox[{"Length", "[", "sols", "]"}]}], "}"}]}], "]"}], ",", 
+              RowBox[{"AxesLabel", "\[Rule]", "axeslabel"}], ",", 
+              RowBox[{"FrameLabel", "\[Rule]", "axeslabel"}], ",", 
+              RowBox[{"PlotRange", "\[Rule]", "plotrange"}]}], "]"}], "]"}]}],
+           ",", "\n", "\t", 
+          RowBox[{
+           RowBox[{"Length", "[", "vars", "]"}], "\[Equal]", "3"}], ",", "\n",
+           "\t", 
+          RowBox[{
+           RowBox[{"If", "[", 
+            RowBox[{
+             RowBox[{"plotrange", "===", "Automatic"}], ",", "\n", "\t\t", 
+             RowBox[{"plotrange", "=", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"comptype", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], "===", 
+                   "\"\<Extensive\>\""}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}], ",",
+                 "\n", "\t\t\t", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"comptype", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "]"}], "===", 
+                   "\"\<Extensive\>\""}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}], ",",
+                 "\n", "\t\t\t", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"comptype", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "3", 
+                    "\[RightDoubleBracket]"}], "]"}], "===", 
+                   "\"\<Extensive\>\""}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}]}], 
+               "}"}]}]}], "\n", "\t\t", 
+            RowBox[{"(*", 
+             RowBox[{"plotrange", "=", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", "\"\<gcomp\>\""}], 
+                   "||", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", 
+                    "\"\<pcomp\>\""}]}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}], ",",
+                 "\n", "\t\t\t", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", "\"\<gcomp\>\""}], 
+                   "||", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", 
+                    "\"\<pcomp\>\""}]}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}], ",",
+                 "\n", "\t\t\t", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "3", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", "\"\<gcomp\>\""}], 
+                   "||", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{"LookUp", "[", 
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "3", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                    "1", "\[RightDoubleBracket]"}], "===", 
+                    "\"\<pcomp\>\""}]}], ",", 
+                  RowBox[{"{", 
+                   RowBox[{"0", ",", "All"}], "}"}], ",", "All"}], "]"}]}], 
+               "}"}]}], "*)"}], "\n", "\t", "]"}], ";", "\n", "\t", 
+           RowBox[{"(*", 
+            RowBox[{
+             RowBox[{"Print", "[", 
+              RowBox[{"\"\<plotrange=\>\"", ",", "plotrange"}], "]"}], ";"}], 
+            "*)"}], "\n", "\t", 
+           RowBox[{"Return", "[", 
+            RowBox[{"Show", "[", 
+             RowBox[{
+              RowBox[{"Table", "[", "\n", "\t\t", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"sol", "=", 
+                  RowBox[{
+                  "sols", "\[LeftDoubleBracket]", "i", 
+                   "\[RightDoubleBracket]"}]}], ";", "\n", "\t\t", 
+                 RowBox[{"Which", "[", "\n", "\t\t\t", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"Head", "[", 
+                    RowBox[{"sol", "\[LeftDoubleBracket]", 
+                    RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "]"}],
+                     "===", "InterpolatingFunction"}], ",", "\n", "\t\t\t", 
+                   RowBox[{"ParametricPlot3D", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "[", "t", "]"}], ",", 
+                    RowBox[{
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "t", "]"}], ",", 
+                    RowBox[{
+                    RowBox[{
+                    "vars", "\[LeftDoubleBracket]", "3", 
+                    "\[RightDoubleBracket]"}], "[", "t", "]"}]}], "}"}], "/.",
+                     "sol"}], ",", 
+                    RowBox[{"{", 
+                    RowBox[{"t", ",", 
+                    RowBox[{"InitialTime", "[", "sol", "]"}], ",", 
+                    RowBox[{"FinalTime", "[", "sol", "]"}]}], "}"}], ",", 
+                    "\n", "\t\t\t\t", 
+                    RowBox[{"PlotStyle", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotstyle", ",", "i"}], "]"}]}], ",", 
+                    RowBox[{"PlotRange", "\[Rule]", "plotrange"}], ",", 
+                    RowBox[{"Evaluate", "[", 
+                    RowBox[{"Sequence", "@@", "parametricplot3dopts"}], 
+                    "]"}]}], "]"}], ",", "\n", "\t\t\t", 
+                   RowBox[{
+                    RowBox[{"Head", "[", 
+                    RowBox[{"sol", "\[LeftDoubleBracket]", 
+                    RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "]"}],
+                     "===", "List"}], ",", "\n", "\t\t\t", 
+                   RowBox[{"MyListLinePlot3D", "[", 
+                    RowBox[{
+                    RowBox[{"Transpose", "[", 
+                    RowBox[{"vars", "/.", "sol"}], "]"}], ",", 
+                    RowBox[{"PlotStyle", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotstyle", ",", "i"}], "]"}]}], ",", "\n", 
+                    "\t\t\t\t", 
+                    RowBox[{"PlotRange", "\[Rule]", "plotrange"}], ",", 
+                    RowBox[{"(*", 
+                    RowBox[{
+                    RowBox[{"PlotMarkers", "\[Rule]", "None"}], ","}], "*)"}], 
+                    RowBox[{"Evaluate", "[", 
+                    RowBox[{"Sequence", "@@", "listlineplot3dopts"}], "]"}]}],
+                     "]"}], ",", "\n", "\t\t\t", 
+                   RowBox[{
+                    RowBox[{"Head", "[", 
+                    RowBox[{"sol", "\[LeftDoubleBracket]", 
+                    RowBox[{"1", ",", "2"}], "\[RightDoubleBracket]"}], "]"}],
+                     "===", "TemporalData"}], ",", "\n", "\t\t\t", 
+                   RowBox[{"MyListLinePlot3D", "[", 
+                    RowBox[{
+                    RowBox[{"Transpose", "[", 
+                    RowBox[{"Map", "[", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{"(", 
+                    RowBox[{"#", "/.", "sol"}], ")"}], "[", "\"\<Values\>\"", 
+                    "]"}], "&"}], ",", "vars"}], "]"}], "]"}], ",", 
+                    RowBox[{"PlotStyle", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotstyle", ",", "i"}], "]"}]}], ",", "\n", 
+                    "\t\t\t\t", 
+                    RowBox[{"PlotRange", "\[Rule]", "plotrange"}], ",", 
+                    RowBox[{"(*", 
+                    RowBox[{
+                    RowBox[{"PlotMarkers", "\[Rule]", "None"}], ","}], "*)"}], 
+                    RowBox[{"Evaluate", "[", 
+                    RowBox[{"Sequence", "@@", "listlineplot3dopts"}], "]"}]}],
+                     "]"}], ",", "\n", "\t\t\t", "Else", ",", "\n", "\t\t\t", 
+                   
+                   RowBox[{"ListPointPlot3D", "[", 
+                    RowBox[{
+                    RowBox[{"{", 
+                    RowBox[{"vars", "/.", "sol"}], "}"}], ",", 
+                    RowBox[{"PlotStyle", "\[Rule]", 
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotstyle", ",", "i"}], "]"}]}], ",", 
+                    RowBox[{"PlotRange", "\[Rule]", "plotrange"}], ",", 
+                    RowBox[{"Evaluate", "[", 
+                    RowBox[{"Sequence", "@@", "listpointplot3dopts"}], 
+                    "]"}]}], "]"}]}], "\n", "\t\t\t\t", 
+                  RowBox[{"(*", 
+                   RowBox[{"/.", 
+                    RowBox[{
+                    RowBox[{"Point", "[", "a___", "]"}], "\[RuleDelayed]", 
+                    RowBox[{"Text", "[", 
+                    RowBox[{
+                    RowBox[{"ModPart", "[", 
+                    RowBox[{"plotmarkers", ",", "i"}], "]"}], ",", "a"}], 
+                    "]"}]}]}], "*)"}], "\n", "\t\t", "]"}]}], "\n", "\t", ",", 
+                RowBox[{"{", 
+                 RowBox[{"i", ",", 
+                  RowBox[{"Length", "[", "sols", "]"}]}], "}"}]}], "]"}], ",", 
+              RowBox[{"AxesLabel", "\[Rule]", "axeslabel"}], ",", 
+              RowBox[{"PlotRange", "\[Rule]", "plotrange"}]}], "]"}], 
+            "]"}]}]}], "\n", "]"}], ";"}]}], "\n", "\n", "]"}]}], "]"}]}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.787500901719795*^9, 3.787500901724001*^9}, {
+   3.787501264661449*^9, 3.7875012805892067`*^9}, {3.7875015872803173`*^9, 
+   3.787501591672102*^9}, {3.787504138479166*^9, 3.7875041894943323`*^9}, {
+   3.787504233991659*^9, 3.787504237463374*^9}, 3.787504306956737*^9, {
+   3.787504567711994*^9, 3.787504613161132*^9}, {3.7875049067489853`*^9, 
+   3.78750491578058*^9}, 3.7875051707273893`*^9, 3.787505303726404*^9, {
+   3.7875053598714037`*^9, 3.78750540210351*^9}, {3.787507361331086*^9, 
+   3.787507364697976*^9}, {3.7875078156636343`*^9, 3.787507816543283*^9}, {
+   3.787512396521821*^9, 3.7875124066832037`*^9}, 3.7875128874101677`*^9, {
+   3.787528128533202*^9, 3.7875281398424377`*^9}, {3.7875281759236937`*^9, 
+   3.7875282127722197`*^9}, 3.7875282527227488`*^9, {3.787528444533531*^9, 
+   3.787528542415618*^9}, {3.787528880016673*^9, 3.7875289022717047`*^9}, {
+   3.787528952586567*^9, 3.7875289672798777`*^9}, {3.787529059249999*^9, 
+   3.787529079164708*^9}, {3.7875301035685377`*^9, 3.7875301316768217`*^9}, {
+   3.787530224262044*^9, 3.7875302256075287`*^9}, {3.7875302579793158`*^9, 
+   3.787530282137412*^9}, {3.787531820638143*^9, 3.787531835009223*^9}, {
+   3.787532580642927*^9, 3.787532616931753*^9}, {3.787532968287065*^9, 
+   3.787532972837208*^9}, {3.787574060899796*^9, 3.78757407054381*^9}, {
+   3.787574134408606*^9, 3.787574160109831*^9}, 3.787574199334215*^9, {
+   3.7875744725905933`*^9, 3.787574508763846*^9}, {3.787574557545168*^9, 
+   3.7875745841982517`*^9}, {3.787574970639862*^9, 3.787574973996476*^9}, {
+   3.7875751221033287`*^9, 3.787575133438793*^9}, 3.787575280823246*^9, 
+   3.7875753300161324`*^9, {3.78757537723355*^9, 3.7875754923892307`*^9}, {
+   3.787576017886484*^9, 3.787576050504835*^9}, {3.7875761267459297`*^9, 
+   3.7875761278726273`*^9}, 3.787576201657073*^9, {3.787578598566033*^9, 
+   3.787578665663457*^9}, {3.787578738462919*^9, 3.7875787418303137`*^9}, 
+   3.787578779360058*^9, {3.78757881683692*^9, 3.787578819439475*^9}, 
+   3.787580352387759*^9, {3.7875803910761337`*^9, 3.787580491774576*^9}, {
+   3.7875805620068483`*^9, 3.787580611390231*^9}, {3.787580720160453*^9, 
+   3.787580764641069*^9}, {3.787580864207962*^9, 3.787581026162611*^9}, {
+   3.787581155260008*^9, 3.7875811687623053`*^9}, {3.7875812135958433`*^9, 
+   3.787581214594545*^9}, 3.7875813311061897`*^9, {3.7875860537861*^9, 
+   3.787586054809835*^9}, {3.787586114298996*^9, 3.787586152354974*^9}, {
+   3.7875868404552727`*^9, 3.787586840525141*^9}, {3.787586943456438*^9, 
+   3.787586981312841*^9}, {3.787587087563272*^9, 3.787587098410828*^9}, {
+   3.7875885990638847`*^9, 3.7875885999903507`*^9}, {3.7875886595589857`*^9, 
+   3.787588672568981*^9}, {3.787588714136808*^9, 3.787588717144598*^9}, 
+   3.7875887954273157`*^9, {3.787589113179552*^9, 3.787589171213963*^9}, {
+   3.787589835889112*^9, 3.787589855987668*^9}, {3.78759008542197*^9, 
+   3.787590125311702*^9}, {3.787591443068727*^9, 3.7875914507741413`*^9}, {
+   3.7875918352467413`*^9, 3.7875918447104473`*^9}, {3.787591881735077*^9, 
+   3.78759188646972*^9}, {3.787592002254891*^9, 3.787592015417153*^9}, {
+   3.787592058681899*^9, 3.7875920592085533`*^9}, {3.7876537924041357`*^9, 
+   3.7876538097793922`*^9}, 3.787666137100095*^9, {3.787675464196354*^9, 
+   3.787675482550935*^9}, 3.7877475744010687`*^9, {3.787753350133457*^9, 
+   3.7877534171470337`*^9}, {3.78775378767269*^9, 3.787753792721814*^9}, {
+   3.787753957694219*^9, 3.787754001553938*^9}, {3.787754283086804*^9, 
+   3.787754324501687*^9}, {3.794137240436783*^9, 3.794137240444448*^9}, {
+   3.8307760597845716`*^9, 3.8307760605288057`*^9}, {3.8307769558193502`*^9, 
+   3.830776984435234*^9}, {3.830782845740583*^9, 3.8307828559749517`*^9}, 
+   3.870815338841215*^9, 
+   3.870815428073592*^9},ExpressionUUID->"cc02d15c-de27-45d1-aa6e-\
+e68e8c35077b"],
+
+Cell[CellGroupData[{
+
+Cell["Aliases", "Subsubsection",
+ CellChangeTimes->{{3.787501314475175*^9, 
+  3.787501317146351*^9}},ExpressionUUID->"8926fbef-1d43-42a0-9009-\
+3508cadbcafb"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RuleListPlot", "[", 
+    RowBox[{
+     RowBox[{"sol_", "?", "RuleListQ"}], ",", "rest___"}], "]"}], ":=", 
+   RowBox[{"RuleListPlot", "[", 
+    RowBox[{
+     RowBox[{"{", "sol", "}"}], ",", "rest"}], "]"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.78749277849233*^9, 3.78749281490476*^9}, {
+  3.787492900499502*^9, 3.7874929064255*^9}},
+ CellLabel->
+  "In[1442]:=",ExpressionUUID->"d0d5440a-9239-46b6-b8cf-37e93caf2f4e"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsubsection",
+ CellChangeTimes->{{3.787501327530854*^9, 
+  3.787501328298284*^9}},ExpressionUUID->"9f29c44c-f393-4122-ba9e-\
+b3a3dc3791be"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "RuleListPlot", "]"}], "=", 
+   RowBox[{"{", "\n", "\t", 
+    RowBox[{
+     RowBox[{"PlotStyle", "\[Rule]", "Automatic"}], ",", 
+     RowBox[{"AxesLabel", "\[Rule]", "Automatic"}], ",", 
+     RowBox[{"PlotRange", "\[Rule]", "Automatic"}], ",", "\n", "\t", 
+     RowBox[{"PlotMarkers", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"Graphics", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"Disk", "[", "]"}], "}"}], ",", 
+         RowBox[{"ImageSize", "\[Rule]", "8"}], ",", 
+         RowBox[{"AlignmentPoint", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{"0", ",", "0"}], "}"}]}], ",", 
+         RowBox[{"ImagePadding", "->", "1"}]}], "]"}], "}"}]}], ",", "\n", 
+     "\t", 
+     RowBox[{"StableMarker", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"Graphics", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"Black", ",", 
+           RowBox[{"Disk", "[", "]"}]}], "}"}], ",", 
+         RowBox[{"ImageSize", "\[Rule]", "8"}], ",", 
+         RowBox[{"AlignmentPoint", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{"0", ",", "0"}], "}"}]}], ",", 
+         RowBox[{"ImagePadding", "->", "1"}]}], "]"}], "}"}]}], ",", "\n", 
+     "\t", 
+     RowBox[{"UnstableMarker", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"Graphics", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"EdgeForm", "[", 
+            RowBox[{"{", "Black", "}"}], "]"}], ",", 
+           RowBox[{"FaceForm", "[", "White", "]"}], ",", 
+           RowBox[{"Disk", "[", "]"}]}], "}"}], ",", 
+         RowBox[{"ImageSize", "\[Rule]", "8"}], ",", 
+         RowBox[{"AlignmentPoint", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{"0", ",", "0"}], "}"}]}], ",", 
+         RowBox[{"ImagePadding", "->", "1"}]}], "]"}], "}"}]}], ",", "\n", 
+     "\t", 
+     RowBox[{"IndeterminateMarker", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"Graphics", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{
+           RowBox[{"EdgeForm", "[", 
+            RowBox[{"{", "Black", "}"}], "]"}], ",", 
+           RowBox[{"FaceForm", "[", "Gray", "]"}], ",", 
+           RowBox[{"Disk", "[", "]"}]}], "}"}], ",", 
+         RowBox[{"ImageSize", "\[Rule]", "8"}], ",", 
+         RowBox[{"AlignmentPoint", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{"0", ",", "0"}], "}"}]}], ",", 
+         RowBox[{"ImagePadding", "->", "1"}]}], "]"}], "}"}]}], ",", "\n", 
+     "\t", 
+     RowBox[{"PlotRangeClipping", "\[Rule]", "False"}], ",", 
+     RowBox[{"BoxRatios", "\[Rule]", "1"}], ",", 
+     RowBox[{"AspectRatio", "\[Rule]", 
+      RowBox[{"1", "/", "GoldenRatio"}]}]}], "\n", "}"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.78736250834746*^9, 3.78736254045562*^9}, {
+   3.787408352901496*^9, 3.787408360053959*^9}, {3.787410235541479*^9, 
+   3.787410241598185*^9}, {3.787419831019977*^9, 3.787419835057035*^9}, {
+   3.787423255453384*^9, 3.7874232561422987`*^9}, {3.787488379821196*^9, 
+   3.7874883843236094`*^9}, 3.787492140450397*^9, {3.787497286127331*^9, 
+   3.7874972921900587`*^9}, {3.7875077785062428`*^9, 3.787507780432378*^9}, {
+   3.787512759897767*^9, 3.787512771138749*^9}, {3.787528310351479*^9, 
+   3.787528353076065*^9}, {3.7875290431523323`*^9, 3.787529052125415*^9}, {
+   3.787530178535309*^9, 3.7875301809294853`*^9}, 3.787530216160533*^9, {
+   3.787532786518793*^9, 3.787532799300123*^9}, {3.787532916900177*^9, 
+   3.787532920518817*^9}, {3.787569629218863*^9, 3.787569629367869*^9}, {
+   3.787573985498416*^9, 3.78757398815327*^9}, {3.787574981287614*^9, 
+   3.787575021527335*^9}, {3.78757509631208*^9, 3.78757509673181*^9}, {
+   3.787575341505731*^9, 3.7875753419620543`*^9}, {3.78757591436865*^9, 
+   3.787575924615575*^9}, {3.787575970561048*^9, 3.787575981944211*^9}, {
+   3.787576227138361*^9, 3.7875762438332157`*^9}, {3.787576358843906*^9, 
+   3.7875763850161467`*^9}, {3.787576453037628*^9, 3.78757652428321*^9}, {
+   3.787576584458632*^9, 3.787576598750012*^9}, {3.7875766528615847`*^9, 
+   3.787576681278062*^9}, {3.787576751590427*^9, 3.7875768028131523`*^9}, {
+   3.7875768464629383`*^9, 3.787576881047027*^9}, {3.7875769264553947`*^9, 
+   3.787576979575289*^9}, {3.7875772217240877`*^9, 3.787577412674781*^9}, {
+   3.7875774445614443`*^9, 3.7875775068107033`*^9}, {3.787577601228544*^9, 
+   3.787577638076295*^9}, {3.787577707928317*^9, 3.7875777881928988`*^9}, {
+   3.787577844255555*^9, 3.7875778727668056`*^9}, {3.7875779039644413`*^9, 
+   3.787577932657098*^9}, {3.787578247218466*^9, 3.787578249369853*^9}, {
+   3.787580666504203*^9, 3.787580668389921*^9}, {3.787678036304346*^9, 
+   3.7876780387448063`*^9}, {3.870868796556562*^9, 3.87086880817272*^9}, {
+   3.870904329406543*^9, 
+   3.870904344403393*^9}},ExpressionUUID->"92636d25-691b-4293-8b55-\
+f6c2a79a4d87"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Messages", "Subsection",
+ CellChangeTimes->{{3.787501456339449*^9, 
+  3.7875014578675957`*^9}},ExpressionUUID->"bab8ef3b-7be0-4a60-8b6e-\
+bf6a512244f7"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RuleListPlot", "::", "baddim"}], "=", 
+   "\"\<RuleListPlot requires two- or three-dimensional data (# of \
+dimensions=`1`).\>\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.787501459585704*^9, 3.787501470547846*^9}, {
+  3.787501530236463*^9, 3.78750156400459*^9}, {3.787501896368977*^9, 
+  3.78750189856776*^9}},
+ CellLabel->
+  "In[1444]:=",ExpressionUUID->"2ba8f199-94e3-4dd2-ac1a-78fed489abdb"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"95dfd314-9fa5-48de-9f46-cc1cd6e58767"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 444, 7, 90, "Code",ExpressionUUID->"662b8384-274a-4f66-9251-4c5f972ed3b8"],
+Cell[CellGroupData[{
+Cell[1027, 31, 157, 3, 67, "Subsection",ExpressionUUID->"580b57ff-fa7b-43ce-945d-82984af79ee4"],
+Cell[1187, 36, 938, 16, 138, "Code",ExpressionUUID->"23dc5efb-32f0-4e53-83d1-02008dc8f3d5"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2162, 57, 158, 3, 67, "Subsection",ExpressionUUID->"9fd57180-3556-4df5-b2c4-b80f02687613"],
+Cell[2323, 62, 38333, 832, 3104, "Code",ExpressionUUID->"cc02d15c-de27-45d1-aa6e-e68e8c35077b"],
+Cell[CellGroupData[{
+Cell[40681, 898, 158, 3, 56, "Subsubsection",ExpressionUUID->"8926fbef-1d43-42a0-9009-3508cadbcafb"],
+Cell[40842, 903, 466, 12, 65, "Code",ExpressionUUID->"d0d5440a-9239-46b6-b8cf-37e93caf2f4e"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[41345, 920, 158, 3, 56, "Subsubsection",ExpressionUUID->"9f29c44c-f393-4122-ba9e-b3a3dc3791be"],
+Cell[41506, 925, 4832, 99, 234, "Code",ExpressionUUID->"92636d25-691b-4293-8b55-f6c2a79a4d87"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[46387, 1030, 158, 3, 67, "Subsection",ExpressionUUID->"bab8ef3b-7be0-4a60-8b6e-bf6a512244f7"],
+Cell[46548, 1035, 441, 10, 65, "Code",ExpressionUUID->"2ba8f199-94e3-4dd2-ac1a-78fed489abdb"]
+}, Open  ]]
+}
+]
+*)
+

@@ -1,0 +1,360 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     13140,        352]
+NotebookOptionsPosition[     10723,        293]
+NotebookOutlinePosition[     11846,        330]
+CellTagsIndexPosition[     11803,        327]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<GaussianIntegral\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+   3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+   3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, 
+   3.9111598389232187`*^9},ExpressionUUID->"1d216bf8-7201-40ad-902e-\
+09353d782f08"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsection",
+ CellChangeTimes->{{3.8574730847659073`*^9, 
+  3.8574730853025913`*^9}},ExpressionUUID->"65b1a387-47e1-490c-b727-\
+9b7fe650e924"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"GaussianIntegral", "::", "usage"}], "=", 
+   "\"\<GaussianIntegral[\!\(\*StyleBox[\"func\", \"TI\"]\), {\!\(\*StyleBox[\
+\"vars\", \"TI\"]\), \!\(\*StyleBox[\"mean\", \"TI\"]\), \
+\!\(\*StyleBox[\"varcov\", \"TI\"]\)}] calculates the Gaussian integral with \
+respect to \!\(\*StyleBox[\"vars\", \"TI\"]\) of \!\(\*StyleBox[\"func\", \
+\"TI\"]\) multiplied by a multinormal distibution with \
+\!\(\*StyleBox[\"mean\", \"TI\"]\) and \!\(\*StyleBox[\"varcov\", \
+\"TI\"]\).\>\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.857473292980644*^9, 3.857473298541737*^9}, 
+   3.857473351442196*^9, {3.8574742685703278`*^9, 3.857474339814*^9}, {
+   3.857475231647345*^9, 3.8574752408571777`*^9}, {3.8589911499893827`*^9, 
+   3.858991215662492*^9}, {3.858991340568619*^9, 3.858991370580473*^9}, 
+   3.8589914078683643`*^9, {3.859902077815503*^9, 
+   3.8599020812975616`*^9}},ExpressionUUID->"49a4c96c-928e-48b5-b2b8-\
+70adcff16be0"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsection",
+ CellChangeTimes->{{3.857473094534528*^9, 
+  3.857473095870947*^9}},ExpressionUUID->"55052867-74a8-4b33-a202-\
+cab08730d0a6"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{
+    RowBox[{"GaussianIntegral", "[", 
+     RowBox[{"func_", ",", 
+      RowBox[{"{", 
+       RowBox[{"x_List", ",", "mean_List", ",", "var_List"}], "}"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"method", ",", "timeconstraint", ",", "res"}], "}"}], ",", 
+      "\n", "\t", 
+      RowBox[{
+       RowBox[{"method", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"Method", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "GaussianIntegral", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"timeconstraint", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"TimeConstraint", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "GaussianIntegral", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"res", "=", 
+        RowBox[{"TimeConstrained", "[", "\n", "\t\t", 
+         RowBox[{
+          RowBox[{"Expectation", "[", 
+           RowBox[{"func", ",", 
+            RowBox[{"x", "\[Distributed]", 
+             RowBox[{"MultinormalDistribution", "[", 
+              RowBox[{"mean", ",", "var"}], "]"}]}], ",", 
+            RowBox[{"Method", "->", "method"}]}], "]"}], ",", "\n", "\t\t", 
+          "timeconstraint", ",", 
+          RowBox[{
+           RowBox[{"Message", "[", 
+            RowBox[{
+             RowBox[{"GaussianIntegral", "::", "time"}], ",", 
+             "timeconstraint"}], "]"}], ";", 
+           RowBox[{"Return", "[", "$Failed", "]"}]}]}], "]"}]}], ";", "\n", 
+       "\t", 
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Head", "[", "res", "]"}], "===", "Expectation"}], ",", 
+         RowBox[{
+          RowBox[{"Message", "[", 
+           RowBox[{"GaussianIntegral", "::", "failed"}], "]"}], ";", 
+          RowBox[{"Return", "[", "$Failed", "]"}]}]}], "]"}], ";", "\n", "\t", 
+       RowBox[{"RealSimplify", "[", "res", "]"}]}]}], "\n", "]"}]}], ";"}], 
+  "\n"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"GaussianIntegral", "[", 
+    RowBox[{"func_", ",", 
+     RowBox[{"{", 
+      RowBox[{"x1_List", ",", "mean1_List", ",", "var1_List"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"x2_List", ",", "mean2_List", ",", "var2_List"}], "}"}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"method", ",", "timeconstraint"}], "}"}], ",", "\n", "\t", 
+     RowBox[{
+      RowBox[{"method", "=", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"Method", "/.", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "GaussianIntegral", "]"}]}], "}"}], 
+          "]"}]}], "]"}]}], ";", "\n", "\t", 
+      RowBox[{"RealSimplify", "[", 
+       RowBox[{
+        RowBox[{"Expectation", "[", 
+         RowBox[{
+          RowBox[{"Expectation", "[", 
+           RowBox[{"func", ",", 
+            RowBox[{"x1", "\[Distributed]", 
+             RowBox[{"MultinormalDistribution", "[", 
+              RowBox[{"mean1", ",", "var1"}], "]"}]}], ",", 
+            RowBox[{"Method", "->", "method"}]}], "]"}], ",", 
+          RowBox[{"x2", "\[Distributed]", 
+           RowBox[{"MultinormalDistribution", "[", 
+            RowBox[{"mean2", ",", "var2"}], "]"}]}], ",", 
+          RowBox[{"Method", "->", "method"}]}], "]"}], ",", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"#", ">=", "0"}], ")"}], "&"}], "/@", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"var1", ",", "var2"}], "}"}], "]"}]}]}], "]"}]}]}], "\n", 
+    "]"}]}], ";"}]}], "Code",
+ CellChangeTimes->{{3.8574730979868927`*^9, 3.8574731217958403`*^9}, {
+   3.857473180778831*^9, 3.8574731811649942`*^9}, {3.858973460400791*^9, 
+   3.858973467850593*^9}, {3.8589812581182528`*^9, 3.858981368237246*^9}, {
+   3.858981437573738*^9, 3.8589814515769663`*^9}, {3.858981482893722*^9, 
+   3.858981547670547*^9}, {3.8589820819442883`*^9, 3.858982094468821*^9}, {
+   3.8589843949714413`*^9, 3.858984403732794*^9}, {3.858984662944518*^9, 
+   3.858984684620545*^9}, {3.8589847575236607`*^9, 3.858984780585781*^9}, {
+   3.858984839371978*^9, 3.858984872534299*^9}, {3.8589849052862473`*^9, 
+   3.8589849199766083`*^9}, {3.858985022572991*^9, 3.858985040415428*^9}, {
+   3.859057593665374*^9, 3.859057618528789*^9}, {3.859057718736987*^9, 
+   3.8590577693131437`*^9}, 
+   3.859909140236148*^9},ExpressionUUID->"137008be-6631-4aa7-946c-\
+ed3bc154f9ae"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Aliases", "Subsection",
+ CellChangeTimes->{{3.858981536870907*^9, 
+  3.8589815382313957`*^9}},ExpressionUUID->"a95105d2-65d5-49ba-8ea5-\
+4f905b51a43c"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"GaussianIntegral", "[", 
+    RowBox[{"func_", ",", 
+     RowBox[{"{", 
+      RowBox[{"x_", ",", "mean_", ",", "var_"}], "}"}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"GaussianIntegral", "[", 
+    RowBox[{"func", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", "x", "}"}], ",", 
+       RowBox[{"{", "mean", "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"{", "var", "}"}], "}"}]}], "}"}], ",", "opts"}], "]"}]}], 
+  ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"GaussianIntegral", "[", 
+    RowBox[{"func_", ",", 
+     RowBox[{"{", 
+      RowBox[{"x1_", ",", "mean1_", ",", "var1_"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"x2_", ",", "mean2_", ",", "var2_"}], "}"}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"GaussianIntegral", "[", 
+    RowBox[{"func", ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", "x1", "}"}], ",", 
+       RowBox[{"{", "mean1", "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"{", "var1", "}"}], "}"}]}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", "x2", "}"}], ",", 
+       RowBox[{"{", "mean2", "}"}], ",", 
+       RowBox[{"{", 
+        RowBox[{"{", "var2", "}"}], "}"}]}], "}"}], ",", "opts"}], "]"}]}], 
+  ";"}]}], "Code",
+ CellChangeTimes->{{3.858981540791831*^9, 
+  3.858981543896441*^9}},ExpressionUUID->"2ff37cc2-db4e-4134-ba23-\
+64fe2184f3ec"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsection",
+ CellChangeTimes->{{3.8589813876809*^9, 
+  3.8589813884642353`*^9}},ExpressionUUID->"0770ce57-a3b5-4317-8fcd-\
+4854eaf61d2f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "GaussianIntegral", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"Method", "->", "Automatic"}], ",", 
+     RowBox[{"TimeConstraint", "->", "5"}]}], "}"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.858981390894231*^9, 3.85898142399902*^9}, {
+   3.8589844108695583`*^9, 3.858984415494403*^9}, {3.858984785141962*^9, 
+   3.85898478556665*^9}, 
+   3.858990522276471*^9},ExpressionUUID->"e2864d23-ca68-4808-bf68-\
+a6a72ed4eef9"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Messages", "Subsection",
+ CellChangeTimes->{{3.858984458853356*^9, 
+  3.858984460663275*^9}},ExpressionUUID->"2c4caaf3-87a9-480b-bcbb-\
+6eb51959df52"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"GaussianIntegral", "::", "time"}], " ", "=", " ", 
+   "\"\<Time spent on GaussianIntegral exceeded `1` seconds, so it was \
+aborted. Increasing the value of TimeConstraint may result in an \
+answer.\>\""}], ";"}], "\n", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"GaussianIntegral", "::", "failed"}], " ", "=", " ", 
+   "\"\<Expectation failed to calculate GaussianIntegral.\>\""}], 
+  ";"}]}], "Code",
+ CellChangeTimes->{{3.858984464352373*^9, 3.858984537709372*^9}, {
+  3.858984891005641*^9, 3.8589848936181583`*^9}, {3.8590577770633307`*^9, 
+  3.859057828913876*^9}},ExpressionUUID->"1460b40d-0df7-4f28-9d31-\
+dd3e30753fcb"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Notes", "Subsection",
+ CellChangeTimes->{{3.911159859677112*^9, 
+  3.91115986030984*^9}},ExpressionUUID->"5c65b2bc-ca6f-4e68-86ca-\
+7168d0fcb01d"],
+
+Cell["Introduced in 1.7.0", "Text",
+ CellChangeTimes->{{3.9111598621514587`*^9, 
+  3.9111598790401983`*^9}},ExpressionUUID->"9a3b06b2-8324-4dad-a163-\
+31f4988a41f0"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"f4b08cbe-5c88-4233-8f11-4b294d4839ce"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 451, 7, 90, "Code",ExpressionUUID->"1d216bf8-7201-40ad-902e-09353d782f08"],
+Cell[CellGroupData[{
+Cell[1034, 31, 157, 3, 67, "Subsection",ExpressionUUID->"65b1a387-47e1-490c-b727-9b7fe650e924"],
+Cell[1194, 36, 965, 17, 65, "Code",ExpressionUUID->"49a4c96c-928e-48b5-b2b8-70adcff16be0"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2196, 58, 158, 3, 67, "Subsection",ExpressionUUID->"55052867-74a8-4b33-a202-cab08730d0a6"],
+Cell[2357, 63, 4793, 114, 378, "Code",ExpressionUUID->"137008be-6631-4aa7-946c-ed3bc154f9ae"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7187, 182, 157, 3, 67, "Subsection",ExpressionUUID->"a95105d2-65d5-49ba-8ea5-4f905b51a43c"],
+Cell[7347, 187, 1453, 43, 90, "Code",ExpressionUUID->"2ff37cc2-db4e-4134-ba23-64fe2184f3ec"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8837, 235, 155, 3, 67, "Subsection",ExpressionUUID->"0770ce57-a3b5-4317-8fcd-4854eaf61d2f"],
+Cell[8995, 240, 494, 12, 65, "Code",ExpressionUUID->"e2864d23-ca68-4808-bf68-a6a72ed4eef9"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9526, 257, 156, 3, 67, "Subsection",ExpressionUUID->"2c4caaf3-87a9-480b-bcbb-6eb51959df52"],
+Cell[9685, 262, 665, 15, 90, "Code",ExpressionUUID->"1460b40d-0df7-4f28-9d31-dd3e30753fcb"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10387, 282, 152, 3, 67, "Subsection",ExpressionUUID->"5c65b2bc-ca6f-4e68-86ca-7168d0fcb01d"],
+Cell[10542, 287, 165, 3, 44, "Text",ExpressionUUID->"9a3b06b2-8324-4dad-a163-31f4988a41f0"]
+}, Open  ]]
+}
+]
+*)
+

@@ -1,0 +1,207 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      7484,        199]
+NotebookOptionsPosition[      5741,        152]
+NotebookOutlinePosition[      6864,        189]
+CellTagsIndexPosition[      6821,        186]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<RuleListDistance\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+   3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+   3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, 
+   3.911141769360262*^9},ExpressionUUID->"c72b48fd-4cc7-47ef-beb2-\
+ea43cda8868b"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsection",
+ CellChangeTimes->{{3.769493952902972*^9, 
+  3.7694939533968782`*^9}},ExpressionUUID->"8502af78-66a1-47af-a791-\
+39c234f7b24b"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RuleListDistance", "::", "usage"}], "=", "\n", 
+   "\"\<RuleListDistance[\!\(\*StyleBox[\"rulelist1\", \"TI\"]\), \
+\!\(\*StyleBox[\"rulelist2\", \"TI\"]\)] gives the distance between two rule \
+lists.\nRuleListDistance[\!\(\*StyleBox[\"rulelist\", \"TI\"]\)] gives the \
+distance between a rule list and the origin.\>\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.7692316309460583`*^9, 3.769231632632921*^9}, 
+   3.7889728020493402`*^9, {3.7889754383316936`*^9, 3.788975447332449*^9}, {
+   3.794700745414358*^9, 3.7947007706208963`*^9}, 3.7947010825465183`*^9},
+ CellLabel->
+  "In[1342]:=",ExpressionUUID->"1325ea7e-989d-4359-aa38-7257520f2711"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsection",
+ CellChangeTimes->{{3.7694936745853653`*^9, 
+  3.769493676072991*^9}},ExpressionUUID->"a56ee9fa-2b1a-4510-9038-\
+ebdf5b3817cd"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"RuleListDistance", "[", 
+    RowBox[{
+     RowBox[{"in1_", "?", "NumericRuleListQ"}], ",", 
+     RowBox[{"in2", ":", 
+      RowBox[{"(", 
+       RowBox[{"_", "?", "NumericRuleListQ"}], ")"}], ":", 
+      RowBox[{"{", "}"}]}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", "\n", "\n", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "\n", 
+      RowBox[{"(*", " ", "options", " ", "*)"}], "\n", 
+      RowBox[{
+       RowBox[{"distancefunction", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"DistanceFunction", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "RuleListDistance", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ",", "\n", 
+       RowBox[{"weights", "=", 
+        RowBox[{"Evaluate", "[", 
+         RowBox[{"Weights", "/.", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{"{", 
+            RowBox[{"opts", ",", 
+             RowBox[{"Options", "[", "RuleListDistance", "]"}]}], "}"}], 
+           "]"}]}], "]"}]}], ",", "\n", 
+       RowBox[{"(*", " ", 
+        RowBox[{"other", " ", "variables"}], " ", "*)"}], "\n", "list1", ",", 
+       "list2"}], "}"}], ",", "\n", "\n", 
+     RowBox[{
+      RowBox[{"list1", "=", 
+       RowBox[{"RuleListMultiply", "[", 
+        RowBox[{"in1", ",", "weights"}], "]"}]}], ";", "\n", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"in2", "\[NotEqual]", 
+         RowBox[{"{", "}"}]}], ",", "\n", "\t", 
+        RowBox[{"list2", "=", 
+         RowBox[{"RuleListMultiply", "[", 
+          RowBox[{"in2", ",", "weights"}], "]"}]}], ",", "\n", "\t", 
+        RowBox[{"list2", "=", 
+         RowBox[{"RuleListMultiply", "[", 
+          RowBox[{"in1", ",", "0"}], "]"}]}]}], "\n", "]"}], ";", "\n", "\n", 
+      
+      RowBox[{"Return", "[", 
+       RowBox[{"distancefunction", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Sort", "[", "list1", "]"}], "\[LeftDoubleBracket]", 
+          RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}], ",", 
+         RowBox[{
+          RowBox[{"Sort", "[", "list2", "]"}], "\[LeftDoubleBracket]", 
+          RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}]}], "]"}], 
+       "]"}]}]}], "\n", "]"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.710202471671939*^9, 3.710202484218748*^9}, {
+   3.710202549862443*^9, 3.7102025503409023`*^9}, {3.710250306821698*^9, 
+   3.710250308509453*^9}, 3.7102503413027983`*^9, 3.788972805300178*^9, {
+   3.7889745328389273`*^9, 3.7889745533417597`*^9}, {3.7889747473494987`*^9, 
+   3.788974788836464*^9}, {3.788974831362464*^9, 3.7889748914405537`*^9}, {
+   3.788979185698216*^9, 3.788979232642787*^9}, {3.788979288720765*^9, 
+   3.7889793519693727`*^9}, {3.794700527085101*^9, 3.7947005574034853`*^9}, {
+   3.794700598046297*^9, 3.794700601188615*^9}},
+ CellLabel->
+  "In[1343]:=",ExpressionUUID->"7601c93d-d640-46b5-99c2-fbe819b0bd13"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsection",
+ CellChangeTimes->{{3.911141777193069*^9, 
+  3.911141777846088*^9}},ExpressionUUID->"b7ed8a23-6096-4eae-a018-\
+050f6c49536d"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "RuleListDistance", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"DistanceFunction", "\[Rule]", "EuclideanDistance"}], ",", 
+     RowBox[{"Weights", "\[Rule]", 
+      RowBox[{"{", "}"}]}]}], "}"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.78897489723983*^9, 3.788974918541696*^9}, {
+  3.78897864053163*^9, 3.788978667577834*^9}},
+ CellLabel->
+  "In[1344]:=",ExpressionUUID->"11e77ce3-32d0-48d4-98c7-57e896ff9cf4"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"4e9a5fb5-39ad-4e1e-bd5d-bb4f593a6569"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 449, 7, 90, "Code",ExpressionUUID->"c72b48fd-4cc7-47ef-beb2-ea43cda8868b"],
+Cell[CellGroupData[{
+Cell[1032, 31, 155, 3, 67, "Subsection",ExpressionUUID->"8502af78-66a1-47af-a791-39c234f7b24b"],
+Cell[1190, 36, 691, 12, 114, "Code",ExpressionUUID->"1325ea7e-989d-4359-aa38-7257520f2711"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1918, 53, 160, 3, 67, "Subsection",ExpressionUUID->"a56ee9fa-2b1a-4510-9038-ebdf5b3817cd"],
+Cell[2081, 58, 2964, 69, 450, "Code",ExpressionUUID->"7601c93d-d640-46b5-99c2-fbe819b0bd13"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5082, 132, 155, 3, 67, "Subsection",ExpressionUUID->"b7ed8a23-6096-4eae-a018-050f6c49536d"],
+Cell[5240, 137, 485, 12, 65, "Code",ExpressionUUID->"11e77ce3-32d0-48d4-98c7-57e896ff9cf4"]
+}, Open  ]]
+}
+]
+*)
+

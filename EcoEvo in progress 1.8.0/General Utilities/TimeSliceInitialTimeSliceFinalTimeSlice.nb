@@ -1,0 +1,401 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     14823,        393]
+NotebookOptionsPosition[     11434,        311]
+NotebookOutlinePosition[     12961,        358]
+CellTagsIndexPosition[     12893,        353]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<TimeSlice\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<InitialTimeSlice\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<FinalTimeSlice\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+  3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+  3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, {
+  3.911246385165411*^9, 
+  3.911246392147868*^9}},ExpressionUUID->"87155ad3-d4c8-4982-9e02-\
+0c0c24078517"],
+
+Cell[CellGroupData[{
+
+Cell["TimeSlice", "Subsection",
+ CellChangeTimes->{{3.8876705963196163`*^9, 3.887670599350909*^9}},
+ CellTags->"1.8.0",ExpressionUUID->"7147b8d6-bb45-47d3-ba11-d6b2f4eada48"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.887670622696476*^9, 
+  3.8876706231883583`*^9}},ExpressionUUID->"b1aa823d-7d41-4dda-a530-\
+1a5a02248926"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TimeSlice", "::", "usage"}], "=", 
+   "\"\<TimeSlice[\!\(\*StyleBox[\"prl\", \"TI\"]\)] returns a temporal slice \
+of ParametricDynamics \!\(\*StyleBox[\"prl\", \"TI\"]\).\>\""}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.8876706257424307`*^9, 3.887670657750054*^9}, {
+   3.887670869850252*^9, 3.887670873796269*^9}, {3.8879932507188883`*^9, 
+   3.887993251359468*^9}, {3.888281374173956*^9, 3.888281379744987*^9}, 
+   3.8894698321658983`*^9},ExpressionUUID->"9505156b-ad29-4e23-b3b6-\
+8f50bc607cb5"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.887652533668545*^9, 3.8876525395837927`*^9}, {
+  3.8876706053531446`*^9, 
+  3.887670606459071*^9}},ExpressionUUID->"fddaa379-8b06-4b61-ab00-\
+4db33b4e3f5d"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"TimeSlice", "[", 
+    RowBox[{"pd_ParametricDynamics", ",", "rest___"}], "]"}], ":=", 
+   RowBox[{"Which", "[", "\n", "\t", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+     ",", "\n", "\t", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"var", "->", 
+        RowBox[{"AssociationToArray", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{
+            RowBox[{"Slice", "[", 
+             RowBox[{"#", ",", "rest"}], "]"}], "&"}], "/@", 
+           RowBox[{"pd", "[", 
+            RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"var", ",", 
+         RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+     "\n", ",", "\n", "\t", 
+     RowBox[{
+      RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Continuous\>\""}], 
+     ",", "\n", "\t", 
+     RowBox[{"RuleListInterpolation", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"Slice", "[", 
+         RowBox[{"#", ",", "rest"}], "]"}], "&"}], "/@", 
+       RowBox[{"pd", "[", 
+        RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], "\n", "]"}]}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.8876515602414494`*^9, 3.887651577383028*^9}, {
+   3.887651727980072*^9, 3.8876517586652517`*^9}, {3.887652571815545*^9, 
+   3.8876525740716887`*^9}, {3.887653404668906*^9, 3.88765340511338*^9}, {
+   3.887653435512537*^9, 3.887653448031127*^9}, {3.8876706078688583`*^9, 
+   3.887670609369514*^9}, {3.888281383979457*^9, 3.888281385688663*^9}, 
+   3.8894698321667137`*^9, {3.8952201037923203`*^9, 3.895220159801333*^9}, {
+   3.895232455798582*^9, 3.895232456162512*^9}, {3.8954134264648933`*^9, 
+   3.895413459639621*^9}},ExpressionUUID->"bd25b830-3528-4a82-849e-\
+2000898738e4"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["InitialTimeSlice", "Subsection",
+ CellChangeTimes->{{3.8879928234381857`*^9, 3.887992826287774*^9}},
+ CellTags->"1.8.0",ExpressionUUID->"e6e11bb0-3358-4d8b-b212-fa874d4b2876"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.887670622696476*^9, 
+  3.8876706231883583`*^9}},ExpressionUUID->"e7fd4ba7-b7b3-4a77-9575-\
+c47204b47b75"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"InitialTimeSlice", "::", "usage"}], "=", 
+   "\"\<InitialTimeSlice[\!\(\*StyleBox[\"pd\", \"TI\"]\)] returns the \
+initial temporal slice of ParametricDynamics \!\(\*StyleBox[\"pd\", \
+\"TI\"]\).\>\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.8876706257424307`*^9, 3.887670657750054*^9}, {
+   3.887670869850252*^9, 3.887670873796269*^9}, {3.887992902586379*^9, 
+   3.887992913988854*^9}, 3.887993254476306*^9, {3.888281394424876*^9, 
+   3.8882814020405817`*^9}, 3.889469832167412*^9, {3.8952186132609577`*^9, 
+   3.895218615880889*^9}},ExpressionUUID->"c141ea58-63b0-4883-bece-\
+638b5507e268"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.887652533668545*^9, 3.8876525395837927`*^9}, {
+  3.8876706053531446`*^9, 
+  3.887670606459071*^9}},ExpressionUUID->"7bdfea42-81ae-48ec-9e10-\
+593cff263a39"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"InitialTimeSlice", "[", 
+     RowBox[{"pd_ParametricDynamics", ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"Which", "[", "\n", "\t", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+      ",", "\n", "\t", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"var", "->", 
+         RowBox[{"AssociationToArray", "[", 
+          RowBox[{
+           RowBox[{"InitialSlice", "/@", 
+            RowBox[{"pd", "[", 
+             RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+        RowBox[{"{", 
+         RowBox[{"var", ",", 
+          RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+      "\n", ",", "\n", "\t", 
+      RowBox[{
+       RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Continuous\>\""}],
+       ",", "\n", "\t", 
+      RowBox[{"RuleListInterpolation", "[", 
+       RowBox[{"MapAt", "[", 
+        RowBox[{"InitialSlice", ",", 
+         RowBox[{"Normal", "[", "pd", "]"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"All", ",", "2"}], "}"}]}], "]"}], "]"}]}], "\n", "]"}]}], 
+   ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.8876515602414494`*^9, 3.887651577383028*^9}, {
+   3.887651727980072*^9, 3.8876517586652517`*^9}, {3.887652571815545*^9, 
+   3.8876525740716887`*^9}, 3.887992919699334*^9, 3.8879929861108007`*^9, 
+   3.888281425142357*^9, 3.889469832168154*^9, {3.895218591914836*^9, 
+   3.895218608179124*^9}, {3.895230709104477*^9, 
+   3.8952307099938107`*^9}},ExpressionUUID->"c18ba396-c24a-4f09-bf2b-\
+db6f8c8bf783"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "ParametricDynamics"}], " ", "*)"}], 
+  "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"InitialTimeSlice", "[", "pd_ParametricDynamics", "]"}], ":=", 
+    RowBox[{"Which", "[", "\n", "\t", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+      ",", "\n", "\t", 
+      RowBox[{"Table", "[", 
+       RowBox[{
+        RowBox[{"var", "->", 
+         RowBox[{"AssociationToArray", "[", 
+          RowBox[{
+           RowBox[{"InitialSlice", "/@", 
+            RowBox[{"pd", "[", 
+             RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+        RowBox[{"{", 
+         RowBox[{"var", ",", 
+          RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+      "\n", ",", "\n", "\t", 
+      RowBox[{
+       RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Continuous\>\""}],
+       ",", "\n", "\t", 
+      RowBox[{"RuleListInterpolation", "[", 
+       RowBox[{"InitialSlice", "/@", 
+        RowBox[{"pd", "[", 
+         RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], "\n", "]"}]}], 
+   ";"}]}]], "Code",
+ CellChangeTimes->{{3.89541289882693*^9, 3.895412925630024*^9}, {
+  3.895413347211534*^9, 
+  3.895413351539627*^9}},ExpressionUUID->"ebb5bc70-69e9-4baf-bc4e-\
+e71ec51360bc"]
+}, Open  ]]
+}, Closed]],
+
+Cell[CellGroupData[{
+
+Cell["FinalTimeSlice", "Subsection",
+ CellChangeTimes->{{3.887992832064474*^9, 3.887992834709395*^9}},
+ CellTags->"1.8.0",ExpressionUUID->"dac0bbc9-321a-473b-9c19-33506b6813b7"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.887670622696476*^9, 
+  3.8876706231883583`*^9}},ExpressionUUID->"9fce169d-aea4-4f70-b524-\
+7a1c29b2972c"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"FinalTimeSlice", "::", "usage"}], "=", 
+   "\"\<FinalTimeSlice[\!\(\*StyleBox[\"pd\", \"TI\"]\)] returns the final \
+temporal slice of ParametricDynamics \!\(\*StyleBox[\"pd\", \"TI\"]\).\>\""}],
+   ";"}]], "Code",
+ CellChangeTimes->{{3.8876706257424307`*^9, 3.887670657750054*^9}, {
+   3.887670869850252*^9, 3.887670873796269*^9}, {3.88799294944969*^9, 
+   3.887992956622384*^9}, 3.887993256780114*^9, {3.888281408221678*^9, 
+   3.888281412635494*^9}, 3.889469832168838*^9, {3.895217847465015*^9, 
+   3.895217850154882*^9}},ExpressionUUID->"36efc402-6a29-4bf0-afe5-\
+3640dd869022"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.887652533668545*^9, 3.8876525395837927`*^9}, {
+  3.8876706053531446`*^9, 
+  3.887670606459071*^9}},ExpressionUUID->"5eda4ab0-195e-4489-a43a-\
+2f81786b7414"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"FinalTimeSlice", "[", "pd_ParametricDynamics", "]"}], ":=", 
+   RowBox[{"Which", "[", "\n", "\t", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Discrete\>\""}], 
+     ",", "\n", "\t", 
+     RowBox[{"Table", "[", 
+      RowBox[{
+       RowBox[{"var", "->", 
+        RowBox[{"AssociationToArray", "[", 
+         RowBox[{
+          RowBox[{"FinalSlice", "/@", 
+           RowBox[{"pd", "[", 
+            RowBox[{"[", "1", "]"}], "]"}]}], ",", "var"}], "]"}]}], ",", 
+       RowBox[{"{", 
+        RowBox[{"var", ",", 
+         RowBox[{"pd", "[", "\"\<Variables\>\"", "]"}]}], "}"}]}], "]"}], 
+     "\n", ",", "\n", "\t", 
+     RowBox[{
+      RowBox[{"pd", "[", "\"\<Type\>\"", "]"}], "==", "\"\<Continuous\>\""}], 
+     ",", "\n", "\t", 
+     RowBox[{"RuleListInterpolation", "[", 
+      RowBox[{"FinalSlice", "/@", 
+       RowBox[{"pd", "[", 
+        RowBox[{"[", "1", "]"}], "]"}]}], "]"}]}], "\n", "]"}]}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.8876515602414494`*^9, 3.887651577383028*^9}, {
+   3.887651727980072*^9, 3.8876517586652517`*^9}, {3.887652571815545*^9, 
+   3.8876525740716887`*^9}, {3.8876533857147284`*^9, 3.887653387142551*^9}, {
+   3.887992988434881*^9, 3.887992992012886*^9}, 3.8882814175192747`*^9, 
+   3.8894698321695633`*^9, {3.895217853753586*^9, 3.89521793439642*^9}, {
+   3.8952182303818197`*^9, 3.895218270956901*^9}, {3.895230713092609*^9, 
+   3.895230713427343*^9}, {3.895230802488591*^9, 3.895230805210281*^9}, {
+   3.895413388402657*^9, 
+   3.8954134060610647`*^9}},ExpressionUUID->"103744d2-07c5-4dc1-bfaf-\
+46ed1c7dd112"]
+}, Open  ]]
+}, Closed]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"90caaa5a-d97d-494d-a4bc-e90f3c9c3132"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{
+ "1.8.0"->{
+  Cell[1193, 34, 174, 2, 85, "Subsection",ExpressionUUID->"7147b8d6-bb45-47d3-ba11-d6b2f4eada48",
+   CellTags->"1.8.0"],
+  Cell[4222, 117, 181, 2, 64, "Subsection",ExpressionUUID->"e6e11bb0-3358-4d8b-b212-fa874d4b2876",
+   CellTags->"1.8.0"],
+  Cell[8520, 235, 177, 2, 64, "Subsection",ExpressionUUID->"dac0bbc9-321a-473b-9c19-33506b6813b7",
+   CellTags->"1.8.0"]}
+ }
+*)
+(*CellTagsIndex
+CellTagsIndex->{
+ {"1.8.0", 12504, 343}
+ }
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 610, 10, 138, "Code",ExpressionUUID->"87155ad3-d4c8-4982-9e02-0c0c24078517"],
+Cell[CellGroupData[{
+Cell[1193, 34, 174, 2, 85, "Subsection",ExpressionUUID->"7147b8d6-bb45-47d3-ba11-d6b2f4eada48",
+ CellTags->"1.8.0"],
+Cell[CellGroupData[{
+Cell[1392, 40, 158, 3, 55, "Subsubsection",ExpressionUUID->"b1aa823d-7d41-4dda-a530-1a5a02248926"],
+Cell[1553, 45, 546, 11, 65, "Code",ExpressionUUID->"9505156b-ad29-4e23-b3b6-8f50bc607cb5"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[2136, 61, 214, 4, 55, "Subsubsection",ExpressionUUID->"fddaa379-8b06-4b61-ab00-4db33b4e3f5d"],
+Cell[2353, 67, 1820, 44, 210, "Code",ExpressionUUID->"bd25b830-3528-4a82-849e-2000898738e4"]
+}, Open  ]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[4222, 117, 181, 2, 64, "Subsection",ExpressionUUID->"e6e11bb0-3358-4d8b-b212-fa874d4b2876",
+ CellTags->"1.8.0"],
+Cell[CellGroupData[{
+Cell[4428, 123, 158, 3, 55, "Subsubsection",ExpressionUUID->"e7fd4ba7-b7b3-4a77-9575-c47204b47b75"],
+Cell[4589, 128, 639, 12, 65, "Code",ExpressionUUID->"c141ea58-63b0-4883-bece-638b5507e268"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5265, 145, 214, 4, 55, "Subsubsection",ExpressionUUID->"7bdfea42-81ae-48ec-9e10-593cff263a39"],
+Cell[5482, 151, 1646, 40, 210, "Code",ExpressionUUID->"c18ba396-c24a-4f09-bf2b-db6f8c8bf783"],
+Cell[7131, 193, 1340, 36, 232, "Code",ExpressionUUID->"ebb5bc70-69e9-4baf-bc4e-e71ec51360bc"]
+}, Open  ]]
+}, Closed]],
+Cell[CellGroupData[{
+Cell[8520, 235, 177, 2, 64, "Subsection",ExpressionUUID->"dac0bbc9-321a-473b-9c19-33506b6813b7",
+ CellTags->"1.8.0"],
+Cell[CellGroupData[{
+Cell[8722, 241, 158, 3, 55, "Subsubsection",ExpressionUUID->"9fce169d-aea4-4f70-b524-7a1c29b2972c"],
+Cell[8883, 246, 629, 12, 65, "Code",ExpressionUUID->"36efc402-6a29-4bf0-afe5-3640dd869022"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9549, 263, 214, 4, 55, "Subsubsection",ExpressionUUID->"5eda4ab0-195e-4489-a43a-2f81786b7414"],
+Cell[9766, 269, 1640, 38, 210, "Code",ExpressionUUID->"103744d2-07c5-4dc1-bfaf-46ed1c7dd112"]
+}, Open  ]]
+}, Closed]]
+}
+]
+*)
+

@@ -1,0 +1,188 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      6664,        180]
+NotebookOptionsPosition[      5144,        137]
+NotebookOutlinePosition[      6268,        174]
+CellTagsIndexPosition[      6225,        171]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<SummaryForm\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+   3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+   3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, 
+   3.91117955249678*^9},ExpressionUUID->"430baad4-db3a-40e5-b87e-\
+9df3e326e94e"],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsection",
+ CellChangeTimes->{{3.9111795642973623`*^9, 
+  3.911179566848607*^9}},ExpressionUUID->"eab016f6-b61d-4423-b5f8-\
+c8598a08bf31"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"SummaryForm", "[", 
+    RowBox[{
+    "name_", ",", "icon_", ",", "infos_", ",", "maxInfos_", ",", "form_", ",",
+      "expr_"}], "]"}], ":=", "\n", 
+   RowBox[{"RawBoxes", "@", 
+    RowBox[{"Quiet", "@", 
+     RowBox[{"Module", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"shown", ",", "hidden"}], "}"}], ",", "\n", "\t", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"convert", " ", "info"}], "-", 
+         RowBox[{"table", " ", "into", " ", "summary", " ", "items"}]}], 
+        "*)"}], "\n", "\t", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"shown", ",", "hidden"}], "}"}], "=", 
+         RowBox[{"Map", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"BoxForm`MakeSummaryItem", "[", 
+             RowBox[{"#", ",", "form"}], "]"}], "&"}], ",", 
+           RowBox[{"TakeDrop", "[", 
+            RowBox[{"infos", ",", "maxInfos"}], "]"}], ",", 
+           RowBox[{"{", "2", "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", 
+        "\t", 
+        RowBox[{"(*", 
+         RowBox[{
+         "arrange", " ", "the", " ", "summary", " ", "and", " ", "make", " ", 
+          "sure", " ", "the", " ", "label", " ", "is", " ", "gray", " ", 
+          RowBox[{"(", 
+           RowBox[{"therefore", " ", "StyleBox"}], ")"}]}], "*)"}], "\n", 
+        "\t", 
+        RowBox[{"StyleBox", "[", 
+         RowBox[{
+          RowBox[{"BoxForm`ArrangeSummaryBox", "[", 
+           RowBox[{"name", ",", "expr", ",", 
+            RowBox[{"Deploy", "@", 
+             RowBox[{"Show", "[", "\n", "\t\t", 
+              RowBox[{"icon", ",", "\n", "\t\t", 
+               RowBox[{"(*", 
+                RowBox[{
+                 RowBox[{
+                 "avoid", " ", "gray", " ", "background", " ", "before", " ", 
+                  "mouse"}], "-", "over"}], "*)"}], 
+               RowBox[{"Background", "->", "White"}], ",", "\n", "\t\t", 
+               RowBox[{"(*", 
+                RowBox[{"set", " ", "standard", " ", "image", " ", "size"}], 
+                "*)"}], 
+               RowBox[{"ImageSize", "->", 
+                RowBox[{"Dynamic", "[", 
+                 RowBox[{"{", 
+                  RowBox[{"Automatic", ",", 
+                   RowBox[{"3.5", " ", 
+                    RowBox[{
+                    RowBox[{
+                    "CurrentValue", "[", "\"\<FontCapHeight\>\"", "]"}], "/", 
+                    
+                    RowBox[{
+                    "AbsoluteCurrentValue", "[", "Magnification", "]"}]}]}]}],
+                   "}"}], "]"}]}]}], "]"}]}], ",", "\n", "\t\t", "shown", ",",
+             "hidden", ",", "form", ",", "\n", "\t\t", 
+            RowBox[{"(*", 
+             RowBox[{
+             "formatted", " ", "object", " ", "should", " ", "be", " ", 
+              "uasable", " ", "as", " ", "input"}], "*)"}], "\n", "\t\t", 
+            RowBox[{"\"\<Interpretable\>\"", "->", "True"}]}], "]"}], ",", 
+          "\"\<NonInterpretableSummary\>\""}], "]"}]}]}], "\n", "]"}]}]}]}], 
+  ";"}]], "Code",
+ CellChangeTimes->{
+  3.8876292541395063`*^9, {3.887629397862892*^9, 3.887629491186042*^9}, {
+   3.887629711942232*^9, 3.887629718652047*^9}, {3.8954074408890543`*^9, 
+   3.895407452729116*^9}, {3.8954075943479652`*^9, 3.895407618777383*^9}, {
+   3.8954086077706423`*^9, 3.895408660387624*^9}, 3.89540875031929*^9, 
+   3.895408780734953*^9, 
+   3.911179583794941*^9},ExpressionUUID->"b747ffc2-235a-4130-aecd-\
+f2deae436994"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Notes", "Subsection",
+ CellChangeTimes->{{3.911179570743512*^9, 
+  3.911179573695709*^9}},ExpressionUUID->"c170e8f4-860a-430f-8a92-\
+24c8d8c55650"],
+
+Cell["\<\
+By JEM_Mosig https://mathematica.stackexchange.com/a/153382
+Introduced in 1.8.0\
+\>", "Text",
+ CellChangeTimes->{{3.911179587187621*^9, 3.911179603428177*^9}, {
+  3.911179745746381*^9, 
+  3.911179753534162*^9}},ExpressionUUID->"3af67620-8e34-4907-bed5-\
+406d139e0ef7"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 866},
+WindowMargins->{{3, Automatic}, {Automatic, 458}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"08079137-0e96-42d5-b879-2e4d1b8afcf4"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 443, 7, 90, "Code",ExpressionUUID->"430baad4-db3a-40e5-b87e-9df3e326e94e"],
+Cell[CellGroupData[{
+Cell[1026, 31, 160, 3, 67, "Subsection",ExpressionUUID->"eab016f6-b61d-4423-b5f8-c8598a08bf31"],
+Cell[1189, 36, 3468, 81, 354, "Code",ExpressionUUID->"b747ffc2-235a-4130-aecd-f2deae436994"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[4694, 122, 153, 3, 67, "Subsection",ExpressionUUID->"c170e8f4-860a-430f-8a92-24c8d8c55650"],
+Cell[4850, 127, 278, 7, 73, "Text",ExpressionUUID->"3af67620-8e34-4907-bed5-406d139e0ef7"]
+}, Open  ]]
+}
+]
+*)
+

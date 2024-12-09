@@ -1,0 +1,272 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 14.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      9678,        262]
+NotebookOptionsPosition[      9114,        245]
+NotebookOutlinePosition[      9534,        262]
+CellTagsIndexPosition[      9491,        259]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{"(*", " ", 
+   RowBox[{"thread", " ", "over", " ", "rule", " ", "lists"}], " ", "*)"}], 
+  "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"TemporalCorrelation", "[", 
+     RowBox[{
+      RowBox[{"f_", "?", "RuleListQ"}], ",", 
+      RowBox[{"varsin_List", ":", 
+       RowBox[{"{", "All", "}"}]}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"vars", ",", "pairs"}], "}"}], ",", "\n", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Print", "[", "\"\<threading 1\>\"", "]"}], ";"}], "*)"}], 
+      "\n", "\t", 
+      RowBox[{
+       RowBox[{"If", "[", 
+        RowBox[{
+         RowBox[{"varsin", "==", 
+          RowBox[{"{", "All", "}"}]}], ",", 
+         RowBox[{"vars", "=", 
+          RowBox[{"Keys", "[", "f", "]"}]}], ",", 
+         RowBox[{"vars", "=", "varsin"}]}], "]"}], ";", "\n", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"Print", "[", 
+          RowBox[{"\"\<vars=\>\"", ",", "vars"}], "]"}], ";"}], "*)"}], "\n", 
+       "\t", 
+       RowBox[{"pairs", "=", 
+        RowBox[{"Subsets", "[", 
+         RowBox[{"vars", ",", 
+          RowBox[{"{", "2", "}"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"Return", "[", "\n", "\t\t", 
+        RowBox[{"Table", "[", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"Cor", "[", 
+            RowBox[{"Evaluate", "@@", 
+             RowBox[{"Sequence", "[", "pair", "]"}]}], "]"}], "\[Rule]", 
+           RowBox[{
+            RowBox[{"TemporalCovariance", "[", 
+             RowBox[{
+              RowBox[{"Evaluate", "@@", 
+               RowBox[{"Sequence", "[", 
+                RowBox[{"pair", "/.", "f"}], "]"}]}], ",", "opts"}], "]"}], 
+            "/", "\n", "\t\t\t", 
+            RowBox[{"Sqrt", "[", 
+             RowBox[{
+              RowBox[{"TemporalVariance", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"pair", "[", 
+                  RowBox[{"[", "1", "]"}], "]"}], "/.", "f"}], ",", "opts"}], 
+               "]"}], "*", 
+              RowBox[{"TemporalVariance", "[", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"pair", "[", 
+                  RowBox[{"[", "2", "]"}], "]"}], "/.", "f"}], ",", "opts"}], 
+               "]"}]}], "]"}]}]}], "\n", "\t", ",", 
+          RowBox[{"{", 
+           RowBox[{"pair", ",", "pairs"}], "}"}]}], "]"}], "]"}]}]}], "\n", 
+     "]"}]}], ";", "\n", "\n", 
+   RowBox[{
+    RowBox[{"TemporalCorrelation", "[", 
+     RowBox[{"f1_", ",", "f2_", ",", "rest___"}], "]"}], ":=", "\n", "\t", 
+    RowBox[{
+     RowBox[{"TemporalCovariance", "[", 
+      RowBox[{"f1", ",", "f2", ",", "rest"}], "]"}], "/", 
+     RowBox[{"Sqrt", "[", 
+      RowBox[{
+       RowBox[{"TemporalVariance", "[", 
+        RowBox[{"f1", ",", "rest"}], "]"}], "*", 
+       RowBox[{"TemporalVariance", "[", 
+        RowBox[{"f2", ",", "rest"}], "]"}]}], "]"}]}]}], ";"}], 
+  "*)"}]], "Code",
+ CellChangeTimes->{{3.889361132389091*^9, 3.8893611408623343`*^9}, {
+   3.889361257168022*^9, 3.889361265230386*^9}, {3.889361405737413*^9, 
+   3.889361467374219*^9}, {3.8893627766870136`*^9, 3.889362798207142*^9}, {
+   3.8893628736349497`*^9, 3.88936294030418*^9}, {3.889362979402306*^9, 
+   3.889362989445546*^9}, {3.889363023375442*^9, 3.889363082497942*^9}, {
+   3.889363123483617*^9, 3.889363134805272*^9}, {3.889363533731204*^9, 
+   3.889363534262673*^9}, {3.889363607895753*^9, 3.889363610926423*^9}, {
+   3.88936364290254*^9, 3.889363678083488*^9}, {3.889363835631566*^9, 
+   3.889363880469268*^9}, {3.88936392643431*^9, 3.88936396383129*^9}, 
+   3.889363998415742*^9},ExpressionUUID->"42824130-0a53-49b4-bfcd-\
+1669d1f72bf3"],
+
+Cell[BoxData[
+ RowBox[{"\t", 
+  RowBox[{"(*", 
+   RowBox[{"Do", "[", "\n", "\t\t", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"i", "++"}], ";", "\n", "\t\t", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"linestyles", "===", 
+         RowBox[{"{", "}"}]}], ",", 
+        RowBox[{"ls", "=", 
+         RowBox[{"LineStyle", "[", "var", "]"}]}], ",", 
+        RowBox[{"ls", "=", 
+         RowBox[{"ModPart", "[", 
+          RowBox[{"linestyles", ",", "i"}], "]"}]}]}], "]"}], ";", "\n", 
+      "\t\t", 
+      RowBox[{"lookup", "=", 
+       RowBox[{"LookUp", "[", "var", "]"}]}], ";", "\n", "\t\t", 
+      RowBox[{"Which", "[", "\n", "\t\t\t", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{
+            "lookup", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+            "===", "\"\<gcomp\>\""}], "||", 
+           RowBox[{
+            RowBox[{
+            "lookup", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+            "===", "\"\<gtrait\>\""}], "||", 
+           RowBox[{
+            RowBox[{
+            "lookup", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+            "===", "\"\<var\>\""}]}], ")"}], "&&", 
+         RowBox[{
+          RowBox[{"Length", "[", "lookup", "]"}], "\[Equal]", "4"}]}], ",", 
+        "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{"plotcolor", "[", "var", "]"}], "=", 
+         RowBox[{
+          RowBox[{"Color", "[", "var", "]"}], "[", 
+          RowBox[{"SpFrac", "[", 
+           RowBox[{
+            RowBox[{
+            "lookup", "\[LeftDoubleBracket]", "4", "\[RightDoubleBracket]"}], 
+            ",", 
+            RowBox[{"\[ScriptCapitalN]", "[", 
+             RowBox[{
+             "lookup", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}],
+              "]"}]}], "]"}], "]"}]}], "\n", "\t\t", ",", "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{
+           RowBox[{
+            RowBox[{
+            "lookup", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+            "===", "\"\<gcomp\>\""}], "||", 
+           RowBox[{
+            RowBox[{
+            "lookup", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+            "===", "\"\<gtrait\>\""}]}], ")"}], "&&", 
+         RowBox[{
+          RowBox[{"Length", "[", "lookup", "]"}], "\[Equal]", "3"}]}], ",", 
+        "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{"plotcolor", "[", "var", "]"}], "=", 
+         RowBox[{"Color", "[", "var", "]"}]}], "\n", "\t\t", ",", 
+        "\[IndentingNewLine]", "\t\t\t", 
+        RowBox[{
+         RowBox[{
+          RowBox[{
+          "lookup", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+          "===", "\"\<pcomp\>\""}], "||", 
+         RowBox[{
+          RowBox[{
+          "lookup", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+          "===", "\"\<aux\>\""}]}], ",", "\[IndentingNewLine]", "\t\t\t", 
+        RowBox[{
+         RowBox[{"plotcolor", "[", "var", "]"}], "=", 
+         RowBox[{"Color", "[", "var", "]"}]}], "\n", "\t\t", ",", "\n", 
+        "\t\t\t", "Else", ",", "\n", "\t\t\t", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"plotcolor", "[", "var", "]"}], "=", 
+          RowBox[{
+           RowBox[{"ColorData", "[", "97", "]"}], "[", "i", "]"}]}], ";"}]}], 
+       "\[IndentingNewLine]", "\t\t", "]"}], ";", "\n", "\t\t", 
+      RowBox[{"AppendTo", "[", 
+       RowBox[{"cplotstyle", ",", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{"plotcolor", "[", "var", "]"}], ",", "ls"}], "}"}]}], 
+       "]"}]}], "\n", "\t", ",", 
+     RowBox[{"{", 
+      RowBox[{"var", ",", "cvars"}], "}"}]}], "]"}], "*)"}]}]], "Input",Expres\
+sionUUID->"6517d787-8b4c-44d9-afe8-d85f99afa2f4"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"little", " ", "hack", " ", "for", " ", "Eigenvalues"}], " ", 
+   "*)"}], "\n", 
+  RowBox[{
+   RowBox[{"If", "[", 
+    RowBox[{
+     RowBox[{"plotvarsin", "===", 
+      RowBox[{"{", "Eigenvalues", "}"}]}], ",", "\n", "\t", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"xinit", ",", "xfinal"}], "}"}], "=", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"(", 
+          RowBox[{"Eigenvalues", "/.", "sol"}], ")"}], "[", "\"\<Domain\>\"", 
+         "]"}], "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}]}], ";",
+       "\n", "\t", 
+      RowBox[{"Return", "[", "\n", "\t\t", 
+       RowBox[{"ReImPlot", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"Eigenvalues", "/.", "sol"}], ")"}], "[", "x", "]"}], ",", 
+         
+         RowBox[{"{", 
+          RowBox[{"x", ",", "xinit", ",", "xfinal"}], "}"}]}], "]"}], "\n", 
+       "\t", "]"}]}]}], "\n", "]"}], ";"}]}]], "Input",ExpressionUUID->\
+"68f1539e-ffe2-4034-812f-9db65f609655"]
+},
+WindowSize->{808, 911},
+WindowMargins->{{876, Automatic}, {Automatic, -38}},
+Magnification->1.25,
+FrontEndVersion->"14.0 for Mac OS X ARM (64-bit) (December 12, 2023)",
+StyleDefinitions->"Default.nb",
+ExpressionUUID->"317e1114-18d1-421e-bd9a-7208543bdb47"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 3730, 92, 378, "Code",ExpressionUUID->"42824130-0a53-49b4-bfcd-1669d1f72bf3"],
+Cell[4291, 114, 3759, 97, 636, "Input",ExpressionUUID->"6517d787-8b4c-44d9-afe8-d85f99afa2f4"],
+Cell[8053, 213, 1057, 30, 194, "Input",ExpressionUUID->"68f1539e-ffe2-4034-812f-9db65f609655"]
+}
+]
+*)
+
+(* End of internal cache information *)
+

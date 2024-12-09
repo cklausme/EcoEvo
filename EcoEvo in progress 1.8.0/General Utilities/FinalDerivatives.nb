@@ -1,0 +1,614 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     25560,        606]
+NotebookOptionsPosition[     23945,        562]
+NotebookOutlinePosition[     25068,        599]
+CellTagsIndexPosition[     25025,        596]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<FinalDerivatives\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+   3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+   3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, 
+   3.911147804987669*^9},ExpressionUUID->"9f39d0d0-3c93-436d-b2cf-\
+f8486e6dbd63"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsection",
+ CellChangeTimes->{{3.769494062290228*^9, 
+  3.769494068652905*^9}},ExpressionUUID->"5f6cb098-7071-4ff6-9497-\
+70354a4a1e15"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"FinalDerivatives", "::", "usage"}], "=", "\[IndentingNewLine]", 
+   "\"\<FinalDerivatives[\!\(\*StyleBox[\"rulelist\", \"TI\"]\)] replaces \
+temporal \!\(\*StyleBox[\"rulelist\", \"TI\"]\) with their final derivatives.\
+\nFinalDerivatives[\!\(\*StyleBox[\"rulelist\", \"TI\"]\), \!\(\*StyleBox[\"\
+\[Delta]\", \"TI\"]\)] averages over the final values starting at \
+\!\(\*StyleBox[\"\[Delta]\", \"TI\"]\).\>\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.7693645124432707`*^9, 3.769364513106771*^9}},
+ CellLabel->
+  "In[1406]:=",ExpressionUUID->"4c7b35ec-eafd-48c6-8671-8f8fa5f4a2ee"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsection",
+ CellChangeTimes->{{3.7694936745853653`*^9, 
+  3.769493676072991*^9}},ExpressionUUID->"ae8c58ba-da38-497b-8f55-\
+8ecabc78bb56"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"FinalDerivatives", "[", 
+   RowBox[{
+    RowBox[{"sol_", "?", "TemporalRuleListQ"}], ",", 
+    RowBox[{"dtin_", ":", "0"}]}], "]"}], ":=", 
+  RowBox[{"Module", "[", 
+   RowBox[{
+    RowBox[{"{", "res", "}"}], ",", "\n", "\t", 
+    RowBox[{
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"dtin", "===", "All"}], ",", 
+       RowBox[{"dt", "=", 
+        RowBox[{"FinalTime", "[", "sol", "]"}]}], ",", 
+       RowBox[{"dt", "=", "dtin"}]}], "]"}], ";", "\n", "\t", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{"dt", "\[Equal]", "0"}], ",", "\n", "\t\t", 
+       RowBox[{"res", "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Which", "[", "\n", "\t\t\t", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Head", "[", 
+              RowBox[{
+              "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+              "]"}], "===", "InterpolatingFunction"}], ",", "\n", "\t\t\t", 
+            RowBox[{"ReplacePart", "[", 
+             RowBox[{"#", ",", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"1", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{
+                  "#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+                   "'"}]}], ",", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{"(", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "'"}], "[", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", "1", ",", "1", ",", "2"}], 
+                    "\[RightDoubleBracket]"}], "]"}], "/.", "#"}], ")"}]}]}], 
+               "}"}]}], "]"}], "\n", "\t\t\t", 
+            RowBox[{"(*", 
+             RowBox[{"ReplacePart", "[", 
+              RowBox[{"#", ",", 
+               RowBox[{"{", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{"(", 
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "'"}], "[", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", "1", ",", "1", ",", "2"}], 
+                    "\[RightDoubleBracket]"}], "]"}], "/.", "#"}], ")"}]}], 
+                "}"}]}], "]"}], "*)"}], "\n", "\t\t", ",", "\n", "\t\t\t", 
+            RowBox[{
+             RowBox[{"Head", "[", 
+              RowBox[{
+              "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+              "]"}], "===", "List"}], ",", "\n", "\t\t\t", 
+            RowBox[{"ReplacePart", "[", 
+             RowBox[{"#", ",", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"1", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{
+                  "#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+                   "'"}]}], ",", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "1"}], ",", "2"}], "\[RightDoubleBracket]"}],
+                     "-", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "2"}], ",", "2"}], 
+                    "\[RightDoubleBracket]"}]}], ")"}], "/", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "1"}], ",", "1"}], "\[RightDoubleBracket]"}],
+                     "-", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "2"}], ",", "1"}], 
+                    "\[RightDoubleBracket]"}]}], ")"}]}]}]}], "}"}]}], "]"}], 
+            "\n", "\t\t\t", 
+            RowBox[{"(*", 
+             RowBox[{"ReplacePart", "[", 
+              RowBox[{"#", ",", 
+               RowBox[{"{", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "1"}], ",", "2"}], "\[RightDoubleBracket]"}],
+                     "-", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "2"}], ",", "2"}], 
+                    "\[RightDoubleBracket]"}]}], ")"}], "/", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "1"}], ",", "1"}], "\[RightDoubleBracket]"}],
+                     "-", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "2"}], ",", "1"}], 
+                    "\[RightDoubleBracket]"}]}], ")"}]}]}], "}"}]}], "]"}], 
+             "*)"}], "\n", "\t\t", ",", "\n", "\t\t\t", 
+            RowBox[{
+             RowBox[{"Head", "[", 
+              RowBox[{
+              "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+              "]"}], "===", "TemporalData"}], ",", "\n", "\t\t\t", 
+            RowBox[{"ReplacePart", "[", 
+             RowBox[{"#", ",", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"1", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{
+                  "#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+                   "'"}]}], ",", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Values\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Values\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "2"}], "\[RightDoubleBracket]"}]}], ")"}], 
+                  "/", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Times\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Times\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "2"}], "\[RightDoubleBracket]"}]}], 
+                   ")"}]}]}]}], "}"}]}], "]"}], "\n", "\t\t\t", 
+            RowBox[{"(*", 
+             RowBox[{"ReplacePart", "[", 
+              RowBox[{"#", ",", 
+               RowBox[{"{", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Values\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Values\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "2"}], "\[RightDoubleBracket]"}]}], ")"}], 
+                  "/", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Times\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Times\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "2"}], "\[RightDoubleBracket]"}]}], 
+                   ")"}]}]}], "}"}]}], "]"}], "*)"}], "\n", "\t\t", ",", "\n",
+             "\t\t\t", "Else", ",", "#"}], "\n", "\t\t", "]"}], "&"}], "/@", 
+         "sol"}]}], "\n", "\t", ",", "\n", "\t\t", 
+       RowBox[{"res", "=", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"Which", "[", "\n", "\t\t\t", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Head", "[", 
+              RowBox[{
+              "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+              "]"}], "===", "InterpolatingFunction"}], ",", "\n", "\t\t\t", 
+            RowBox[{"ReplacePart", "[", 
+             RowBox[{"#", ",", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"1", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{
+                  "#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+                   "'"}]}], ",", 
+                RowBox[{
+                 RowBox[{"2", "\[Rule]", 
+                  RowBox[{
+                   RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "[", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", "1", ",", "1", ",", "2"}], 
+                    "\[RightDoubleBracket]"}], "]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "[", 
+                    RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", "1", ",", "1", ",", "2"}], 
+                    "\[RightDoubleBracket]"}], "-", "dt"}], "]"}]}], ")"}], 
+                   "/", "dt"}]}], "/.", "#"}]}], "}"}]}], "]"}], "\n", 
+            "\t\t\t", 
+            RowBox[{"(*", 
+             RowBox[{"ReplacePart", "[", 
+              RowBox[{"#", ",", 
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{"2", "\[Rule]", 
+                  RowBox[{
+                   RowBox[{"(", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "[", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", "1", ",", "1", ",", "2"}], 
+                    "\[RightDoubleBracket]"}], "]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "[", 
+                    RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", "1", ",", "1", ",", "2"}], 
+                    "\[RightDoubleBracket]"}], "-", "dt"}], "]"}]}], ")"}], 
+                   "/", "dt"}]}], "/.", "#"}], "}"}]}], "]"}], "*)"}], "\n", 
+            "\t\t", ",", "\n", "\t\t\t", 
+            RowBox[{
+             RowBox[{"Head", "[", 
+              RowBox[{
+              "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+              "]"}], "===", "List"}], ",", "\n", "\t\t\t", 
+            RowBox[{"ReplacePart", "[", 
+             RowBox[{"#", ",", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"1", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{
+                  "#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+                   "'"}]}], ",", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "1"}], ",", "2"}], "\[RightDoubleBracket]"}],
+                     "-", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", 
+                    RowBox[{"(", 
+                    RowBox[{"1", "+", "dt"}], ")"}]}], ",", "2"}], 
+                    "\[RightDoubleBracket]"}]}], ")"}], "/", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "1"}], ",", "1"}], "\[RightDoubleBracket]"}],
+                     "-", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", 
+                    RowBox[{"(", 
+                    RowBox[{"1", "+", "dt"}], ")"}]}], ",", "1"}], 
+                    "\[RightDoubleBracket]"}]}], ")"}]}]}]}], "}"}]}], "]"}], 
+            "\n", "\t\t\t", 
+            RowBox[{"(*", 
+             RowBox[{"ReplacePart", "[", 
+              RowBox[{"#", ",", 
+               RowBox[{"{", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "1"}], ",", "2"}], "\[RightDoubleBracket]"}],
+                     "-", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", 
+                    RowBox[{"(", 
+                    RowBox[{"1", "+", "dt"}], ")"}]}], ",", "2"}], 
+                    "\[RightDoubleBracket]"}]}], ")"}], "/", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", "1"}], ",", "1"}], "\[RightDoubleBracket]"}],
+                     "-", 
+                    RowBox[{"#", "\[LeftDoubleBracket]", 
+                    RowBox[{"2", ",", 
+                    RowBox[{"-", 
+                    RowBox[{"(", 
+                    RowBox[{"1", "+", "dt"}], ")"}]}], ",", "1"}], 
+                    "\[RightDoubleBracket]"}]}], ")"}]}]}], "}"}]}], "]"}], 
+             "*)"}], "\n", "\t\t", ",", "\n", "\t\t\t", 
+            RowBox[{
+             RowBox[{"Head", "[", 
+              RowBox[{
+              "#", "\[LeftDoubleBracket]", "2", "\[RightDoubleBracket]"}], 
+              "]"}], "===", "TemporalData"}], ",", "\n", "\t\t\t", 
+            RowBox[{"ReplacePart", "[", 
+             RowBox[{"#", ",", 
+              RowBox[{"{", 
+               RowBox[{
+                RowBox[{"1", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{
+                  "#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+                   "'"}]}], ",", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Values\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Values\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", 
+                    RowBox[{"(", 
+                    RowBox[{"1", "+", "dt"}], ")"}]}], 
+                    "\[RightDoubleBracket]"}]}], ")"}], "/", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Times\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Times\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", 
+                    RowBox[{"(", 
+                    RowBox[{"1", "+", "dt"}], ")"}]}], 
+                    "\[RightDoubleBracket]"}]}], ")"}]}]}]}], "}"}]}], "]"}], 
+            "\n", "\t\t\t", 
+            RowBox[{"(*", 
+             RowBox[{"ReplacePart", "[", 
+              RowBox[{"#", ",", 
+               RowBox[{"{", 
+                RowBox[{"2", "\[Rule]", 
+                 RowBox[{
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Values\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Values\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", 
+                    RowBox[{"(", 
+                    RowBox[{"1", "+", "dt"}], ")"}]}], 
+                    "\[RightDoubleBracket]"}]}], ")"}], "/", 
+                  RowBox[{"(", 
+                   RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Times\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", "1"}], "\[RightDoubleBracket]"}], "-", 
+                    RowBox[{
+                    RowBox[{
+                    RowBox[{
+                    "#", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "[", "\"\<Times\>\"", "]"}], 
+                    "\[LeftDoubleBracket]", 
+                    RowBox[{"-", 
+                    RowBox[{"(", 
+                    RowBox[{"1", "+", "dt"}], ")"}]}], 
+                    "\[RightDoubleBracket]"}]}], ")"}]}]}], "}"}]}], "]"}], 
+             "*)"}], "\n", "\t\t", ",", "\n", "\t\t\t", "Else", ",", "#"}], 
+           "\n", "\t\t", "]"}], "&"}], "/@", "sol"}]}]}], "\n", "\t", "]"}], 
+     ";", "\n", "\t", 
+     RowBox[{"Return", "[", "res", "]"}]}]}], "\n", "]"}]}]], "Code",
+ CellChangeTimes->{{3.6885717192202168`*^9, 3.6885717193028183`*^9}, {
+   3.688571777267274*^9, 3.688571777296155*^9}, {3.688571808081353*^9, 
+   3.688571808109118*^9}, {3.696590077606003*^9, 3.6965901903838053`*^9}, 
+   3.696590327289241*^9, {3.69659040450349*^9, 3.696590538232264*^9}, {
+   3.6965905977709293`*^9, 3.696590639500061*^9}, {3.696590716489375*^9, 
+   3.696590744177958*^9}, {3.696590778012137*^9, 3.696590818516485*^9}, {
+   3.696591190718431*^9, 3.6965911981404448`*^9}, {3.696591576063525*^9, 
+   3.6965916224868603`*^9}, {3.696591703887327*^9, 3.696591705727127*^9}, {
+   3.6965918125357323`*^9, 3.6965918766180363`*^9}, {3.6965919654659433`*^9, 
+   3.696591982672152*^9}, {3.6965939839160748`*^9, 3.6965940017734528`*^9}, 
+   3.696597401027027*^9, {3.696604430959165*^9, 3.6966044379479*^9}, {
+   3.722038291330578*^9, 3.722038341323505*^9}, {3.722039357736128*^9, 
+   3.7220393970921097`*^9}, {3.7793625114848633`*^9, 3.779362522047867*^9}, {
+   3.89441425484826*^9, 3.8944142867635717`*^9}, {3.894414987506846*^9, 
+   3.8944150499356117`*^9}},ExpressionUUID->"30b00826-7b67-4a64-98e6-\
+eaaf2e957a06"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"FinalDerivatives", "[", 
+   RowBox[{
+    RowBox[{"sol_", "?", "NumericRuleListQ"}], ",", "___"}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"ReplacePart", "[", 
+     RowBox[{"#", ",", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"1", "\[Rule]", 
+         RowBox[{
+          RowBox[{"#", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}],
+           "'"}]}], ",", 
+        RowBox[{"2", "\[Rule]", "0"}]}], "}"}]}], "]"}], "&"}], "/@", 
+   "sol"}]}]], "Code",
+ CellChangeTimes->{{3.779362527789496*^9, 3.779362529645175*^9}, {
+   3.779362569118285*^9, 3.779362576210465*^9}, 3.779362618194418*^9, {
+   3.779362672911565*^9, 3.779362691461166*^9}},
+ CellLabel->
+  "In[1408]:=",ExpressionUUID->"14e7d230-462c-47e7-ad29-dafcd44d8ac9"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"15c871c3-4e0d-467c-873c-4791b6b08ac9"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 449, 7, 90, "Code",ExpressionUUID->"9f39d0d0-3c93-436d-b2cf-f8486e6dbd63"],
+Cell[CellGroupData[{
+Cell[1032, 31, 153, 3, 67, "Subsection",ExpressionUUID->"5f6cb098-7071-4ff6-9497-70354a4a1e15"],
+Cell[1188, 36, 628, 11, 114, "Code",ExpressionUUID->"4c7b35ec-eafd-48c6-8671-8f8fa5f4a2ee"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1853, 52, 160, 3, 67, "Subsection",ExpressionUUID->"ae8c58ba-da38-497b-8f55-8ecabc78bb56"],
+Cell[2016, 57, 21126, 479, 930, "Code",ExpressionUUID->"30b00826-7b67-4a64-98e6-eaaf2e957a06"],
+Cell[23145, 538, 784, 21, 65, "Code",ExpressionUUID->"14e7d230-462c-47e7-ad29-dafcd44d8ac9"]
+}, Open  ]]
+}
+]
+*)
+

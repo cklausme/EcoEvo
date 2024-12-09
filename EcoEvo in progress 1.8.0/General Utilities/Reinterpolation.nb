@@ -1,0 +1,304 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     11806,        296]
+NotebookOptionsPosition[     10056,        249]
+NotebookOutlinePosition[     11179,        286]
+CellTagsIndexPosition[     11136,        283]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<Reinterpolation\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+   3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+   3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, 
+   3.911089982330419*^9},ExpressionUUID->"d2b692f6-8f30-4f81-a32e-\
+2f88c851300e"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.7829881206581182`*^9, 
+  3.782988122223402*^9}},ExpressionUUID->"ccc9d3c6-fc6f-4f83-a9ad-\
+5a7bed3df2da"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Reinterpolation", "::", "usage"}], "=", 
+   "\"\<Reinterpolation[\!\(\*StyleBox[\"f\", \"TI\"]\)] reinterpolates a \
+function containing one or more InterpolatingFunctions.\>\""}], ";"}]], "Code",\
+
+ CellChangeTimes->{{3.782988127379388*^9, 3.782988194638617*^9}},
+ CellLabel->
+  "In[1124]:=",ExpressionUUID->"695096e4-dd40-408f-ae2b-687296713401"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.782988123866335*^9, 
+  3.782988124993032*^9}},ExpressionUUID->"f3b6685f-aa4c-4bb3-afc0-\
+c571c0eebe55"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Reinterpolation", "[", 
+    RowBox[{"f_", ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "\n", 
+      RowBox[{"(*", " ", "options", " ", "*)"}], "\n", 
+      RowBox[{"interpolationopts", ",", "interpolationpoints", ",", "\n", 
+       RowBox[{"(*", " ", 
+        RowBox[{"other", " ", "variables"}], " ", "*)"}], "\n", "xmin", ",", 
+       "xmax", ",", "ifs", ",", "grid", ",", "tmp"}], "}"}], ",", "\n", "\t", 
+     "\n", 
+     RowBox[{"(*", " ", 
+      RowBox[{"handle", " ", "options"}], " ", "*)"}], "\[IndentingNewLine]", 
+     
+     RowBox[{
+      RowBox[{"interpolationopts", "=", 
+       RowBox[{"FilterRules", "[", 
+        RowBox[{
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "Reinterpolation", "]"}]}], "}"}], "]"}], 
+         ",", 
+         RowBox[{"Options", "[", "Interpolation", "]"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"interpolationpoints", "=", 
+       RowBox[{"Evaluate", "[", 
+        RowBox[{"InterpolationPoints", "/.", 
+         RowBox[{"Flatten", "[", 
+          RowBox[{"{", 
+           RowBox[{"opts", ",", 
+            RowBox[{"Options", "[", "Reinterpolation", "]"}]}], "}"}], 
+          "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", "\n", 
+      RowBox[{"ifs", "=", 
+       RowBox[{"Cases", "[", 
+        RowBox[{"f", ",", "_InterpolatingFunction", ",", 
+         RowBox[{"{", 
+          RowBox[{"0", ",", "\[Infinity]"}], "}"}]}], "]"}]}], ";", 
+      "\[IndentingNewLine]", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"ifs", "\[Equal]", 
+         RowBox[{"{", "}"}]}], ",", 
+        RowBox[{"Return", "[", "f", "]"}]}], "]"}], ";", 
+      "\[IndentingNewLine]", "\n", 
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"interpolationpoints", "===", "Automatic"}], ",", "\n", "\t", 
+        
+        RowBox[{"grid", "=", 
+         RowBox[{"Union", "[", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{
+            RowBox[{"Through", "[", 
+             RowBox[{"ifs", "[", "\"\<Grid\>\"", "]"}], "]"}], ",", "1"}], 
+           "]"}], "]"}]}], ",", "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{"using", " ", 
+          RowBox[{"ifs", "\[LeftDoubleBracket]", 
+           RowBox[{"1", ",", "1"}], "\[RightDoubleBracket]"}], " ", "because",
+           " ", 
+          RowBox[{
+           RowBox[{
+           "ifs", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+           "[", "\"\<Domain\>\"", "]"}], " ", "fails", " ", 
+          RowBox[{"sometimes", "?", 
+           RowBox[{"!", " ", 
+            RowBox[{
+             RowBox[{"-", " ", "see"}], " ", "\"\<wtf domain.nb\>\""}]}]}]}], 
+         " ", "*)"}], "\n", "\t", 
+        RowBox[{"(*", 
+         RowBox[{"grid", "=", 
+          RowBox[{"Flatten", "[", 
+           RowBox[{
+            RowBox[{
+             RowBox[{"Subdivide", "[", 
+              RowBox[{
+               RowBox[{"Sequence", "@@", "#"}], ",", "interpolationpoints"}], 
+              "]"}], "&"}], "/@", 
+            RowBox[{"ifs", "\[LeftDoubleBracket]", 
+             RowBox[{"1", ",", "1"}], "\[RightDoubleBracket]"}]}], "]"}]}], 
+         "*)"}], "\n", "\t", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"{", 
+           RowBox[{"xmin", ",", "xmax"}], "}"}], "=", 
+          RowBox[{"ifs", "\[LeftDoubleBracket]", 
+           RowBox[{"1", ",", "1", ",", "1"}], "\[RightDoubleBracket]"}]}], 
+         ";", "\n", "\t", 
+         RowBox[{"grid", "=", 
+          RowBox[{"Table", "[", 
+           RowBox[{"x", ",", 
+            RowBox[{"{", 
+             RowBox[{"x", ",", "xmin", ",", "xmax", ",", 
+              RowBox[{
+               RowBox[{"(", 
+                RowBox[{"xmax", "-", "xmin"}], ")"}], "/", 
+               RowBox[{"(", 
+                RowBox[{"interpolationpoints", "-", "1"}], ")"}]}]}], "}"}]}],
+            "]"}]}], ";"}]}], "\n", "]"}], ";", "\n", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Print", "[", 
+         RowBox[{"\"\<grid=\>\"", ",", "grid"}], "]"}], ";"}], "*)"}], "\n", 
+      "\n", 
+      RowBox[{"Quiet", "[", "\n", "\t", 
+       RowBox[{
+        RowBox[{"tmp", "=", 
+         RowBox[{"Interpolation", "[", 
+          RowBox[{
+           RowBox[{"Table", "[", 
+            RowBox[{
+             RowBox[{"{", 
+              RowBox[{
+               RowBox[{"Sequence", "@@", "val"}], ",", 
+               RowBox[{"f", "/.", 
+                RowBox[{"(", 
+                 RowBox[{"if_InterpolatingFunction", "\[Rule]", 
+                  RowBox[{"if", "[", 
+                   RowBox[{"Sequence", "@@", "val"}], "]"}]}], ")"}]}]}], 
+              "}"}], ",", 
+             RowBox[{"{", 
+              RowBox[{"val", ",", "grid"}], "}"}]}], "]"}], ",", 
+           RowBox[{"Evaluate", "[", 
+            RowBox[{"Sequence", "@@", "interpolationopts"}], "]"}]}], "]"}]}],
+         ",", "\n", "\t", 
+        RowBox[{"{", 
+         RowBox[{"InterpolatingFunction", "::", "dmval"}], "}"}]}], "]"}], 
+      ";", "\n", "\n", 
+      RowBox[{
+       RowBox[{"tmp", "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], 
+       "=", 
+       RowBox[{"ifs", "\[LeftDoubleBracket]", 
+        RowBox[{"1", ",", "1"}], "\[RightDoubleBracket]"}]}], ";", " ", 
+      RowBox[{"(*", " ", 
+       RowBox[{"fix", " ", "domain"}], " ", "*)"}], "\n", "\n", 
+      RowBox[{"Return", "[", "tmp", "]"}]}]}], "\[IndentingNewLine]", "]"}]}],
+   ";"}]], "Code",
+ CellChangeTimes->{{3.782988079997802*^9, 3.782988092534563*^9}, {
+   3.784732715969939*^9, 3.784732718455331*^9}, {3.784732914081176*^9, 
+   3.78473291490557*^9}, {3.7847330004158297`*^9, 3.784733000572249*^9}, {
+   3.798801334576931*^9, 3.7988013467924643`*^9}, {3.798804747899366*^9, 
+   3.798804766971941*^9}, {3.798805082238496*^9, 3.7988051241025753`*^9}, {
+   3.7988053380646353`*^9, 3.798805360489352*^9}, {3.798805604380218*^9, 
+   3.798805605462636*^9}, {3.798805648018655*^9, 3.7988056869151154`*^9}, {
+   3.7988057800470057`*^9, 3.798805799397027*^9}, {3.7988067014015427`*^9, 
+   3.798806708589616*^9}, {3.798806757151376*^9, 3.7988067697519093`*^9}, {
+   3.798807283011372*^9, 3.798807286210596*^9}, {3.798811805553258*^9, 
+   3.7988118465286837`*^9}, {3.798812357128758*^9, 3.798812358358865*^9}, {
+   3.798816319869275*^9, 3.798816321917424*^9}, {3.798816352143407*^9, 
+   3.798816365597548*^9}, {3.798816541312085*^9, 3.798816541504568*^9}, {
+   3.79881697298847*^9, 3.798816978827042*^9}, {3.798817037844515*^9, 
+   3.798817038844564*^9}, {3.798818340712715*^9, 3.7988183744088373`*^9}, {
+   3.798818453801496*^9, 3.798818492778575*^9}, {3.812102818560308*^9, 
+   3.8121028202552958`*^9}, {3.812102903426998*^9, 3.812102951882617*^9}, {
+   3.812103004587606*^9, 3.81210301128434*^9}, {3.8121030791444473`*^9, 
+   3.812103116712007*^9}, {3.812103148833198*^9, 3.812103154656461*^9}, {
+   3.8121032892544947`*^9, 3.812103302828328*^9}, {3.812103399249021*^9, 
+   3.8121034218006687`*^9}, {3.829152097404381*^9, 3.829152114059376*^9}, {
+   3.8291521581637*^9, 3.829152165131336*^9}, {3.829152232620058*^9, 
+   3.829152235667944*^9}, {3.8291523885189543`*^9, 3.829152401718151*^9}, {
+   3.829152489977054*^9, 3.829152529423524*^9}, {3.829152560113212*^9, 
+   3.8291525602635803`*^9}, {3.829326416203388*^9, 3.829326419354203*^9}, {
+   3.8293266383503227`*^9, 3.829326658134015*^9}, {3.829326990682048*^9, 
+   3.829326996386159*^9}, {3.829327071627244*^9, 3.829327151163775*^9}, {
+   3.829327185893412*^9, 3.8293272448848133`*^9}, 3.8293436581573343`*^9, 
+   3.829344108723585*^9},
+ CellLabel->
+  "In[1125]:=",ExpressionUUID->"96d88b1c-f196-46b9-9b4d-5be39056a87b"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsubsection",
+ CellChangeTimes->{{3.7988056914660788`*^9, 
+  3.7988056937386103`*^9}},ExpressionUUID->"14d2c502-9066-4eda-8a2d-\
+d7654580cf8a"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "Reinterpolation", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{"InterpolationPoints", "\[Rule]", "Automatic"}], "}"}]}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.798805695714473*^9, 3.798805718619419*^9}},
+ CellLabel->
+  "In[1126]:=",ExpressionUUID->"3d1662ae-04f9-4f27-9a85-61687ab0cc43"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"b72ca9a5-8eb4-4ac8-8ff1-2fa9676e0d51"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 448, 7, 90, "Code",ExpressionUUID->"d2b692f6-8f30-4f81-a32e-2f88c851300e"],
+Cell[CellGroupData[{
+Cell[1031, 31, 158, 3, 56, "Subsubsection",ExpressionUUID->"ccc9d3c6-fc6f-4f83-a9ad-5a7bed3df2da"],
+Cell[1192, 36, 395, 9, 65, "Code",ExpressionUUID->"695096e4-dd40-408f-ae2b-687296713401"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1624, 50, 161, 3, 56, "Subsubsection",ExpressionUUID->"f3b6685f-aa4c-4bb3-afc0-c571c0eebe55"],
+Cell[1788, 55, 7701, 172, 762, "Code",ExpressionUUID->"96d88b1c-f196-46b9-9b4d-5be39056a87b"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[9526, 232, 162, 3, 56, "Subsubsection",ExpressionUUID->"14d2c502-9066-4eda-8a2d-d7654580cf8a"],
+Cell[9691, 237, 349, 9, 65, "Code",ExpressionUUID->"3d1662ae-04f9-4f27-9a85-61687ab0cc43"]
+}, Open  ]]
+}
+]
+*)
+

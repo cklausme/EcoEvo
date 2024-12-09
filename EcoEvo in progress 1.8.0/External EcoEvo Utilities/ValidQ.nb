@@ -1,0 +1,386 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     14684,        378]
+NotebookOptionsPosition[     12487,        323]
+NotebookOutlinePosition[     13610,        360]
+CellTagsIndexPosition[     13567,        357]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<ValidQ\>\"", "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+  3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+  3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, {
+  3.9112537652130423`*^9, 
+  3.911253766488255*^9}},ExpressionUUID->"598e2747-3482-4028-a395-\
+494d9015d981"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsection",
+ CellChangeTimes->{{3.865531310594554*^9, 
+  3.865531311050261*^9}},ExpressionUUID->"f99657a6-8cef-4dba-82cc-\
+181c111e142f"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ValidQ", "::", "usage"}], "=", 
+   "\"\<ValidQ[\!\(\*StyleBox[\"sol\", \"TI\"]\)] returns True if \
+\!\(\*StyleBox[\"sol\", \"TI\"]\) is within the allowed range of variables.\>\
+\""}], ";"}]], "Code",
+ CellChangeTimes->{{3.865531314275302*^9, 3.8655313211057262`*^9}, {
+  3.86553142984431*^9, 
+  3.865531476536272*^9}},ExpressionUUID->"afda4b60-52d1-4913-bbc0-\
+d92b49b5a9a3"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsection",
+ CellChangeTimes->{{3.865531479751659*^9, 3.865531481367962*^9}, 
+   3.865602984157057*^9},ExpressionUUID->"8d9c7c0a-ea3b-4aff-a220-\
+936de3121704"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"ValidQ", "[", 
+    RowBox[{
+     RowBox[{"eq_", "?", "RuleListQ"}], ",", 
+     RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "\n", 
+      RowBox[{"(*", " ", "options", " ", "*)"}], "\n", 
+      RowBox[{
+      "verbose", ",", "simplifyresult", ",", "simplifyopts", ",", "\n", 
+       RowBox[{"(*", " ", 
+        RowBox[{"other", " ", "variables"}], " ", "*)"}], "\n", "res"}], 
+      "}"}], ",", "\n", "\n", 
+     RowBox[{
+      RowBox[{"If", "[", 
+       RowBox[{
+        RowBox[{"modelloaded", "\[NotEqual]", "True"}], ",", 
+        RowBox[{
+         RowBox[{"Message", "[", 
+          RowBox[{"EcoEvoGeneral", "::", "nomodel"}], "]"}], ";", 
+         RowBox[{"Return", "[", "$Failed", "]"}]}]}], "]"}], ";", "\n", "\n", 
+      
+      RowBox[{"Block", "[", 
+       RowBox[{
+        RowBox[{"{", "verbosity", "}"}], ",", "\n", "\n", 
+        RowBox[{"(*", " ", 
+         RowBox[{"set", " ", "verbosity"}], " ", "*)"}], "\n", "\n", 
+        RowBox[{
+         RowBox[{"verbose", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"Verbose", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "EcoStableQ", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{"verbose", ",", "\n", "\t", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Max", "[", 
+             RowBox[{"1", ",", 
+              RowBox[{"Evaluate", "[", 
+               RowBox[{"Verbosity", "/.", 
+                RowBox[{"Flatten", "[", 
+                 RowBox[{"{", 
+                  RowBox[{"opts", ",", 
+                   RowBox[{"Options", "[", "ValidQ", "]"}]}], "}"}], "]"}]}], 
+               "]"}]}], "]"}]}], ",", "\n", "\t", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Evaluate", "[", 
+             RowBox[{"Verbosity", "/.", 
+              RowBox[{"Flatten", "[", 
+               RowBox[{"{", 
+                RowBox[{"opts", ",", 
+                 RowBox[{"Options", "[", "ValidQ", "]"}]}], "}"}], "]"}]}], 
+             "]"}]}]}], "\n", "]"}], ";", "\n", 
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{"IntegerQ", "[", "Global`$verbosity", "]"}], ",", 
+           RowBox[{"verbosity", "=", 
+            RowBox[{"Max", "[", 
+             RowBox[{"Global`$verbosity", ",", "verbosity"}], "]"}]}]}], 
+          "]"}], ";", "\n", "\n", 
+         RowBox[{"(*", " ", 
+          RowBox[{"handle", " ", "options"}], " ", "*)"}], "\n", "\n", 
+         RowBox[{"simplifyresult", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"SimplifyResult", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "ValidQ", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", 
+         RowBox[{"simplifyopts", "=", 
+          RowBox[{"Evaluate", "[", 
+           RowBox[{"SimplifyOpts", "/.", 
+            RowBox[{"Flatten", "[", 
+             RowBox[{"{", 
+              RowBox[{"opts", ",", 
+               RowBox[{"Options", "[", "ValidQ", "]"}]}], "}"}], "]"}]}], 
+           "]"}]}], ";", "\n", "\n", 
+         RowBox[{"(*", 
+          RowBox[{
+           RowBox[{"Print", "[", 
+            RowBox[{"\"\<simplifyresult=\>\"", ",", "simplifyresult"}], "]"}],
+            ";", "\n", 
+           RowBox[{"Print", "[", 
+            RowBox[{"\"\<simplifyopts=\>\"", ",", "simplifyopts"}], "]"}], 
+           ";"}], "*)"}], "\n", "\n", 
+         RowBox[{"res", "=", 
+          RowBox[{"CompoundAnd", "[", 
+           RowBox[{"Flatten", "@", 
+            RowBox[{"Table", "[", "\n", "\t", 
+             RowBox[{
+              RowBox[{"Which", "[", "\n", "\t\t", 
+               RowBox[{
+                RowBox[{
+                 RowBox[{"Head", "[", 
+                  RowBox[{
+                  "el", "\[LeftDoubleBracket]", "2", 
+                   "\[RightDoubleBracket]"}], "]"}], "===", "TemporalData"}], 
+                ",", "\n", "\t\t", 
+                RowBox[{"Map", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{"IntervalMemberQ", "[", 
+                    RowBox[{
+                    RowBox[{"range", "[", 
+                    RowBox[{
+                    "el", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], ",", "#"}], "]"}], 
+                   "&"}], ",", 
+                  RowBox[{
+                   RowBox[{"Normal", "[", 
+                    RowBox[{
+                    "el", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "]"}], "\[LeftDoubleBracket]", 
+                   
+                   RowBox[{"All", ",", "2"}], "\[RightDoubleBracket]"}]}], 
+                 "]"}], ",", "\n", "\t\t", "Else", ",", "\n", "\t\t", 
+                RowBox[{"If", "[", 
+                 RowBox[{
+                  RowBox[{
+                   RowBox[{
+                    RowBox[{"Im", "[", 
+                    RowBox[{"el", "[", 
+                    RowBox[{"[", "2", "]"}], "]"}], "]"}], "==", "0"}], "&&", 
+                   
+                   RowBox[{
+                    RowBox[{"Min", "[", 
+                    RowBox[{"range", "[", 
+                    RowBox[{
+                    "el", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], "]"}], "\[LessEqual]", 
+                    RowBox[{
+                    "el", "\[LeftDoubleBracket]", "2", 
+                    "\[RightDoubleBracket]"}], "\[LessEqual]", 
+                    RowBox[{"Max", "[", 
+                    RowBox[{"range", "[", 
+                    RowBox[{
+                    "el", "\[LeftDoubleBracket]", "1", 
+                    "\[RightDoubleBracket]"}], "]"}], "]"}]}]}], ",", "True", 
+                  ",", "False"}], "]"}]}], "\n", "\t", "]"}], "\n", ",", 
+              RowBox[{"{", 
+               RowBox[{"el", ",", "eq"}], "}"}]}], "]"}]}], "]"}]}], ";", 
+         "\n", "\n", 
+         RowBox[{"VPrint", "[", 
+          RowBox[{"3", ",", "\"\<res\>\"", ",", "res"}], "]"}], ";", "\n", 
+         "\n", 
+         RowBox[{"Which", "[", "\n", "\t", 
+          RowBox[{
+           RowBox[{"simplifyresult", "===", "True"}], ",", "\n", "\t", 
+           RowBox[{"CheckAssumptions", ";", "\n", "\t", 
+            RowBox[{"Return", "[", 
+             RowBox[{"Simplify", "[", 
+              RowBox[{"res", ",", 
+               RowBox[{"Evaluate", "[", 
+                RowBox[{"Sequence", "@@", "simplifyopts"}], "]"}]}], "]"}], 
+             "]"}]}], ",", "\n", "\t", 
+           RowBox[{"simplifyresult", "===", "Full"}], ",", "\n", "\t", 
+           RowBox[{"CheckAssumptions", ";", "\n", "\t", 
+            RowBox[{"Return", "[", 
+             RowBox[{"FullSimplify", "[", 
+              RowBox[{"res", ",", 
+               RowBox[{"Evaluate", "[", 
+                RowBox[{"Sequence", "@@", "simplifyopts"}], "]"}]}], "]"}], 
+             "]"}]}], ",", "\n", "\t", 
+           RowBox[{"simplifyresult", "===", "Real"}], ",", "\n", "\t", 
+           RowBox[{"CheckAssumptions", ";", "\n", "\t", 
+            RowBox[{"Return", "[", 
+             RowBox[{"RealSimplify", "[", 
+              RowBox[{"res", ",", 
+               RowBox[{"Evaluate", "[", 
+                RowBox[{"Sequence", "@@", "simplifyopts"}], "]"}]}], "]"}], 
+             "]"}]}], ",", "\n", "\t", "Else", ",", "\n", "\t", 
+           RowBox[{"Return", "[", "res", "]"}]}], "\n", "]"}], ";"}]}], "\n", 
+       "\n", "]"}]}]}], "]"}]}], ";"}]], "Code",
+ CellChangeTimes->{{3.865531482922867*^9, 3.865531493594159*^9}, {
+   3.86553155887284*^9, 3.865531640118555*^9}, 3.865531677887591*^9, {
+   3.8655320970608273`*^9, 3.865532102124435*^9}, {3.865532156841151*^9, 
+   3.865532204334882*^9}, {3.865600143821142*^9, 3.865600144179303*^9}, {
+   3.865600176022273*^9, 3.865600193170208*^9}, {3.8656003067348013`*^9, 
+   3.865600343116383*^9}, {3.865600425301321*^9, 3.865600441801117*^9}, {
+   3.8656004877432003`*^9, 3.865600510773946*^9}, {3.865600837674161*^9, 
+   3.865600889542077*^9}, {3.865600935303298*^9, 3.865600949123486*^9}, {
+   3.865601150969843*^9, 3.865601158985927*^9}, 3.865601191868168*^9, {
+   3.865601229091897*^9, 3.865601320405055*^9}, {3.865601414493268*^9, 
+   3.865601479620326*^9}, {3.865603204147889*^9, 3.8656032149502897`*^9}, 
+   3.865603361184222*^9, {3.8656074621787367`*^9, 3.86560746316464*^9}, {
+   3.8656126471203613`*^9, 
+   3.8656126615667267`*^9}},ExpressionUUID->"d627164e-37df-46a2-814c-\
+ac9b4542661a"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Aliases", "Subsection",
+ CellChangeTimes->{{3.8656030833607807`*^9, 
+  3.865603084295987*^9}},ExpressionUUID->"0da477ad-2589-4648-9cd4-\
+49848ca27ad0"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", " ", 
+   RowBox[{"make", " ", "listable", " ", "across", " ", "variables"}], " ", 
+   "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"ValidQ", "[", 
+     RowBox[{
+      RowBox[{"eqs_", "?", "ListOfVariablesQ"}], ",", 
+      RowBox[{"opts___", "?", "OptionQ"}]}], "]"}], ":=", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"ValidQ", "[", 
+        RowBox[{"#", ",", "opts"}], "]"}], "&"}], "/@", "eqs"}], ")"}]}], 
+   ";"}]}]], "Code",
+ CellChangeTimes->{{3.865602987698545*^9, 
+  3.86560306499542*^9}},ExpressionUUID->"737a46e3-47d5-4304-a126-\
+90d60119b5b4"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Options", "Subsection",
+ CellChangeTimes->{{3.865600952095365*^9, 
+  3.865600952742256*^9}},ExpressionUUID->"ea3b958b-4c4c-4a48-afc6-\
+f184204b43f7"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"Options", "[", "ValidQ", "]"}], "=", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"Verbose", "\[Rule]", "False"}], ",", 
+     RowBox[{"Verbosity", "->", "0"}], ",", "\n", 
+     RowBox[{"SimplifyResult", "\[Rule]", "Real"}], ",", 
+     RowBox[{"SimplifyOpts", "->", 
+      RowBox[{"{", 
+       RowBox[{"Assumptions", ":>", 
+        RowBox[{"DeleteCases", "[", 
+         RowBox[{"$Assumptions", ",", "False"}], "]"}]}], "}"}]}]}], "}"}]}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.865600954496665*^9, 
+  3.865600994720141*^9}},ExpressionUUID->"0057926e-f3ba-4602-a293-\
+b4614d039b0a"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Notes", "Subsection",
+ CellChangeTimes->{{3.911253776705902*^9, 
+  3.911253778160453*^9}},ExpressionUUID->"035ef216-2e2b-4453-8d1e-\
+522736c84152"],
+
+Cell["Introduced in 1.7.0", "Text",
+ CellChangeTimes->{{3.9112537795298033`*^9, 
+  3.911253783202526*^9}},ExpressionUUID->"30ae6b18-9fb2-4540-9c53-\
+441049dd93ca"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"3fde5f27-5e6e-41b4-adb3-750e94dee3e0"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 465, 8, 90, "Code",ExpressionUUID->"598e2747-3482-4028-a395-494d9015d981"],
+Cell[CellGroupData[{
+Cell[1048, 32, 153, 3, 67, "Subsection",ExpressionUUID->"f99657a6-8cef-4dba-82cc-181c111e142f"],
+Cell[1204, 37, 424, 10, 65, "Code",ExpressionUUID->"afda4b60-52d1-4913-bbc0-d92b49b5a9a3"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1665, 52, 181, 3, 67, "Subsection",ExpressionUUID->"8d9c7c0a-ea3b-4aff-a220-936de3121704"],
+Cell[1849, 57, 8628, 194, 1314, "Code",ExpressionUUID->"d627164e-37df-46a2-814c-ac9b4542661a"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[10514, 256, 157, 3, 67, "Subsection",ExpressionUUID->"0da477ad-2589-4648-9cd4-49848ca27ad0"],
+Cell[10674, 261, 618, 19, 90, "Code",ExpressionUUID->"737a46e3-47d5-4304-a126-90d60119b5b4"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[11329, 285, 155, 3, 67, "Subsection",ExpressionUUID->"ea3b958b-4c4c-4a48-afc6-f184204b43f7"],
+Cell[11487, 290, 628, 17, 90, "Code",ExpressionUUID->"0057926e-f3ba-4602-a293-b4614d039b0a"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[12152, 312, 153, 3, 67, "Subsection",ExpressionUUID->"035ef216-2e2b-4453-8d1e-522736c84152"],
+Cell[12308, 317, 163, 3, 44, "Text",ExpressionUUID->"30ae6b18-9fb2-4540-9c53-441049dd93ca"]
+}, Open  ]]
+}
+]
+*)
+

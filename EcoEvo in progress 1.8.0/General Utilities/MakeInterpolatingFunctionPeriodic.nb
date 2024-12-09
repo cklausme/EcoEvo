@@ -1,0 +1,275 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 13.2' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     10103,        267]
+NotebookOptionsPosition[      8484,        223]
+NotebookOutlinePosition[      9607,        260]
+CellTagsIndexPosition[      9564,        257]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"Package", "[", "\"\<EcoEvo`\>\"", "]"}], "\n", 
+ RowBox[{"PackageExport", "[", "\"\<MakeInterpolatingFunctionPeriodic\>\"", 
+  "]"}]}], "Code",
+ CellChangeTimes->{{3.9110853460183*^9, 3.9110853467450953`*^9}, {
+   3.9110866656006947`*^9, 3.9110866663934593`*^9}, {3.911087084583579*^9, 
+   3.911087090413562*^9}, {3.9110881099830217`*^9, 3.911088137910088*^9}, 
+   3.911090055386441*^9},ExpressionUUID->"455247ac-a56d-4f98-b3c8-\
+3cf37dc80fd6"],
+
+Cell[CellGroupData[{
+
+Cell["Usage", "Subsubsection",
+ CellChangeTimes->{{3.815413765457252*^9, 
+  3.815413765933066*^9}},ExpressionUUID->"5c93c609-2414-4bc5-888d-\
+2094793b28ac"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{"MakeInterpolatingFunctionPeriodic", "::", "usage"}], "=", 
+   "\"\<MakeInterpolatingFunctionPeriodic[\!\(\*StyleBox[\"if\", \"TI\"]\)] \
+makes InterpolatingFunction \!\(\*StyleBox[\"if\", \"TI\"]\) periodic.\>\""}],
+   ";"}]], "Code",
+ CellChangeTimes->{{3.8154137685337763`*^9, 3.8154138093104*^9}},
+ CellLabel->
+  "In[1127]:=",ExpressionUUID->"3042d780-1c05-4d82-994e-b2baa9e808ac"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Definition", "Subsubsection",
+ CellChangeTimes->{{3.815413760846533*^9, 
+  3.815413762605719*^9}},ExpressionUUID->"c96a5181-8e87-48ef-9f8e-\
+d9e57c084a53"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{
+   RowBox[{
+   "MakeInterpolatingFunctionPeriodic", "[", "if_InterpolatingFunction", 
+    "]"}], ":=", 
+   RowBox[{"Module", "[", 
+    RowBox[{
+     RowBox[{"{", "\n", "\t", 
+      RowBox[{
+       RowBox[{"dorder", "=", 
+        RowBox[{"if", "\[LeftDoubleBracket]", 
+         RowBox[{"2", ",", "3"}], "\[RightDoubleBracket]"}]}], ",", "\n", 
+       "\t", 
+       RowBox[{"ngrid", "=", 
+        RowBox[{"if", "\[LeftDoubleBracket]", 
+         RowBox[{"2", ",", "4"}], "\[RightDoubleBracket]"}]}]}], "}"}], ",", 
+     "\n", "\t", 
+     RowBox[{"Which", "[", "\[IndentingNewLine]", "\t\t", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"if", "\[LeftDoubleBracket]", 
+         RowBox[{"4", ",", "1"}], "\[RightDoubleBracket]"}], "===", 
+        "Developer`PackedArrayForm"}], ",", "\[IndentingNewLine]", "\t\t", 
+       RowBox[{"ReplacePart", "[", 
+        RowBox[{"if", ",", 
+         RowBox[{"{", "\[IndentingNewLine]", "\t\t\t", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"2", ",", "7"}], "}"}], "\[Rule]", 
+            RowBox[{"{", "1", "}"}]}], ",", " ", 
+           RowBox[{"(*", " ", 
+            RowBox[{"set", " ", "periodic", " ", "flag"}], " ", "*)"}], 
+           "\[IndentingNewLine]", "\t\t\t", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"2", ",", "4"}], "}"}], "\[Rule]", 
+            RowBox[{"ngrid", "-", "1"}]}], " ", ",", 
+           RowBox[{"(*", " ", 
+            RowBox[{"decrease", " ", "ngrid", " ", "by", " ", "1"}], " ", 
+            "*)"}], "\[IndentingNewLine]", "\t\t\t", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"4", ",", "2"}], "}"}], "\[Rule]", 
+            RowBox[{"Drop", "[", 
+             RowBox[{
+              RowBox[{"if", "\[LeftDoubleBracket]", 
+               RowBox[{"4", ",", "2"}], "\[RightDoubleBracket]"}], ",", 
+              RowBox[{"-", "1"}]}], "]"}]}], ",", " ", 
+           RowBox[{"(*", " ", 
+            RowBox[{"remove", " ", "last", " ", "abscissa"}], " ", "*)"}], 
+           "\[IndentingNewLine]", "\t\t\t", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"4", ",", "3"}], "}"}], "\[Rule]", 
+            RowBox[{"Drop", "[", 
+             RowBox[{
+              RowBox[{"if", "\[LeftDoubleBracket]", 
+               RowBox[{"4", ",", "3"}], "\[RightDoubleBracket]"}], ",", 
+              RowBox[{
+               RowBox[{"-", "dorder"}], "-", "1"}]}], "]"}]}]}], " ", 
+          RowBox[{"(*", " ", 
+           RowBox[{
+            RowBox[{"remove", " ", "last", " ", "dorder"}], "+", 
+            RowBox[{"1", " ", "values"}]}], " ", "*)"}], 
+          "\[IndentingNewLine]", "\t\t", "}"}]}], "]"}], "\n", "\t", ",", 
+       "\[IndentingNewLine]", "\t\t", 
+       RowBox[{"ListQ", "[", 
+        RowBox[{"if", "\[LeftDoubleBracket]", 
+         RowBox[{"4", ",", "1"}], "\[RightDoubleBracket]"}], "]"}], ",", 
+       "\[IndentingNewLine]", "\t\t", 
+       RowBox[{"ReplacePart", "[", 
+        RowBox[{"if", ",", 
+         RowBox[{"{", "\[IndentingNewLine]", "\t\t\t", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"2", ",", "7"}], "}"}], "\[Rule]", 
+            RowBox[{"{", "1", "}"}]}], ",", " ", 
+           RowBox[{"(*", " ", 
+            RowBox[{"set", " ", "periodic", " ", "flag"}], " ", "*)"}], 
+           "\[IndentingNewLine]", "\t\t\t", 
+           RowBox[{
+            RowBox[{"{", 
+             RowBox[{"2", ",", "4"}], "}"}], "\[Rule]", 
+            RowBox[{"ngrid", "-", "1"}]}], ",", " ", 
+           RowBox[{"(*", " ", 
+            RowBox[{"decrease", " ", "ngrid", " ", "by", " ", "1"}], " ", 
+            "*)"}], "\[IndentingNewLine]", "\t\t\t", 
+           RowBox[{
+            RowBox[{"{", "4", "}"}], "\[Rule]", 
+            RowBox[{"Drop", "[", 
+             RowBox[{
+              RowBox[{
+              "if", "\[LeftDoubleBracket]", "4", "\[RightDoubleBracket]"}], 
+              ",", 
+              RowBox[{"-", "1"}]}], "]"}]}]}], " ", 
+          RowBox[{"(*", " ", 
+           RowBox[{"remove", " ", "last", " ", "point"}], " ", "*)"}], 
+          "\[IndentingNewLine]", "\t\t", "}"}]}], "]"}]}], 
+      "\[IndentingNewLine]", "\t", "]"}]}], "\[IndentingNewLine]", "]"}]}], 
+  ";"}]], "Code",
+ CellChangeTimes->{{3.815413691676259*^9, 3.8154137478784723`*^9}},
+ CellLabel->
+  "In[1128]:=",ExpressionUUID->"b186fa8e-59f1-4f67-b72d-a77affaf17c6"],
+
+Cell[BoxData[
+ RowBox[{"(*", 
+  RowBox[{"(*", " ", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"modified", " ", "from"}], " ", "<", 
+     RowBox[{"https", ":"}]}], "//", 
+    RowBox[{
+     RowBox[{
+      RowBox[{
+       RowBox[{
+        RowBox[{"mathematica", ".", "stackexchange", ".", "com"}], "/", "a"}],
+        "/", "235451"}], "/", "6358"}], ">", " ", 
+     RowBox[{"by", " ", "MichaelE2"}]}]}], " ", "*)"}], "\n", 
+  RowBox[{
+   RowBox[{
+    RowBox[{
+    "MakeInterpolatingFunctionPeriodic", "[", "if_InterpolatingFunction", 
+     "]"}], ":=", 
+    RowBox[{"Module", "[", 
+     RowBox[{
+      RowBox[{"{", "periodify", "}"}], ",", "\n", "\t", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"periodify", "[", "list_List", "]"}], ":=", 
+        RowBox[{"Append", "[", 
+         RowBox[{"list", ",", 
+          RowBox[{"First", "@", "list"}]}], "]"}]}], ";", "\n", "\t", 
+       RowBox[{"Interpolation", "[", "\n", "\t\t", 
+        RowBox[{
+         RowBox[{"Transpose", "@", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"if", "[", "\"\<Grid\>\"", "]"}], ",", "\n", "\t\t", 
+            RowBox[{"periodify", "@", 
+             RowBox[{"Most", "@", 
+              RowBox[{"if", "[", "\"\<ValuesOnGrid\>\"", "]"}]}]}], ",", "\n",
+             "\t\t", 
+            RowBox[{"periodify", "@", 
+             RowBox[{"Most", "@", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"Derivative", "[", "1", "]"}], "[", "if", "]"}], "[", 
+               "\"\<ValuesOnGrid\>\"", "]"}]}]}], ",", "\n", "\t\t", 
+            RowBox[{"periodify", "@", 
+             RowBox[{"Most", "@", 
+              RowBox[{
+               RowBox[{
+                RowBox[{"Derivative", "[", "2", "]"}], "[", "if", "]"}], "[", 
+               "\"\<ValuesOnGrid\>\"", "]"}]}]}]}], "}"}]}], ",", "\n", 
+         "\t\t", 
+         RowBox[{"PeriodicInterpolation", "\[Rule]", "True"}]}], "]"}]}]}], 
+     "\n", "]"}]}], ";"}], "*)"}]], "Code",
+ CellChangeTimes->{{3.815413691676259*^9, 3.8154137478784723`*^9}, {
+  3.815508917592463*^9, 3.815508943550778*^9}, {3.8155091038162127`*^9, 
+  3.815509201393136*^9}},
+ CellLabel->
+  "In[1129]:=",ExpressionUUID->"1a2eeb87-1362-4ee0-85c7-fae26ac541a4"]
+}, Open  ]]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{1405, 1331},
+WindowMargins->{{3, Automatic}, {Automatic, 0}},
+PrintingCopies->1,
+PrintingPageRange->{1, Automatic},
+PrintingOptions->{"PaperOrientation"->"Landscape",
+"PaperSize"->{792, 612},
+"PrintCellBrackets"->False,
+"PrintMultipleHorizontalPages"->False,
+"PrintRegistrationMarks"->False,
+"PrintingMargins"->18},
+ShowGroupOpener->True,
+WholeCellGroupOpener->False,
+TaggingRules->None,
+ShowCellTags->True,
+Magnification:>1.25 Inherited,
+FrontEndVersion->"13.3 for Mac OS X ARM (64-bit) (July 24, 2023)",
+StyleDefinitions->Notebook[{
+   Cell[
+    StyleData[StyleDefinitions -> "Default.nb"]], 
+   Cell[
+    RawData["Cell[StyleData[\"Input\"],\n InitializationCell->True]"], 
+    InitializationCell -> True]}, Visible -> False, FrontEndVersion -> 
+  "13.3 for Mac OS X ARM (64-bit) (July 24, 2023)", StyleDefinitions -> 
+  "PrivateStylesheetFormatting.nb"],
+ExpressionUUID->"c7e67638-94ba-48de-9e82-6076a68f8407"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 469, 8, 90, "Code",ExpressionUUID->"455247ac-a56d-4f98-b3c8-3cf37dc80fd6"],
+Cell[CellGroupData[{
+Cell[1052, 32, 156, 3, 56, "Subsubsection",ExpressionUUID->"5c93c609-2414-4bc5-888d-2094793b28ac"],
+Cell[1211, 37, 431, 9, 65, "Code",ExpressionUUID->"3042d780-1c05-4d82-994e-b2baa9e808ac"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[1679, 51, 161, 3, 56, "Subsubsection",ExpressionUUID->"c96a5181-8e87-48ef-9f8e-d9e57c084a53"],
+Cell[1843, 56, 4419, 105, 522, "Code",ExpressionUUID->"b186fa8e-59f1-4f67-b72d-a77affaf17c6"],
+Cell[6265, 163, 2203, 57, 282, "Code",ExpressionUUID->"1a2eeb87-1362-4ee0-85c7-fae26ac541a4"]
+}, Open  ]]
+}
+]
+*)
+
