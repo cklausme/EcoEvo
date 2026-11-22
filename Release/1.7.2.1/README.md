@@ -42,8 +42,22 @@ Future code changes require a new reviewed manifest and tests.
 
 ## Publication status
 
-This is local release preparation. PacletSite.m and PacletSite.mz remain at
-the baseline version. No new tag, remote push, GitHub release, cloud-document
-publication, or package installation is part of this step. The historical
+The local `PacletSite.m` and `PacletSite.mz` advertise 1.7.2.1 and preserve all
+19 previous release entries. Their catalog contents are identical, and the
+new entry matches the tested archive's metadata. PacletManager ranks 1.7.2.1
+above all previous versions. See `verification.json` for checks and hashes.
+
+To regenerate the indexes from the repository root:
+
+```wl
+Needs["PacletManager`"];
+PacletManager`BuildPacletSiteFiles[Directory[]]
+```
+
+Publication remains a separate step. The public site's `master` update needs
+only `Paclets/EcoEvo-1.7.2.1.paclet`, `PacletSite.m`, and `PacletSite.mz` from
+this branch. The maintenance source branch can be tagged separately for the
+GitHub release. No tag, remote push, GitHub release, cloud-document publication,
+or package installation has been performed here. The historical
 `finish paclet.wl` is retained; use the maintenance commands above for this
 build rather than its full development/documentation workflow.
