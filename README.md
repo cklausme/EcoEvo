@@ -34,3 +34,10 @@ replacing X.Y.Z with the actual version number.
 - Email klausme1@msu.edu
 
 ## [Version History](https://github.com/cklausme/EcoEvo/releases)
+
+## Maintenance source for 1.7.2.1
+
+See [release notes](Release/1.7.2.1/ReleaseNotes.md),
+[build instructions](Release/1.7.2.1/README.md), and
+[tests](Tests/README.md). The tested paclet is in
+`Paclets/EcoEvo-1.7.2.1.paclet`.

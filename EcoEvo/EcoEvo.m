@@ -395,7 +395,7 @@ ZeroGrowthBy::usage = "ZeroGrowthBy is an option for various EcoEvo functions th
 Begin["`Private`"];
 
 
-$EcoEvoVersion="1.7.2 (September 1, 2023)";
+$EcoEvoVersion="1.7.2.1 (November 22, 2026)";
 
 
 modelloaded=False;
@@ -954,7 +954,7 @@ StyleBox[\"x\", \"TI\"]\)] is True if \!\(\*
 StyleBox[\"x\", \"TI\"]\) is a TemporalData function.";
 
 
-TemporalDataFunctionQ[x_]:=If[Length[Cases[x,_TemporalData,\[Infinity],Heads->True]]!=0,True,False];
+TemporalDataFunctionQ[x_]:=If[Length[Cases[x,_TemporalData|_TimeSeries,\[Infinity],Heads->True]]!=0,True,False];
 
 
 TemporalMean::usage=
@@ -1048,15 +1048,15 @@ TemporalMean[f_InterpolatingFunction,{var_Symbol,varmin_?NumericQ,varmax_?Numeri
 
 
 (* TemporalData *)
-TemporalMean[f_TemporalData,opts___?OptionQ]:=((*Print["td"];*)Mean[f]);
-TemporalMean[f_TemporalData,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=((*Print["td2"];*)
+TemporalMean[f:(_TemporalData|_TimeSeries),opts___?OptionQ]:=((*Print["td"];*)Mean[f]);
+TemporalMean[f:(_TemporalData|_TimeSeries),{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=((*Print["td2"];*)
 Mean[TimeSeriesWindow[f,{varmin,varmax}]]);
 
 
 (* TemporalDataFunctions *)
 TemporalMean[f_?TemporalDataFunctionQ,var_Symbol:t,opts___?OptionQ]:=Module[{domains,numdomains,varmin,varmax},
 	
-	domains=Map[{#["FirstTimes"][[1]],#["LastTimes"][[1]]}&,Cases[f,_TemporalData,\[Infinity],Heads->True]];
+	domains=Map[{#["FirstTime"],#["LastTime"]}&,Cases[f,_TemporalData|_TimeSeries,\[Infinity],Heads->True]];
 	numdomains=Length[Union[domains]];
 	
 	Which[
@@ -1168,13 +1168,13 @@ TemporalVariance[f_InterpolatingFunction,{var_Symbol,varmin_?NumericQ,varmax_?Nu
 
 
 (* TemporalData *)
-TemporalVariance[f_TemporalData,opts___?OptionQ]:=Module[{n},
+TemporalVariance[f:(_TemporalData|_TimeSeries),opts___?OptionQ]:=Module[{n},
 (*Print["td"];*)
-	n=(f["LastTimes"]-f["FirstTimes"])[[1]]+1;
+	n=(f["LastTime"]-f["FirstTime"])+1;
 	Variance[f]*(n-1)/n
 ];
 
-TemporalVariance[f_TemporalData,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=Module[{n},
+TemporalVariance[f:(_TemporalData|_TimeSeries),{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=Module[{n},
 (*Print["td2"];*)
 	n=varmax-varmin+1;
 	Variance[TimeSeriesWindow[f,{varmin,varmax}]]*(n-1)/n
@@ -1184,7 +1184,7 @@ TemporalVariance[f_TemporalData,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},o
 (* TemporalDataFunctions *)
 TemporalVariance[f_?TemporalDataFunctionQ,var_Symbol:t,opts___?OptionQ]:=Module[{domains,numdomains,varmin,varmax},
 	
-	domains=Map[{#["FirstTimes"][[1]],#["LastTimes"][[1]]}&,Cases[f,_TemporalData,\[Infinity],Heads->True]];
+	domains=Map[{#["FirstTime"],#["LastTime"]}&,Cases[f,_TemporalData|_TimeSeries,\[Infinity],Heads->True]];
 	numdomains=Length[Union[domains]];
 
 	Which[
@@ -1306,16 +1306,16 @@ TemporalCovariance[f1_InterpolatingFunction,f2_InterpolatingFunction,{var_Symbol
 
 
 (* TemporalData *)
-TemporalCovariance[f1_TemporalData,f2_TemporalData,opts___?OptionQ]:=Module[{n},
+TemporalCovariance[f1:(_TemporalData|_TimeSeries),f2:(_TemporalData|_TimeSeries),opts___?OptionQ]:=Module[{n},
 (*Print["td"];*)
-	n=(f1["LastTimes"]-f1["FirstTimes"])[[1]]+1;
-	Covariance[f1["Values"],f2["Values"]]*(n-1)/n
+	n=(f1["LastTime"]-f1["FirstTime"])+1;
+	Covariance[Normal[f1["Values"]],Normal[f2["Values"]]]*(n-1)/n
 ];
 
-TemporalCovariance[f1_TemporalData,f2_TemporalData,{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=Module[{n},
+TemporalCovariance[f1:(_TemporalData|_TimeSeries),f2:(_TemporalData|_TimeSeries),{var_Symbol,varmin_?NumericQ,varmax_?NumericQ},opts___?OptionQ]:=Module[{n},
 	n=varmax-varmin+1;
 	(*Print["td2"];*)
-	Covariance[TimeSeriesWindow[f1,{varmin,varmax}]["Values"],TimeSeriesWindow[f2,{varmin,varmax}]["Values"]]*(n-1)/n
+	Covariance[Normal[TimeSeriesWindow[f1,{varmin,varmax}]["Values"]],Normal[TimeSeriesWindow[f2,{varmin,varmax}]["Values"]]]*(n-1)/n
 ];
 
 
@@ -1324,8 +1324,8 @@ TemporalCovariance[f1_,f2_?TemporalDataFunctionQ,var_Symbol:t,opts___?OptionQ]:=
 	(*Print["tdf2"];*)
 	
 	domains=Join[
-		Map[{#["FirstTimes"][[1]],#["LastTimes"][[1]]}&,Cases[f1,_TemporalData,\[Infinity],Heads->True]],
-		Map[{#["FirstTimes"][[1]],#["LastTimes"][[1]]}&,Cases[f2,_TemporalData,\[Infinity],Heads->True]]
+		Map[{#["FirstTime"],#["LastTime"]}&,Cases[f1,_TemporalData|_TimeSeries,\[Infinity],Heads->True]],
+		Map[{#["FirstTime"],#["LastTime"]}&,Cases[f2,_TemporalData|_TimeSeries,\[Infinity],Heads->True]]
 	];
 	numdomains=Length[Union[domains]];
 	
@@ -1501,8 +1501,8 @@ FindMinima[if_InterpolatingFunction]:=FindMinima[if,if["Domain"][[1]]];
 
 
 (* TemporalData *)
-FindMinima[td_TemporalData]:=Normal[TimeSeriesMap[Minus,FindPeaks[TimeSeriesMap[Minus,td]]]];
-FindMinima[td_TemporalData,{tmin_?NumericQ,tmax_?NumericQ}]:=FindMinima[TimeSeriesWindow[td,{tmin,tmax}]];
+FindMinima[td:(_TemporalData|_TimeSeries)]:=Normal[TimeSeriesMap[Minus,FindPeaks[TimeSeriesMap[Minus,td]]]];
+FindMinima[td:(_TemporalData|_TimeSeries),{tmin_?NumericQ,tmax_?NumericQ}]:=FindMinima[TimeSeriesWindow[td,{tmin,tmax}]];
 
 
 (* thread over RuleLists *)
@@ -1543,8 +1543,8 @@ FindMaxima[if_InterpolatingFunction]:=FindMaxima[if,if["Domain"][[1]]];
 
 
 (* TemporalData *)
-FindMaxima[td_TemporalData]:=Normal[FindPeaks[td]];
-FindMaxima[td_TemporalData,{tmin_?NumericQ,tmax_?NumericQ}]:=FindMaxima[TimeSeriesWindow[td,{tmin,tmax}]];
+FindMaxima[td:(_TemporalData|_TimeSeries)]:=Normal[FindPeaks[td]];
+FindMaxima[td:(_TemporalData|_TimeSeries),{tmin_?NumericQ,tmax_?NumericQ}]:=FindMaxima[TimeSeriesWindow[td,{tmin,tmax}]];
 
 
 (* thread over RuleLists *)
@@ -1585,8 +1585,8 @@ FindExtrema[if_InterpolatingFunction]:=FindExtrema[if,if["Domain"][[1]]];
 
 
 (* TemporalData *)
-FindExtrema[td_TemporalData]:=Sort[Join[FindMinima[td],FindMaxima[td]]];
-FindExtrema[td_TemporalData,{tmin_?NumericQ,tmax_?NumericQ}]:=FindExtrema[TimeSeriesWindow[td,{tmin,tmax}]];
+FindExtrema[td:(_TemporalData|_TimeSeries)]:=Sort[Join[FindMinima[td],FindMaxima[td]]];
+FindExtrema[td:(_TemporalData|_TimeSeries),{tmin_?NumericQ,tmax_?NumericQ}]:=FindExtrema[TimeSeriesWindow[td,{tmin,tmax}]];
 
 
 (* thread over RuleLists *)
@@ -1615,7 +1615,7 @@ StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\).";
 
 
-MaximumValues[x:(_InterpolatingFunction|_TemporalData),opts___?OptionQ]:=Module[{samethreshold},
+MaximumValues[x:(_InterpolatingFunction|_TemporalData|_TimeSeries),opts___?OptionQ]:=Module[{samethreshold},
 samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MaximumValues]}]];
 
 	If[samethreshold!=0,
@@ -1625,7 +1625,7 @@ samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MaximumValues]}]];
 ];
 
 
-MaximumValues[x:(_InterpolatingFunction|_TemporalData),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
+MaximumValues[x:(_InterpolatingFunction|_TemporalData|_TimeSeries),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
 samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MaximumValues]}]];
 
 	If[samethreshold!=0,
@@ -1692,7 +1692,7 @@ StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\).";
 
 
-MinimumValues[x:(_InterpolatingFunction|_TemporalData),opts___?OptionQ]:=Module[{samethreshold},
+MinimumValues[x:(_InterpolatingFunction|_TemporalData|_TimeSeries),opts___?OptionQ]:=Module[{samethreshold},
 samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MinimumValues]}]];
 
 	If[samethreshold!=0,
@@ -1702,7 +1702,7 @@ samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MinimumValues]}]];
 ];
 
 
-MinimumValues[x:(_InterpolatingFunction|_TemporalData),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
+MinimumValues[x:(_InterpolatingFunction|_TemporalData|_TimeSeries),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
 samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[MinimumValues]}]];
 
 	If[samethreshold!=0,
@@ -1751,7 +1751,7 @@ StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\).";
 
 
-ExtremumValues[x:(_InterpolatingFunction|_TemporalData),opts___?OptionQ]:=Module[{samethreshold},
+ExtremumValues[x:(_InterpolatingFunction|_TemporalData|_TimeSeries),opts___?OptionQ]:=Module[{samethreshold},
 samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[ExtremumValues]}]];
 
 	If[samethreshold!=0,
@@ -1761,7 +1761,7 @@ samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[ExtremumValues]}]];
 ];
 
 
-ExtremumValues[x:(_InterpolatingFunction|_TemporalData),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
+ExtremumValues[x:(_InterpolatingFunction|_TemporalData|_TimeSeries),{tmin_?NumericQ,tmax_?NumericQ},opts___?OptionQ]:=Module[{samethreshold},
 samethreshold=Evaluate[SameThreshold/.Flatten[{opts,Options[ExtremumValues]}]];
 
 	If[samethreshold!=0,
@@ -1827,8 +1827,8 @@ StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\).";
 
 
-MaximumValue[x:(_InterpolatingFunction|_TemporalData)]:=Sort[MapValues[Max,(FindMaxima[x][[All,2]])]];
-MaximumValue[x:(_InterpolatingFunction|_TemporalData),{tmin_?NumericQ,tmax_?NumericQ}]:=
+MaximumValue[x:(_InterpolatingFunction|_TemporalData|_TimeSeries)]:=Sort[MapValues[Max,(FindMaxima[x][[All,2]])]];
+MaximumValue[x:(_InterpolatingFunction|_TemporalData|_TimeSeries),{tmin_?NumericQ,tmax_?NumericQ}]:=
 	Sort[MapValues[Max,(FindMaxima[x,{tmin,tmax}][[All,2]])]];
 
 
@@ -1870,8 +1870,8 @@ StyleBox[\"rulelist\", \"TI\"]\)] threads over \!\(\*
 StyleBox[\"rulelist\", \"TI\"]\).";
 
 
-MinimumValue[x:(_InterpolatingFunction|_TemporalData)]:=Sort[MapValues[Min,(FindMinima[x][[All,2]])]];
-MinimumValue[x:(_InterpolatingFunction|_TemporalData),{tmin_?NumericQ,tmax_?NumericQ}]:=
+MinimumValue[x:(_InterpolatingFunction|_TemporalData|_TimeSeries)]:=Sort[MapValues[Min,(FindMinima[x][[All,2]])]];
+MinimumValue[x:(_InterpolatingFunction|_TemporalData|_TimeSeries),{tmin_?NumericQ,tmax_?NumericQ}]:=
 	Sort[MapValues[Min,(FindMinima[x,{tmin,tmax}][[All,2]])]];
 
 
@@ -1975,10 +1975,10 @@ StyleBox[\"rulelist\", \"TI\"]\).";
 FindPeriod[sol_,opts:OptionsPattern[]]:=Module[{var1,res,tmp},
 
 Which[
-	Head[sol[[1,2]]]===TemporalData,
+	MemberQ[{TemporalData,TimeSeries},Head[sol[[1,2]]]],
 	(* based on idea from bbgodfrey, http://mathematica.stackexchange.com/a/107741/6358 *)
 	res=Length[DeleteDuplicates[Transpose[
-		Map[(#/.sol)["Values"][[Max[-sol[[1,2]]["PathLength"],-OptionValue[MaxPeriod]];;]]&,sol[[All,1]]]],
+		Map[Normal[(#/.sol)["Values"]][[Max[-sol[[1,2]]["PathLength"],-OptionValue[MaxPeriod]];;]]&,sol[[All,1]]]],
 		Norm[#1-#2]<10^-OptionValue[AccuracyGoal]+Norm[(#1-#2)/#1]*10^-OptionValue[PrecisionGoal]&]]
 ,
 	Head[sol[[1,2]]]===InterpolatingFunction&&OptionValue[BasePeriod]=!=None,
@@ -2218,7 +2218,7 @@ StyleBox[\"x\", \"TI\"]\)] returns True if \!\(\*
 StyleBox[\"x\", \"TI\"]\) is a RuleList with temporal values, False otherwise.";
 
 
-TemporalRuleListQ[x_]:=If[RuleListQ[x],VectorQ[x,MatchQ[#,_->_InterpolatingFunction|_TemporalData]&],False];
+TemporalRuleListQ[x_]:=If[RuleListQ[x],VectorQ[x,MatchQ[#,_->(_InterpolatingFunction|_TemporalData|_TimeSeries)]&],False];
 
 
 ParametricRuleListQ::usage="ParametricRuleListQ[\!\(\*
@@ -2226,7 +2226,7 @@ StyleBox[\"x\", \"TI\"]\)] returns True if \!\(\*
 StyleBox[\"x\", \"TI\"]\) is a RuleList with a parameter, False otherwise.";
 
 
-ParametricRuleListQ[x_]:=If[RuleListQ[x],VectorQ[x,MatchQ[#,_->_InterpolatingFunction[_]|_TemporalData[_]]&],False];
+ParametricRuleListQ[x_]:=If[RuleListQ[x],VectorQ[x,MatchQ[#,_->(_InterpolatingFunction[_]|_TemporalData[_]|_TimeSeries[_])]&],False];
 
 
 RuleListListQ::usage=
@@ -2394,7 +2394,7 @@ RuleListInterpolation[assoc_Association,opts___?OptionQ]:=Module[{interpolationo
 
 
 RuleListInterpolation[pd_ParametricDynamics,opts___?OptionQ]:=Module[{tmp},
-	tmp=MapAt[#["Values"]&,Normal[pd],{All,2,1,2}];
+	tmp=MapAt[Normal[#["Values"]]&,Normal[pd],{All,2,1,2}];
 	RuleListInterpolation[tmp,opts]
 ]
 
@@ -2509,7 +2509,7 @@ Slice[prl_?ParametricRuleListQ,parval:(_?NumericQ|_DirectedInfinity)]:=Module[{p
 
 Slice[sol_?(*Temporal*)RuleListQ,t:(_?NumericQ|_DirectedInfinity)]:=
 Which[
-	MemberQ[{InterpolatingFunction,TemporalData},Head[#[[2]]]],
+	MemberQ[{InterpolatingFunction,TemporalData,TimeSeries},Head[#[[2]]]],
 	(*ReplacePart[#,2\[Rule](#\[LeftDoubleBracket]1\[RightDoubleBracket][t]/.#)]*)
 	ReplacePart[#,2->(#[[1]]/.#)[t]]
 ,
@@ -2527,8 +2527,8 @@ Which[
 	Head[#[[2]]]===List,
 	ReplacePart[#,2->Select[sol[[1,2]],t1<=#[[1]]<=t2&]]
 ,
-	Head[#[[2]]]===TemporalData,
-	ReplacePart[#,2->TimeSeries[Transpose[{#[[2]]["Times"][[t1+1;;t2+1]],#[[2]]["Values"][[t1+1;;t2+1]]}]]]
+	MemberQ[{TemporalData,TimeSeries},Head[#[[2]]]],
+	ReplacePart[#,2->TimeSeries[Transpose[{#[[2]]["Times"][[t1+1;;t2+1]],Normal[#[[2]]["Values"]][[t1+1;;t2+1]]}]]]
 ,
 	Else,#
 ]&/@sol
@@ -2618,8 +2618,8 @@ FinalDerivatives[sol_?TemporalRuleListQ,dtin_:0]:=Module[{res},
 			ReplacePart[#,{1->#[[1]]',2->(#[[2,-1,2]]-#[[2,-2,2]])/(#[[2,-1,1]]-#[[2,-2,1]])}]
 			(*ReplacePart[#,{2\[Rule](#\[LeftDoubleBracket]2,-1,2\[RightDoubleBracket]-#\[LeftDoubleBracket]2,-2,2\[RightDoubleBracket])/(#\[LeftDoubleBracket]2,-1,1\[RightDoubleBracket]-#\[LeftDoubleBracket]2,-2,1\[RightDoubleBracket])}]*)
 		,
-			Head[#[[2]]]===TemporalData,
-			ReplacePart[#,{1->#[[1]]',2->(#[[2]]["Values"][[-1]]-#[[2]]["Values"][[-2]])/(#[[2]]["Times"][[-1]]-#[[2]]["Times"][[-2]])}]
+			MemberQ[{TemporalData,TimeSeries},Head[#[[2]]]],
+			ReplacePart[#,{1->#[[1]]',2->(Normal[#[[2]]["Values"]][[-1]]-Normal[#[[2]]["Values"]][[-2]])/(#[[2]]["Times"][[-1]]-#[[2]]["Times"][[-2]])}]
 			(*ReplacePart[#,{2\[Rule](#\[LeftDoubleBracket]2\[RightDoubleBracket]["Values"]\[LeftDoubleBracket]-1\[RightDoubleBracket]-#\[LeftDoubleBracket]2\[RightDoubleBracket]["Values"]\[LeftDoubleBracket]-2\[RightDoubleBracket])/(#\[LeftDoubleBracket]2\[RightDoubleBracket]["Times"]\[LeftDoubleBracket]-1\[RightDoubleBracket]-#\[LeftDoubleBracket]2\[RightDoubleBracket]["Times"]\[LeftDoubleBracket]-2\[RightDoubleBracket])}]*)
 		,
 			Else,#
@@ -2634,8 +2634,8 @@ FinalDerivatives[sol_?TemporalRuleListQ,dtin_:0]:=Module[{res},
 			ReplacePart[#,{1->#[[1]]',2->(#[[2,-1,2]]-#[[2,-(1+dt),2]])/(#[[2,-1,1]]-#[[2,-(1+dt),1]])}]
 			(*ReplacePart[#,{2\[Rule](#\[LeftDoubleBracket]2,-1,2\[RightDoubleBracket]-#\[LeftDoubleBracket]2,-(1+dt),2\[RightDoubleBracket])/(#\[LeftDoubleBracket]2,-1,1\[RightDoubleBracket]-#\[LeftDoubleBracket]2,-(1+dt),1\[RightDoubleBracket])}]*)
 		,
-			Head[#[[2]]]===TemporalData,
-			ReplacePart[#,{1->#[[1]]',2->(#[[2]]["Values"][[-1]]-#[[2]]["Values"][[-(1+dt)]])/(#[[2]]["Times"][[-1]]-#[[2]]["Times"][[-(1+dt)]])}]
+			MemberQ[{TemporalData,TimeSeries},Head[#[[2]]]],
+			ReplacePart[#,{1->#[[1]]',2->(Normal[#[[2]]["Values"]][[-1]]-Normal[#[[2]]["Values"]][[-(1+dt)]])/(#[[2]]["Times"][[-1]]-#[[2]]["Times"][[-(1+dt)]])}]
 			(*ReplacePart[#,{2\[Rule](#\[LeftDoubleBracket]2\[RightDoubleBracket]["Values"]\[LeftDoubleBracket]-1\[RightDoubleBracket]-#\[LeftDoubleBracket]2\[RightDoubleBracket]["Values"]\[LeftDoubleBracket]-(1+dt)\[RightDoubleBracket])/(#\[LeftDoubleBracket]2\[RightDoubleBracket]["Times"]\[LeftDoubleBracket]-1\[RightDoubleBracket]-#\[LeftDoubleBracket]2\[RightDoubleBracket]["Times"]\[LeftDoubleBracket]-(1+dt)\[RightDoubleBracket])}]*)
 		,
 			Else,#
@@ -2665,7 +2665,7 @@ InitialTime[sol_?RuleListQ]:=Module[{tmp,numtmp},
 	tmp=Which[
 		Head[#[[2]]]===InterpolatingFunction,#[[2,1,1,1]],
 		Head[#[[2]]]===List,#[[2,1,1]],
-		Head[#[[2]]]===TemporalData,#[[2]]["FirstTime"],
+		MemberQ[{TemporalData,TimeSeries},Head[#[[2]]]],#[[2]]["FirstTime"],
 		Else,-\[Infinity]
 	]&/@sol;
 	numtmp=Select[tmp,NumericQ];
@@ -2698,7 +2698,7 @@ FinalTime[sol_?RuleListQ]:=Module[{tmp,numtmp},
 	tmp=Which[
 		Head[#[[2]]]===InterpolatingFunction,#[[2,1,1,2]],
 		Head[#[[2]]]===List,#[[2,-1,1]],
-		Head[#[[2]]]===TemporalData,#[[2]]["LastTime"],
+		MemberQ[{TemporalData,TimeSeries},Head[#[[2]]]],#[[2]]["LastTime"],
 		Else,\[Infinity]
 	]&/@sol;
 	numtmp=Select[tmp,NumericQ];
@@ -2937,7 +2937,7 @@ If[axeslabel===Automatic,
 (* split into InterpolatingFunctions, TemporalData, and constants *)
 ifvars=Select[plotvars,Head[#/.sol]==InterpolatingFunction&];
 (*Print["ifvars=",ifvars];*)
-tdvars=Select[plotvars,Head[#/.sol]==TemporalData||Head[#/.sol]==List&];
+tdvars=Select[plotvars,MemberQ[{TemporalData,TimeSeries},Head[#/.sol]]||Head[#/.sol]==List&];
 (*Print["tdvars=",tdvars];*)
 cvars=Select[plotvars,NumericQ[#/.sol]&];
 (*Print["cvars=",cvars];*)
@@ -2948,7 +2948,7 @@ If[plotstyle==={},
 	i=0;
 	Do[
 		i++;
-		If[linestyles==={},ls=LineStyle[var],ls=ModPart[linestyles,i]];
+		If[linestyles==={},ls=Replace[LineStyle[var],_LineStyle->{}],ls=ModPart[linestyles,i]];
 		lookup=LookUp[var];
 		Which[
 			(lookup[[1]]==="gcomp"||lookup[[1]]==="gtrait"||lookup[[1]]==="var")&&Length[lookup]==4,
@@ -3194,8 +3194,8 @@ Which[
 			Head[sol[[1,2]]]===List,
 			ListLinePlot[Transpose[(vars/.sol)[[All,All,2]]],PlotStyle->ModPart[plotstyle,i],
 				PlotRange->plotrange,PlotMarkers->None,Evaluate[Sequence@@listlineplotopts]],
-			Head[sol[[1,2]]]===TemporalData,
-			ListLinePlot[Transpose[Map[(#/.sol)["Values"]&,vars]],PlotStyle->ModPart[plotstyle,i],
+			MemberQ[{TemporalData,TimeSeries},Head[sol[[1,2]]]],
+			ListLinePlot[Transpose[Map[Normal[(#/.sol)["Values"]]&,vars]],PlotStyle->ModPart[plotstyle,i],
 				PlotRange->plotrange,PlotMarkers->None,Evaluate[Sequence@@listlineplotopts]]
 		]
 	,{i,Length[sols]}],AxesLabel->axeslabel,FrameLabel->axeslabel,PlotRange->plotrange]],
@@ -3218,8 +3218,8 @@ Which[
 			Head[sol[[1,2]]]===List,
 			MyListLinePlot3D[Transpose[vars/.sol],PlotStyle->ModPart[plotstyle,i],
 				PlotRange->plotrange,(*PlotMarkers\[Rule]None,*)Evaluate[Sequence@@listlineplot3dopts]],
-			Head[sol[[1,2]]]===TemporalData,
-			MyListLinePlot3D[Transpose[Map[(#/.sol)["Values"]&,vars]],PlotStyle->ModPart[plotstyle,i],
+			MemberQ[{TemporalData,TimeSeries},Head[sol[[1,2]]]],
+			MyListLinePlot3D[Transpose[Map[Normal[(#/.sol)["Values"]]&,vars]],PlotStyle->ModPart[plotstyle,i],
 				PlotRange->plotrange,(*PlotMarkers\[Rule]None,*)Evaluate[Sequence@@listlineplot3dopts]]
 		]
 	,{i,Length[sols]}],AxesLabel->axeslabel,PlotRange->plotrange]]
@@ -3340,8 +3340,8 @@ Which[
 			Head[sol[[1,2]]]===List,
 			ListLinePlot[Transpose[(vars/.sol)[[All,All,2]]],PlotStyle->ModPart[plotstyle,i],
 				PlotRange->plotrange,PlotMarkers->None,Evaluate[Sequence@@listlineplotopts]],
-			Head[sol[[1,2]]]===TemporalData,
-			ListLinePlot[Transpose[Map[(#/.sol)["Values"]&,vars]],PlotStyle->ModPart[plotstyle,i],
+			MemberQ[{TemporalData,TimeSeries},Head[sol[[1,2]]]],
+			ListLinePlot[Transpose[Map[Normal[(#/.sol)["Values"]]&,vars]],PlotStyle->ModPart[plotstyle,i],
 				PlotRange->plotrange,PlotMarkers->None,Evaluate[Sequence@@listlineplotopts]],
 			Else,
 			(*Print["listplotopts=",listplotopts];*)
@@ -3368,8 +3368,8 @@ Which[
 			Head[sol[[1,2]]]===List,
 			MyListLinePlot3D[Transpose[vars/.sol],PlotStyle->ModPart[plotstyle,i],
 				PlotRange->plotrange,(*PlotMarkers\[Rule]None,*)Evaluate[Sequence@@listlineplot3dopts]],
-			Head[sol[[1,2]]]===TemporalData,
-			MyListLinePlot3D[Transpose[Map[(#/.sol)["Values"]&,vars]],PlotStyle->ModPart[plotstyle,i],
+			MemberQ[{TemporalData,TimeSeries},Head[sol[[1,2]]]],
+			MyListLinePlot3D[Transpose[Map[Normal[(#/.sol)["Values"]]&,vars]],PlotStyle->ModPart[plotstyle,i],
 				PlotRange->plotrange,(*PlotMarkers\[Rule]None,*)Evaluate[Sequence@@listlineplot3dopts]],
 			Else,
 			ListPointPlot3D[{vars/.sol},PlotStyle->ModPart[plotstyle,i],PlotRange->plotrange,Evaluate[Sequence@@listpointplot3dopts]]
@@ -4310,7 +4310,7 @@ MyTuples[{x_,y_}]:=Tuples[{Flatten[{x}],Flatten[{y}]}];
 DropTimes::usage="";
 
 
-DropTimes[{var_->ts_TemporalData}]:={var->Union@ts["Values"]};
+DropTimes[{var_->ts:(_TemporalData|_TimeSeries)}]:={var->Union@Normal[ts["Values"]]};
 
 
 ExtractArgs::usage="";
@@ -5237,7 +5237,7 @@ Print["simplifyopts=",simplifyopts];*)
 
 res=CompoundAnd[Flatten@Table[
 	Which[
-		Head[el[[2]]]===TemporalData,
+		MemberQ[{TemporalData,TimeSeries},Head[el[[2]]]],
 		Map[IntervalMemberQ[range[el[[1]]],#]&,Normal[el[[2]]][[All,2]]],
 		Else,
 		If[Im[el[[2]]]==0&&Min[range[el[[1]]]]<=el[[2]]<=Max[range[el[[1]]]],True,False]
@@ -6264,7 +6264,7 @@ wa=WeightedAbundance[sol,WeightFunction->weightfunction];
 
 Return[
 	Flatten@Table[Table[
-		gtrait->Reinterpolation[Moment[WeightedData[Table[Subscript[gtrait, i],{i,\[ScriptCapitalN][gu]}]/.traits,Chop[Table[Subscript[gu, i],{i,\[ScriptCapitalN][gu]}]]],1]/.wa]
+		gtrait->Reinterpolation[Moment[WeightedData[Table[Subscript[gtrait, i],{i,\[ScriptCapitalN][gu]}]/.traits,Chop[Table[Subscript[gu, i],{i,\[ScriptCapitalN][gu]}]/.wa]],1]]
 	,{gtrait,gtraits[gu]}],{gu,guilds}]
 ]
 
@@ -7163,6 +7163,23 @@ StyleBox[\"attributes\", \"TI\"]\) and initial guess / range \!\(\*
 StyleBox[\"init\", \"TI\"]\).";
 
 
+(* Polynomial dependence is tested only in the equilibrium unknowns. *)
+polynomialEquationsQ[eqns_List,unks_List]:=AllTrue[
+	eqns/.Equal[lhs_,rhs_]:>(lhs-rhs),
+	MatchQ[#,True|False]||PolynomialQ[#,unks]&
+];
+
+
+(* Distinct symbolic numeric markers preserve parameter dependence when testing
+   the assembled equations. Unrecognized expressions remain unrestricted. *)
+numericalEquationsQ[eqns_List,unks_List]:=Quiet[Module[{marker,residuals},
+	SetAttributes[marker,NumericFunction];
+	residuals=eqns/.Equal[lhs_,rhs_]:>(lhs-rhs);
+	AllTrue[residuals/.Thread[unks->Array[marker,Length[unks]]],
+		NumericQ[#]||MatchQ[#,True|False]&]
+]];
+
+
 EcoEq[attributesin:(_?AttributesQ):{},Gsin:(_?GsQ):{},init:(_?VariablesQ):{},vars:(__List|All):All,opts___?OptionQ]:=
 
 Module[{
@@ -7170,7 +7187,7 @@ Module[{
 method,solveopts,nsolveopts,findrootopts,findrootsopts,
 boundarydetection,time,fixed,chop,qss,percapita,verbose,ignorevar,
 (* other variables *)
-attributes,nonvars,nonfixedvars,fixedvars,Gs,removets,eqns,unks,newunk,sol,res},
+attributes,nonvars,nonfixedvars,fixedvars,Gs,removets,eqns,nsolveeqns,unks,newunk,sol,res},
 
 Block[{\[ScriptCapitalN],verbosity,func="EcoEq"},
 
@@ -7259,10 +7276,13 @@ Which[
 	method=="NSolve",
 	unks=nonfixedvars;
 	VPrint[3,"unks=",unks];
+	If[!MemberQ[Flatten[nsolveopts],HoldPattern[(Method->_)|(Method:>_)]],
+		nsolveopts=Append[nsolveopts,Method->If[polynomialEquationsQ[eqns,unks],"EndomorphismMatrix",Automatic]]
+	];
+	nsolveeqns=If[numericalEquationsQ[eqns,unks],Append[eqns,Element[unks,Reals]],eqns];
 	If[verbosity>=1,
-		With[{eqns=eqns,unks=unks,options=Sequence@@nsolveopts},PrintCall[Global`sol=NSolve[eqns,unks,options]]]];
-	sol=NSolve[eqns,unks,Evaluate[Sequence@@nsolveopts]];
-	If[Head[sol]===NSolve,sol=NSolve[eqns,unks,Reals,Evaluate[Sequence@@nsolveopts]]]
+		With[{callEqns=nsolveeqns,callUnks=unks,callOptions=Sequence@@nsolveopts},PrintCall[Global`sol=NSolve[callEqns,callUnks,callOptions]]]];
+	sol=NSolve[nsolveeqns,unks,Evaluate[Sequence@@nsolveopts]]
 	,
 
 	method=="FindRoot",
@@ -7305,7 +7325,7 @@ If[chop,
 
 
 Options[EcoEq]={Method->Automatic,
-SolveOpts->{},NSolveOpts->{Method->"EndomorphismMatrix"},FindRootOpts->{},FindRootsOpts->{},
+SolveOpts->{},NSolveOpts->{},FindRootOpts->{},FindRootsOpts->{},
 PerCapita->False,Fixed->{},Chop->True,QSS->False,Time->t,Verbose->False,Verbosity->0,IgnoreVar->False};
 
 
@@ -7966,7 +7986,7 @@ Which[
 ];
 
 If[modeltype=="DiscreteTime",(* drop last point *)
-	sol=ReplaceAll[sol,{(var_->td_List):>(var->Drop[td,-1]),(var_->td_TemporalData)->(var->TimeSeriesWindow[td,{0,per-1}])}]
+	sol=ReplaceAll[sol,{(var_->td_List):>(var->Drop[td,-1]),(var_->td:(_TemporalData|_TimeSeries))->(var->TimeSeriesWindow[td,{0,per-1}])}]
 ];
 
 (* make InterpolatingFunctions Periodic *)
@@ -8155,7 +8175,7 @@ res=FindRoot[thing[{unks,param}]=={unks,1},Join[unksics,{{param,parinit}}],Evalu
 
 If[modeltype=="DiscreteTime",(* drop last point *)
 	sol=ReplaceAll[sol,
-		{(var_->td_List):>(var->Drop[td,-1]),(var_->td_TemporalData)->(var->TimeSeriesWindow[td,{0,per-1}])}]
+		{(var_->td_List):>(var->Drop[td,-1]),(var_->td:(_TemporalData|_TimeSeries))->(var->TimeSeriesWindow[td,{0,per-1}])}]
 ];
 
 (* make InterpolatingFunctions Periodic *)
@@ -8515,11 +8535,11 @@ VPrint[3,"jmat=",jmat];
 
 Which[
 	(* DiscreteTime cycle *)
-	variables!={}&&(variables[[1,2,0]]===TemporalData||(modeltype=="DiscreteTime"&&modelperiod=!=0))&&time===t,
+	variables!={}&&(MemberQ[{TemporalData,TimeSeries},Head[variables[[1,2]]]]||(modeltype=="DiscreteTime"&&modelperiod=!=0))&&time===t,
 	Return[TimeSeries[Table[{t\[Prime],jmat/.AddVariablets/.t->t\[Prime]},{t\[Prime],variables[[1,2]]["Times"]}]/.variables/.attributes]];
 ,
 	(* ContinuousTime cycle *)
-	variables!={}&&(variables[[1,2,0]]===InterpolatingFunction||(modeltype=="ContinuousTime"&&modelperiod=!=0))&&time===t,
+	variables!={}&&(Head[variables[[1,2]]]===InterpolatingFunction||(modeltype=="ContinuousTime"&&modelperiod=!=0))&&time===t,
 	Return[jmat/.AddVariablets/.variables/.attributes];
 ,
 	(* ContinuousTime or DiscreteTime equilibrium *)
@@ -8610,11 +8630,11 @@ VPrint[1,"j=",j];
 
 Which[
 	(* DiscreteTime cycle *)
-	variables!={}&&((variables[[1,2,0]]===TemporalData||(modeltype=="DiscreteTime"&&modelperiod=!=0))&&time===t),
+	variables!={}&&((MemberQ[{TemporalData,TimeSeries},Head[variables[[1,2]]]]||(modeltype=="DiscreteTime"&&modelperiod=!=0))&&time===t),
 	res=Eigenvalues[ListMultiplier[Table[j[t\[Prime]],{t\[Prime],j["Times"]}]]]
 ,
 	(* ContinousTime cycle *)
-	variables!={}&&((variables[[1,2,0]]===InterpolatingFunction||(modeltype=="ContinousTime"&&modelperiod=!=0))&&time===t),
+	variables!={}&&((Head[variables[[1,2]]]===InterpolatingFunction||(modeltype=="ContinousTime"&&modelperiod=!=0))&&time===t),
 	dim=Length[j];
 	per=FinalTime[variables];
 	xsol=NDSolve[{x'[t]==j . x[t],x[0]==IdentityMatrix[dim]},x,{t,0,per},Sequence@@ndsolveopts][[1]];
@@ -9759,7 +9779,7 @@ If[TemporalRuleListQ[sol]&&time===t, (* temporal dynamics *)
 		];
 		If[InterpolatingFunctionFunctionQ[sol],
 			dat=Table[Subscript[gu, sp][t]/.sol,{sp,Subscript[\[ScriptCapitalN], gu]},{t,tmin,tmax,(tmax-tmin)/plotpoints}],
-			dat=Table[(Subscript[gu, sp]/.sol)["Values"],{sp,Subscript[\[ScriptCapitalN], gu]}]
+			dat=Table[Normal[(Subscript[gu, sp]/.sol)["Values"]],{sp,Subscript[\[ScriptCapitalN], gu]}]
 		];		
 		res=ArrayPlot[Reverse@dat,Evaluate[Sequence@@arrayplotopts],DataRange->{{tmin,tmax},traitrange},FrameLabel->framelabel]
 	,
@@ -9800,10 +9820,10 @@ If[plotstyle===Automatic,
 	,
 		If[species=!=None,
 			plotstyle=Table[If[i==species,
-				Directive[Thick,Color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]]],
-				Directive[Thin,Color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]]]
+				Directive[Thick,Color[Subscript[If[tr===None,First[gcomps[gu]],tr], 1]][SpFrac[i,\[ScriptCapitalN][gu]]]],
+				Directive[Thin,Color[Subscript[If[tr===None,First[gcomps[gu]],tr], 1]][SpFrac[i,\[ScriptCapitalN][gu]]]]
 			],{i,Subscript[\[ScriptCapitalN], gu]}],
-			plotstyle=Table[Color[Subscript[gu, 1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}]
+			plotstyle=Table[Color[Subscript[If[tr===None,First[gcomps[gu]],tr], 1]][SpFrac[i,\[ScriptCapitalN][gu]]],{i,Subscript[\[ScriptCapitalN], gu]}]
 		];
 	];
 ];
@@ -10447,14 +10467,14 @@ VPrint[3,"qssunks=",qssunks];
 (* decide on mode *)
 
 Which[
-	(modelperiod==0&&(Length[sol]==0||!MemberQ[{InterpolatingFunction,TemporalData},Head[sol[[1,2]]]]))
+	(modelperiod==0&&(Length[sol]==0||!MemberQ[{InterpolatingFunction,TemporalData,TimeSeries},Head[sol[[1,2]]]]))
 	||(modelperiod=!=0&&(method==="Instantaneous"||time=!=t)),
 	mode="eigenvalue",
 	modeltype=="ContinuousTime"&&
 	((modelperiod=!=0&&method=!="Instantaneous"&&time===t)||(Length[sol]>0&&Head[sol[[1,2]]]===InterpolatingFunction)),
 	mode="continuoustime floquet",
 	modeltype=="DiscreteTime"&&
-	((modelperiod=!=0&&method=!="Instantaneous"&&time===t)||(Length[sol]>0&&Head[sol[[1,2]]]===TemporalData)),
+	((modelperiod=!=0&&method=!="Instantaneous"&&time===t)||(Length[sol]>0&&MemberQ[{TemporalData,TimeSeries},Head[sol[[1,2]]]])),
 	mode="discretetime floquet"
 ];
 VPrint[3,"mode=",mode];
@@ -10561,7 +10581,7 @@ Which[
 	VPrint[1,"DiscreteTime Floquet mode"];
 
 	(* figure out time range *)
-	If[Head[sol[[1,2]]]===TemporalData,
+	If[MemberQ[{TemporalData,TimeSeries},Head[sol[[1,2]]]],
 		{tstart,tend}={InitialTime[sol],FinalTime[sol]},
 		{tstart,tend}={0,modelperiod}
 	];
