@@ -40,7 +40,7 @@ resaves may change whitespace; top-level Null expressions introduced by
 package-export formatting are ignored in that comparison.
 Future code changes require a new reviewed manifest and tests.
 
-## Publication status
+## Publication
 
 The local `PacletSite.m` and `PacletSite.mz` advertise 1.7.2.1 and preserve all
 19 previous release entries. Their catalog contents are identical, and the
@@ -54,10 +54,21 @@ Needs["PacletManager`"];
 PacletManager`BuildPacletSiteFiles[Directory[]]
 ```
 
-Publication remains a separate step. The public site's `master` update needs
-only `Paclets/EcoEvo-1.7.2.1.paclet`, `PacletSite.m`, and `PacletSite.mz` from
-this branch. The maintenance source branch can be tagged separately for the
-GitHub release. No tag, remote push, GitHub release, cloud-document publication,
-or package installation has been performed here. The historical
-`finish paclet.wl` is retained; use the maintenance commands above for this
-build rather than its full development/documentation workflow.
+The maintenance source is on `codex/release-1.7.2.1`, tagged `1.7.2.1`.
+The separate `codex/publish-1.7.2.1` branch starts at the public site's
+`master` and adds only `Paclets/EcoEvo-1.7.2.1.paclet`, `PacletSite.m`, and
+`PacletSite.mz`. Publish both branches and the tag, then merge the three-file
+catalog update into `master`. Keep the maintenance source branch separate
+from the development sources on `master`.
+
+Create a GitHub release for tag `1.7.2.1`, use `ReleaseNotes.md` for its
+description, and attach the checked-in `Paclets/EcoEvo-1.7.2.1.paclet`.
+The archive's SHA-256 must be
+`e85548e256a52454cd148dbc46dcb86b26f8f7bce3202bbc4ee0d819782ef600`.
+After publication, verify both the release download and the catalog download
+against this checksum. `verification.json` records local validation before
+publication; it is not evidence of a remote push or public installation.
+
+The historical `finish paclet.wl` is retained; use the maintenance commands
+above for this build rather than its full development/documentation workflow.
+Cloud documentation publication is a separate task.
